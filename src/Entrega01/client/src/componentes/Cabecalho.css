@@ -1,0 +1,178 @@
+@import url('https://fonts.googleapis.com/css2?family=Abyssinica+SIL&display=swap');
+
+.cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 72px;
+  padding: 0 2%;
+
+}
+
+.cabecalho-esquerda {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.icone-menu {
+  color: white;
+  cursor: pointer;
+}
+
+.botao-menu {
+  background: none;
+  border: none;
+  color: white;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 0;
+  transition: 0.3s;
+}
+
+.botao-menu:hover {
+  color: #916FBE;
+}
+
+.logo {
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.logo span {
+  background: linear-gradient(135deg,
+      #FFFFFF 0%,
+      #916FBE 40%,
+      #732DC5 70%,
+      #4800EF 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.menu {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+}
+
+.menu a {
+  color: white;
+  text-decoration: none;
+  font-size: 14px;
+  font-family: 'Abyssinica SIL', serif;
+}
+
+.link-servicos {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.servicos-menu {
+  position: relative;
+}
+
+.dropdown-servicos {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #1f082e;
+  padding: 10px;
+  border-radius: 7px;
+  min-width: 180px;
+  z-index: 10;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.servicos-menu:hover .dropdown-servicos {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dropdown-servicos a {
+  padding: 8px 10px;
+  border-radius: 5px;
+  transition: 0.3s;
+}
+
+.dropdown-servicos a:hover {
+  background: #732DC5;
+  color: white;
+}
+
+.menu .ativo {
+  color: #8b3dff;
+}
+
+.menu .botao-entrar {
+  background: #7b2dd1;
+  padding: 9px 22px;
+  border-radius: 7px;
+  transition: 0.3s;
+}
+
+.menu .botao-entrar:hover {
+  transform: translateY(-2px);
+}
+
+.botao-perfil {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.botao-perfil:hover {
+  transform: translateY(-2px);
+  color: #916FBE;
+}
+
+.botao-entrar + .botao-perfil {
+  margin-left: -20px;
+}
+
+.menu-lateral {
+  position: absolute;
+  top: 72px;
+  left: 0;
+  width: 250px;
+  height: calc(100vh - 72px);
+  background: #170025;
+  box-shadow: 6px 0 20px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  padding: 30px;
+  gap: 25px;
+  z-index: 20;
+  animation: abrirMenu 0.3s ease;
+}
+
+@keyframes abrirMenu {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+.menu-lateral a {
+  color: white;
+  text-decoration: none;
+  font-family: 'Abyssinica SIL', serif;
+  transition: 0.3s;
+}
+
+.menu-lateral a:hover {
+  color: #916FBE;
+  transform: translateX(5px);
+}
+
