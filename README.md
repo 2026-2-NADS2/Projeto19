@@ -14,7 +14,7 @@ Vide tutoriais do PI.
 
 ## Sintonia Tech
 
-## Integrantes: <a href="https://www.linkedin.com/in/victorbarq/">Goku Sayajin</a>, <a href="https://www.linkedin.com/in/victorbarq/">Saitama One</a>, <a href="https://www.linkedin.com/in/victorbarq/">Ikki de Fenix</a>, <a href="https://www.linkedin.com/in/victorbarq/">Yusuke Urameshi</a>, <a href="https://www.linkedin.com/in/victorbarq/">Roronoa Zoro</a>
+## Integrantes: <a href="https://www.linkedin.com/in/victorbarq/">Douglas Silva Gadelha Macario</a>, <a href="https://www.linkedin.com/in/victorbarq/">Eric Carvalho</a>, <a href="https://www.linkedin.com/in/victorbarq/">Gabriel Vaz Ferreira Neves</a>, <a href="https://www.linkedin.com/in/victorbarq/">Gustavo Cocoloti Melo</a>
 
 ## Professores Orientadores: <a href="https://www.linkedin.com/in/adriano-valente-534576135/" target="_blank" rel="noopener noreferrer"> Adriano Felix Valente </a>, <a href="https://www.linkedin.com/in/eduardo-savino-gomes-77833a10/" target="_blank" rel="noopener noreferrer"> Eduardo Savino Gomes </a>, <a href="https://www.linkedin.com/in/francisco-escobar/" target="_blank" rel="noopener noreferrer"> Francisco de Souza Escobar </a>, <a href="https://www.linkedin.com/in/jbuesso/" target="_blank" rel="noopener noreferrer"> José Carlos Buesso Jr </a>, <a href="https://www.linkedin.com/in/ronaldo-araujo-pinto-3542811a/" target="_blank" rel="noopener noreferrer"> Ronaldo Araujo Pinto </a>
 
