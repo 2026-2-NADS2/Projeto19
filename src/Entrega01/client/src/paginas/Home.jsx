@@ -1,7 +1,7 @@
-import { Link } from 'react-router-dom'
 import notebook from '../assets/home-notebook.png'
 import './Home.css'
 import Cabecalho from '../componentes/Cabecalho.jsx'
+import { Link } from 'react-router-dom'
 
 function Home() {
   return (
@@ -11,14 +11,19 @@ function Home() {
       <main className="conteudo-home">
         <div className="texto-home">
           <h1>
-            Transformando o Futuro com <span>KFKA</span>
+            Transformando a Educação com <span>KFKA</span>
           </h1>
+
           <p>
-            Inovação, Eficiência e Soluções Sob Medida para o Seu Negócio.
+            Conectando escola e responsáveis para acompanhar de perto
+            o desenvolvimento de cada aluno.
           </p>
 
           <div className="botoes-home">
-            <button>Saiba Mais</button>
+            <Link to="/sobre-plataforma" className="botao-saiba-mais">
+              Saiba Mais
+            </Link>
+
             <Link to="/login" className="botao-plataforma">
               Acessar Plataforma
             </Link>
@@ -26,7 +31,11 @@ function Home() {
         </div>
 
         <div className="area-imagem">
-          <img className="imagem-home" src={notebook} alt="Notebook" />
+          <img
+            className="imagem-home"
+            src={notebook}
+            alt="Plataforma escolar KFKA"
+          />
         </div>
       </main>
     </div>

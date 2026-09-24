@@ -1,0 +1,124 @@
+@import url('https://fonts.googleapis.com/css2?family=Abyssinica+SIL&family=Alexandria:wght@400;500;600;700&family=Amethysta&display=swap');
+
+/* Página inteira */
+.sobre-nos {
+  min-height: 100vh;
+  background: linear-gradient(
+    135deg,
+    #170025 0%,
+    #2b0754 55%,
+    #4800EF 100%
+  );
+  color: white;
+}
+
+/* Conteúdo principal */
+.conteudo-sobre {
+  display: flex;
+  min-height: calc(100vh - 72px);
+  padding: 60px 8%;
+  gap: 80px;
+}
+
+/* Divide a página em dois lados */
+.lado-esquerdo-sobre,
+.lado-direito-sobre {
+  width: 50%;
+}
+
+/* ===== LADO ESQUERDO ===== */
+
+.lado-esquerdo-sobre h1 {
+  font-family: 'Alexandria', sans-serif;
+  font-size: 64px;
+  line-height: 1.05;
+  font-weight: 600;
+}
+
+.lado-esquerdo-sobre h1 span {
+  color: #916FBE;
+}
+
+.lado-esquerdo-sobre p {
+  max-width: 480px;
+  margin-top: 35px;
+  font-family: 'Amethysta', serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #B8A7CE;
+}
+
+/* ===== LADO DIREITO ===== */
+
+.lado-direito-sobre {
+  padding-top: 15px;
+}
+
+.subtitulo-metodo {
+  font-family: 'Alexandria', sans-serif;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: #A659FF;
+  margin-bottom: 15px;
+}
+
+.lado-direito-sobre h2 {
+  font-family: 'Alexandria', sans-serif;
+  font-size: 40px;
+  font-weight: 500;
+}
+
+.lado-direito-sobre h2 span {
+  color: #916FBE;
+}
+
+.descricao-metodo {
+  margin-top: 10px;
+  margin-bottom: 35px;
+  font-family: 'Amethysta', serif;
+  color: #B8A7CE;
+}
+
+/* Área dos quatro cards */
+.cards-metodo {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+
+/* Cada card */
+.card-metodo {
+  min-height: 180px;
+  padding: 22px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(184, 167, 206, 0.25);
+  border-radius: 10px;
+  transition: 0.3s;
+}
+
+.card-metodo:hover {
+  transform: translateY(-4px);
+  border-color: #916FBE;
+}
+
+/* Número 01, 02, 03, 04 */
+.numero-card {
+  display: block;
+  font-family: 'Alexandria', sans-serif;
+  font-size: 14px;
+  color: #A659FF;
+  margin-bottom: 18px;
+}
+
+.card-metodo h3 {
+  font-family: 'Alexandria', sans-serif;
+  font-size: 19px;
+  margin-bottom: 12px;
+}
+
+.card-metodo p {
+  font-family: 'Amethysta', serif;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #B8A7CE;
+}

@@ -2,11 +2,13 @@
 
 .home {
     min-height: 100vh;
-    font-family: Arial, sans-serif;
-    background: #170025;
+    background: linear-gradient(135deg,
+            #170025 0%,
+            #2b0754 55%,
+            #4800EF 100%);
 }
 
-.botoes-home button,
+.botoes-home .botao-saiba-mais,
 .botoes-home .botao-plataforma {
     width: 180px;
     height: 44px;
@@ -27,21 +29,20 @@
 }
 
 .area-imagem {
-  width: 45%;
-  align-self: stretch;
-  position: relative;
-  overflow: hidden;
-}
+    width: 45%;
+    align-self: stretch;
+    position: relative;
+    overflow: hidden;
 
-.area-imagem::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 18%;
-  height: 100%;
-  background: linear-gradient(to right, #170025, transparent);
-  z-index: 1;
+    mask-image: linear-gradient(to right,
+            transparent 0%,
+            black 30%,
+            black 100%);
+
+    -webkit-mask-image: linear-gradient(to right,
+            transparent 0%,
+            black 30%,
+            black 100%);
 }
 
 .texto-home {
@@ -75,12 +76,14 @@
     margin-top: 25px;
 }
 
-.botoes-home button:first-child {
+.botao-saiba-mais {
     background: #732DC5;
     color: white;
     border: none;
     border-radius: 7px;
     cursor: pointer;
+    text-decoration: none;
+    transition: 0.3s;
 }
 
 .botao-plataforma {
@@ -101,7 +104,7 @@
     transition: 0.3s;
 }
 
-.botoes-home button:hover {
+.botao-saiba-mais:hover {
     transform: translateY(-2px);
 }
 

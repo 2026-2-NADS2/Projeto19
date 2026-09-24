@@ -1,0 +1,282 @@
+@import url('https://fonts.googleapis.com/css2?family=Abyssinica+SIL&family=Alexandria:wght@400;500;600;700&family=Amethysta&display=swap');
+
+/* Página */
+
+.pagina-login {
+  display: flex;
+  min-height: 100vh;
+  color: white;
+
+  background: linear-gradient(
+    135deg,
+    #170025 0%,
+    #2b0754 55%,
+    #4800EF 100%
+  );
+}
+
+/* Lado esquerdo */
+
+.login-esquerda {
+  width: 47%;
+  min-height: 100vh;
+
+  background: linear-gradient(
+    135deg,
+    #732DC5 0%,
+    #5b19b5 45%,
+    #2b0754 100%
+  );
+
+  display: flex;
+  justify-content: center;
+  padding-top: 80px;
+
+  border-right: 1px solid rgba(237, 227, 251, 0.25);
+}
+
+.conteudo-login-esquerda {
+  width: 65%;
+}
+
+.conteudo-login-esquerda h2 {
+  font-family: 'Alexandria', sans-serif;
+  font-size: 30px;
+  font-weight: 700;
+  margin-bottom: 25px;
+}
+
+.conteudo-login-esquerda h1 {
+  font-family: 'Alexandria', sans-serif;
+  font-size: 56px;
+  line-height: 1.08;
+  font-weight: 400;
+}
+
+.conteudo-login-esquerda h1 span {
+  color: #170025;
+  font-weight: 600;
+}
+
+.conteudo-login-esquerda p {
+  margin-top: 25px;
+  font-family: 'Amethysta', serif;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #EDE3FB;
+}
+
+/* Lado direito */
+
+.login-direita {
+  width: 53%;
+  min-height: 100vh;
+
+  background: linear-gradient(
+    135deg,
+    #170025 0%,
+    #2b0754 60%,
+    #4800EF 100%
+  );
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Formulário */
+
+.formulario-login {
+  width: 410px;
+  padding: 35px;
+
+  background: linear-gradient(
+    135deg,
+    rgba(23, 0, 37, 0.75),
+    rgba(72, 0, 239, 0.18)
+  );
+
+  border: 1px solid rgba(184, 167, 206, 0.22);
+  border-radius: 18px;
+
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+}
+
+.formulario-login h1 {
+  font-family: 'Alexandria', sans-serif;
+  font-size: 28px;
+  font-weight: 400;
+  margin-bottom: 5px;
+}
+
+.subtitulo-login {
+  font-family: 'Amethysta', serif;
+  font-size: 14px;
+  color: #B8A7CE;
+  margin-bottom: 30px;
+}
+
+/* Labels */
+
+.formulario-login > label {
+  display: block;
+  margin-bottom: 8px;
+
+  font-family: 'Amethysta', serif;
+  font-size: 14px;
+  color: #EDE3FB;
+}
+
+/* Inputs */
+
+.campo-login {
+  width: 100%;
+  height: 45px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 0 15px;
+  margin-bottom: 25px;
+
+  background: linear-gradient(
+    90deg,
+    rgba(115, 45, 197, 0.8),
+    rgba(43, 7, 84, 0.85)
+  );
+
+  border: 1px solid rgba(145, 111, 190, 0.35);
+  border-radius: 20px;
+
+  color: #B8A7CE;
+  transition: 0.3s;
+}
+
+.campo-login:focus-within {
+  border-color: #A659FF;
+  box-shadow: 0 0 15px rgba(166, 89, 255, 0.3);
+}
+
+.campo-login input {
+  flex: 1;
+  height: 100%;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+  color: white;
+
+  font-family: 'Amethysta', serif;
+  font-size: 14px;
+}
+
+/* Opções */
+
+.opcoes-login {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-top: -15px;
+  margin-bottom: 25px;
+
+  font-family: 'Amethysta', serif;
+  font-size: 12px;
+}
+
+.lembrar-login {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #B8A7CE;
+}
+
+.opcoes-login a {
+  color: #916FBE;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.opcoes-login a:hover {
+  color: #A659FF;
+}
+
+/* Erro */
+
+.erro-login {
+  color: #EDE3FB;
+  font-family: 'Amethysta', serif;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+/* Botões */
+
+.botao-login,
+.botao-cadastro {
+  width: 100%;
+  height: 42px;
+
+  border: none;
+  border-radius: 12px;
+
+  color: white;
+  cursor: pointer;
+
+  font-family: 'Abyssinica SIL', serif;
+  transition: 0.3s;
+}
+
+.botao-login {
+  background: linear-gradient(
+    90deg,
+    #4800EF,
+    #732DC5,
+    #A659FF
+  );
+}
+
+.botao-cadastro {
+  background: linear-gradient(
+    90deg,
+    #2b0754,
+    #732DC5
+  );
+}
+
+.botao-login:hover,
+.botao-cadastro:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.15);
+}
+
+/* Ou */
+
+.ou-login {
+  text-align: center;
+  margin: 15px 0;
+
+  font-family: 'Amethysta', serif;
+  font-size: 12px;
+  color: #B8A7CE;
+}
+
+/* Responsividade */
+
+@media (max-width: 850px) {
+  .login-esquerda {
+    display: none;
+  }
+
+  .login-direita {
+    width: 100%;
+    padding: 30px;
+  }
+
+  .formulario-login {
+    width: 100%;
+    max-width: 410px;
+  }
+}
