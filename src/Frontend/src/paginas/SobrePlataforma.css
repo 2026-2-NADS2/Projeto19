@@ -1,5 +1,351 @@
+@import url('https://fonts.googleapis.com/css2?family=Abyssinica+SIL&family=Alexandria:wght@400;500;600;700&family=Amethysta&display=swap');
+
+/* Página */
+
 .sobre-plataforma {
   min-height: 100vh;
-  background: #170025;
-  color: white;
+
+  color: #ffffff;
+
+  background: linear-gradient(135deg,
+      #170025 0%,
+      #2b0754 55%,
+      #4800EF 100%);
+}
+
+/* Conteúdo */
+
+.conteudo-plataforma {
+  display: flex;
+
+  min-height: calc(100vh - 72px);
+
+  padding: 60px 8%;
+
+  gap: 80px;
+}
+
+.lado-esquerdo-plataforma,
+.lado-direito-plataforma {
+  width: 50%;
+}
+
+/* Lado esquerdo */
+
+.lado-esquerdo-plataforma {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.plataforma-etiqueta {
+  margin: 0 0 18px;
+
+  color: #A659FF;
+
+  font-family: 'Alexandria', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+
+  letter-spacing: 2px;
+}
+
+.lado-esquerdo-plataforma h1 {
+  margin: 0;
+
+  font-family: 'Alexandria', sans-serif;
+  font-size: 64px;
+  line-height: 1.05;
+  font-weight: 600;
+}
+
+.lado-esquerdo-plataforma h1 span {
+  color: #916FBE;
+}
+
+.plataforma-descricao {
+  max-width: 500px;
+
+  margin-top: 35px;
+
+  color: #B8A7CE;
+
+  font-family: 'Amethysta', serif;
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+/* Fluxo */
+
+.fluxo-plataforma {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+
+  gap: 10px;
+
+  margin-top: 28px;
+}
+
+.fluxo-plataforma span {
+  padding: 8px 12px;
+
+  color: #EDE3FB;
+
+  background: rgba(115, 45, 197, 0.18);
+
+  border: 1px solid rgba(184, 167, 206, 0.22);
+  border-radius: 7px;
+
+  font-family: 'Alexandria', sans-serif;
+  font-size: 11px;
+}
+
+.fluxo-plataforma strong {
+  color: #A659FF;
+
+  font-size: 15px;
+  font-weight: 400;
+}
+
+/* Lado direito */
+
+.lado-direito-plataforma {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  padding-top: 15px;
+}
+
+.subtitulo-plataforma {
+  margin: 0 0 15px;
+
+  color: #A659FF;
+
+  font-family: 'Alexandria', sans-serif;
+  font-size: 12px;
+
+  letter-spacing: 2px;
+}
+
+.lado-direito-plataforma h2 {
+  margin: 0;
+
+  font-family: 'Alexandria', sans-serif;
+  font-size: 40px;
+  font-weight: 500;
+}
+
+.lado-direito-plataforma h2 span {
+  color: #916FBE;
+}
+
+.descricao-plataforma {
+  max-width: 620px;
+
+  margin-top: 10px;
+  margin-bottom: 35px;
+
+  color: #B8A7CE;
+
+  font-family: 'Amethysta', serif;
+  line-height: 1.6;
+}
+
+/* Cards */
+
+.cards-plataforma {
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 15px;
+}
+
+.card-plataforma {
+  min-height: 190px;
+
+  padding: 22px;
+
+  background: rgba(255, 255, 255, 0.08);
+
+  border: 1px solid rgba(184, 167, 206, 0.25);
+  border-radius: 10px;
+
+  transition: 0.3s;
+}
+
+.card-plataforma:hover {
+  transform: translateY(-4px);
+
+  border-color: #916FBE;
+}
+
+.numero-plataforma {
+  display: block;
+
+  margin-bottom: 18px;
+
+  color: #A659FF;
+
+  font-family: 'Alexandria', sans-serif;
+  font-size: 14px;
+}
+
+.card-plataforma h3 {
+  margin: 0 0 12px;
+
+  font-family: 'Alexandria', sans-serif;
+  font-size: 19px;
+}
+
+.card-plataforma p {
+  margin: 0;
+
+  color: #B8A7CE;
+
+  font-family: 'Amethysta', serif;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* Responsividade */
+
+/* Responsividade */
+
+@media (max-width: 768px) {
+
+  .conteudo-plataforma {
+    flex-direction: column;
+
+    min-height: auto;
+
+    padding: 45px 22px 60px;
+
+    gap: 50px;
+  }
+
+  .lado-esquerdo-plataforma,
+  .lado-direito-plataforma {
+    width: 100%;
+  }
+
+  /* Título principal */
+
+  .plataforma-etiqueta {
+    margin-bottom: 14px;
+
+    font-size: 10px;
+  }
+
+  .lado-esquerdo-plataforma h1 {
+    font-size: 40px;
+    line-height: 1.08;
+  }
+
+  .plataforma-descricao {
+    max-width: 100%;
+
+    margin-top: 24px;
+
+    font-size: 14px;
+    line-height: 1.65;
+  }
+
+  /* Fluxo */
+
+  .fluxo-plataforma {
+    gap: 7px;
+
+    margin-top: 24px;
+  }
+
+  .fluxo-plataforma span {
+    padding: 7px 9px;
+
+    font-size: 9px;
+  }
+
+  .fluxo-plataforma strong {
+    font-size: 12px;
+  }
+
+  /* Parte dos perfis */
+
+  .lado-direito-plataforma {
+    padding-top: 0;
+  }
+
+  .subtitulo-plataforma {
+    margin-bottom: 12px;
+
+    font-size: 10px;
+  }
+
+  .lado-direito-plataforma h2 {
+    font-size: 30px;
+    line-height: 1.15;
+  }
+
+  .descricao-plataforma {
+    margin-top: 12px;
+    margin-bottom: 25px;
+
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* Cards */
+
+  .cards-plataforma {
+    grid-template-columns: 1fr;
+
+    gap: 12px;
+  }
+
+  .card-plataforma {
+    min-height: auto;
+
+    padding: 20px;
+  }
+
+  .numero-plataforma {
+    margin-bottom: 12px;
+
+    font-size: 12px;
+  }
+
+  .card-plataforma h3 {
+    margin-bottom: 8px;
+
+    font-size: 18px;
+  }
+
+  .card-plataforma p {
+    font-size: 13px;
+  }
+}
+
+/* Celulares menores */
+
+@media (max-width: 420px) {
+
+  .conteudo-plataforma {
+    padding: 38px 18px 50px;
+
+    gap: 42px;
+  }
+
+  .lado-esquerdo-plataforma h1 {
+    font-size: 36px;
+  }
+
+  .lado-direito-plataforma h2 {
+    font-size: 27px;
+  }
+
+  .fluxo-plataforma {
+    flex-wrap: wrap;
+  }
 }

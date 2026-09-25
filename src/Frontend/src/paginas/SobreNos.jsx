@@ -9,61 +9,76 @@ function SobreNos() {
       <main className="conteudo-sobre">
 
         <section className="lado-esquerdo-sobre">
+          <p className="sobre-etiqueta">
+            SOBRE NÓS
+          </p>
+
           <h1>
-            Tecnologia<br />
-            que <span>aproxima</span><br />
-            escola e<br />
-            família.
+            Ideias que<br />
+            <span>conectam</span><br />
+            educação e<br />
+            tecnologia.
           </h1>
 
-          <p>
-            A KFKA oferece uma plataforma voltada ao acompanhamento escolar,
-            facilitando a comunicação entre professores, responsáveis e
-            administradores e tornando as avaliações dos alunos mais
-            acessíveis e organizadas.
+          <p className="sobre-descricao">
+            A KFKA nasceu como um projeto acadêmico com o propósito
+            de explorar como a tecnologia pode contribuir para uma
+            relação mais próxima entre escola e família.
           </p>
         </section>
 
         <section className="lado-direito-sobre">
+
           <p className="subtitulo-metodo">
-            • NOSSA PLATAFORMA •
+            • NOSSO PROPÓSITO •
           </p>
 
           <h2>
-            Uma plataforma, <span>3 perfis</span>
+            Tecnologia com <span>propósito</span>
           </h2>
 
           <p className="descricao-metodo">
-            Cada perfil possui recursos pensados para sua função no ambiente escolar.
+            Desenvolvemos a KFKA pensando em uma experiência simples,
+            organizada e acessível para o ambiente escolar.
           </p>
 
           <div className="cards-metodo">
 
-            <div className="card-metodo">
+            <article className="card-metodo">
               <span className="numero-card">01</span>
-              <h3>Responsável</h3>
-              <p>
-                Acompanha avaliações, desempenho e informações do aluno.
-              </p>
-            </div>
 
-            <div className="card-metodo">
+              <h3>Conexão</h3>
+
+              <p>
+                Aproximar escola e família por meio de uma
+                comunicação mais clara e organizada.
+              </p>
+            </article>
+
+            <article className="card-metodo">
               <span className="numero-card">02</span>
-              <h3>Professor</h3>
-              <p>
-                Registra avaliações e acompanha o desenvolvimento dos alunos.
-              </p>
-            </div>
 
-            <div className="card-metodo">
-              <span className="numero-card">03</span>
-              <h3>Administrador</h3>
+              <h3>Simplicidade</h3>
+
               <p>
-                Gerencia usuários, turmas e informações da plataforma.
+                Criar uma experiência intuitiva para os diferentes
+                usuários da plataforma.
               </p>
-            </div>
+            </article>
+
+            <article className="card-metodo">
+              <span className="numero-card">03</span>
+
+              <h3>Organização</h3>
+
+              <p>
+                Centralizar informações importantes do acompanhamento
+                escolar em um único ambiente.
+              </p>
+            </article>
 
           </div>
+
         </section>
 
       </main>

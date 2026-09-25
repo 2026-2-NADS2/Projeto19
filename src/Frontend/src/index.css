@@ -7,3 +7,22 @@
 body {
   margin: 0;
 }
+
+/* Acessibilidade - navegação por teclado */
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid #A659FF;
+  outline-offset: 3px;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
