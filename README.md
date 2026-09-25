@@ -33,17 +33,23 @@ O KFKA reúne essas informações em um único ambiente, organizado de acordo co
 
 ## 🛠 Estrutura de pastas
 
+text
 Projeto19/
+│
 ├── documentos/
-│   ├── Entrega_1/
-│   ├── Banco_de_Dados.pdf
-│   └── Design_de_Interface_Digital.pdf
+│   └── Entrega_1/
+│       ├── Banco_de_Dados.pdf
+│       └── Design_de_Interface_Digital.pdf
+│
 ├── imagens/
+│
 ├── src/
-│   ├── Entrega_1/
-│   ├── Estrutura_de_Dados/
-│   ├── FullStack/
-│   └── POO/
+│   └── Entrega_1/
+│       ├── Estrutura_de_Dados/
+│       ├── FullStack/
+│       │   └── iniciar.bat
+│       └── POO/
+│
 ├── .gitignore
 └── README.md
 
