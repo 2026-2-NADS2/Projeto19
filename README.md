@@ -25,7 +25,8 @@ Vide tutoriais do PI.
 </p>
 
 <br><br>
-O KFKA facilita a comunicação entre escola e responsável, permitindo acompanhar informações e o desenvolvimento dos alunos de forma centralizada e organizada.
+O KFKA é uma plataforma digital desenvolvida para facilitar o acompanhamento escolar de estudantes do Ensino Fundamental, centralizando o registro e o compartilhamento de informações acadêmicas. Ao final de cada bimestre, os professores podem inserir as médias dos alunos, tags de acompanhamento e observações qualitativas sobre seu desempenho e evolução. Antes da publicação, os registros passam pela análise da gestão escolar, que pode revisar, ajustar, devolver para correção ou aprovar as informações.
+Após a aprovação, os responsáveis têm acesso exclusivo aos relatórios dos alunos vinculados aos seus perfis, podendo acompanhar seu desempenho de forma simples e organizada. A plataforma também permite gerar e baixar os relatórios em formato Excel, contribuindo para um melhor gerenciamento dos dados. Dessa forma, o KFKA integra professores, gestão escolar e famílias em um único ambiente, facilitando a comunicação e fortalecendo o acompanhamento pedagógico.
 <br><br>
 O KFKA reúne essas informações em um único ambiente, organizado de acordo com o perfil de cada usuário.
 <br><br>
