@@ -32,20 +32,24 @@ O KFKA reúne essas informações em um único ambiente, organizado de acordo co
 
 ## 🛠 Estrutura de pastas
 
--Raiz<br>
-|<br>
-|-->documentos<br>
-  &emsp;|-->antigos<br>
-  &emsp;|Documentação.docx<br>
-|-->executáveis<br>
-  &emsp;|-->windows<br>
-  &emsp;|-->android<br>
-  &emsp;|-->HTML<br>
-|-->imagens<br>
-|-->src<br>
-  &emsp;|-->Backend<br>
-  &emsp;|-->Frontend<br>
-|readme.md<br>
+text
+Projeto19/
+│
+├── documentos/
+│   └── Entrega_1/
+│       ├── Banco_de_Dados.pdf
+│       └── Design_de_Interface_Digital.pdf
+│
+├── imagens/
+│
+├── src/
+│   └── Entrega_1/
+│       ├── Estrutura_de_Dados/
+│       ├── FullStack/
+│       └── POO/
+│
+├── .gitignore
+└── README.md
 
 A pasta raiz contem dois arquivos que devem ser alterados:
 
