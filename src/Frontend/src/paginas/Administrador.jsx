@@ -36,6 +36,26 @@ function Administrador() {
     carregarAlunos()
   }, [])
 
+  function publicarAcompanhamento(id) {
+    setAlunos((alunosAtuais) =>
+      alunosAtuais.map((aluno) =>
+        aluno.id === id
+          ? { ...aluno, status: 'Publicado' }
+          : aluno
+      )
+    )
+  }
+
+  function devolverAcompanhamento(id) {
+    setAlunos((alunosAtuais) =>
+      alunosAtuais.map((aluno) =>
+        aluno.id === id
+          ? { ...aluno, status: 'Devolvido' }
+          : aluno
+      )
+    )
+  }
+
   const enviados = alunos.filter(
     (aluno) => aluno.status === 'Enviado'
   ).length
@@ -101,7 +121,7 @@ function Administrador() {
 
         <Link to="/" className="admin-voltar">
           <ArrowLeft size={18} />
-          Voltar
+          Voltar ao início
         </Link>
 
         <header className="admin-topo">
@@ -191,6 +211,7 @@ function Administrador() {
                   <th>Disciplina</th>
                   <th>Bimestre</th>
                   <th>Status</th>
+                  <th>Ações</th>
                 </tr>
               </thead>
 
@@ -212,6 +233,32 @@ function Administrador() {
                       <span className="admin-badge">
                         {aluno.status}
                       </span>
+                    </td>
+
+                    <td>
+                      <div className="admin-acoes">
+
+                        <button
+                          type="button"
+                          className="admin-publicar"
+                          onClick={() =>
+                            publicarAcompanhamento(aluno.id)
+                          }
+                        >
+                          Publicar
+                        </button>
+
+                        <button
+                          type="button"
+                          className="admin-devolver"
+                          onClick={() =>
+                            devolverAcompanhamento(aluno.id)
+                          }
+                        >
+                          Devolver
+                        </button>
+
+                      </div>
                     </td>
 
                   </tr>

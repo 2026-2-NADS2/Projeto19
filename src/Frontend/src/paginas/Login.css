@@ -1,19 +1,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Abyssinica+SIL&family=Alexandria:wght@400;500;600;700&family=Amethysta&display=swap');
 
+
 /* Página */
 
 .pagina-login {
   display: flex;
   min-height: 100vh;
-  color: white;
 
-  background: linear-gradient(
-    135deg,
-    #170025 0%,
-    #2b0754 55%,
-    #4800EF 100%
-  );
+  color: #ffffff;
+
+  background: linear-gradient(135deg,
+      #170025 0%,
+      #2b0754 55%,
+      #4800EF 100%);
 }
+
 
 /* Lado esquerdo */
 
@@ -21,50 +22,126 @@
   width: 47%;
   min-height: 100vh;
 
-  background: linear-gradient(
-    135deg,
-    #732DC5 0%,
-    #5b19b5 45%,
-    #2b0754 100%
-  );
+  position: relative;
+  overflow: hidden;
 
   display: flex;
+  align-items: center;
   justify-content: center;
-  padding-top: 80px;
 
-  border-right: 1px solid rgba(237, 227, 251, 0.25);
+  background:
+    radial-gradient(circle at 15% 20%,
+      rgba(145, 111, 190, 0.18),
+      transparent 38%),
+    radial-gradient(circle at 85% 85%,
+      rgba(115, 45, 197, 0.20),
+      transparent 42%),
+    linear-gradient(145deg,
+      #170025 0%,
+      #26063f 45%,
+      #321056 72%,
+      #2b0754 100%);
+
+  border-right: 1px solid rgba(237, 227, 251, 0.15);
 }
 
-.conteudo-login-esquerda {
-  width: 65%;
-}
 
-.conteudo-login-esquerda h2 {
+/* Logo */
+
+.login-logo {
+  position: absolute;
+
+  top: 70px;
+  left: 12%;
+
+  margin: 0;
+
+  color: #ffffff;
+
   font-family: 'Alexandria', sans-serif;
   font-size: 30px;
   font-weight: 700;
-  margin-bottom: 25px;
+
+  letter-spacing: -1px;
 }
+
+
+/* F colorido da logo */
+
+.login-logo span {
+  background: linear-gradient(135deg,
+      #ffffff 0%,
+      #916FBE 40%,
+      #732DC5 70%,
+      #4800EF 100%);
+
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  color: transparent;
+}
+
+
+/* Conteúdo esquerdo */
+
+.conteudo-login-esquerda {
+  position: relative;
+  z-index: 1;
+
+  width: 76%;
+  max-width: 680px;
+
+  transform: translateY(-10px);
+}
+
+
+/* Título */
 
 .conteudo-login-esquerda h1 {
+  margin: 0;
+
+  color: #ffffff;
+
   font-family: 'Alexandria', sans-serif;
-  font-size: 56px;
+  font-size: clamp(42px, 3.2vw, 56px);
+  font-weight: 500;
+
   line-height: 1.08;
-  font-weight: 400;
+  letter-spacing: -2px;
 }
 
+
+/* Destaque do título */
+
 .conteudo-login-esquerda h1 span {
-  color: #170025;
+  display: block;
+
+  margin-top: 8px;
+
+  color: #B8A7CE;
+
   font-weight: 600;
 }
 
+
+/* Descrição */
+
 .conteudo-login-esquerda p {
-  margin-top: 25px;
-  font-family: 'Amethysta', serif;
-  font-size: 15px;
-  line-height: 1.5;
+  max-width: 390px;
+
+  margin-top: 30px;
+
   color: #EDE3FB;
+
+  font-family: 'Amethysta', serif;
+  font-size: 16px;
+
+  line-height: 1.65;
+
+  opacity: 0.9;
 }
+
 
 /* Lado direito */
 
@@ -72,29 +149,29 @@
   width: 53%;
   min-height: 100vh;
 
-  background: linear-gradient(
-    135deg,
-    #170025 0%,
-    #2b0754 60%,
-    #4800EF 100%
-  );
+  padding: 30px 0;
 
   display: flex;
   align-items: center;
   justify-content: center;
+
+  background: linear-gradient(135deg,
+      #170025 0%,
+      #2b0754 60%,
+      #4800EF 100%);
 }
+
 
 /* Formulário */
 
 .formulario-login {
   width: 410px;
+
   padding: 35px;
 
-  background: linear-gradient(
-    135deg,
-    rgba(23, 0, 37, 0.75),
-    rgba(72, 0, 239, 0.18)
-  );
+  background: linear-gradient(135deg,
+      rgba(23, 0, 37, 0.75),
+      rgba(72, 0, 239, 0.18));
 
   border: 1px solid rgba(184, 167, 206, 0.22);
   border-radius: 18px;
@@ -102,32 +179,73 @@
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
 }
 
+
+/* Título do formulário */
+
 .formulario-login h1 {
+  margin-bottom: 5px;
+
   font-family: 'Alexandria', sans-serif;
   font-size: 28px;
   font-weight: 400;
-  margin-bottom: 5px;
 }
 
+
+/* Subtítulo */
+
 .subtitulo-login {
+  margin-bottom: 30px;
+
+  color: #B8A7CE;
+
   font-family: 'Amethysta', serif;
   font-size: 14px;
-  color: #B8A7CE;
-  margin-bottom: 30px;
 }
+
+
+/* Voltar ao início */
+
+.login-voltar {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 7px;
+
+  margin-bottom: 22px;
+
+  color: #B8A7CE;
+
+  text-decoration: none;
+
+  font-family: 'Alexandria', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+
+  transition: 0.2s;
+}
+
+.login-voltar:hover {
+  color: #ffffff;
+
+  transform: translateX(-3px);
+}
+
 
 /* Labels */
 
-.formulario-login > label {
+.formulario-login>label {
   display: block;
+
   margin-bottom: 8px;
+
+  color: #EDE3FB;
 
   font-family: 'Amethysta', serif;
   font-size: 14px;
-  color: #EDE3FB;
 }
 
-/* Inputs */
+
+/* Campos */
 
 .campo-login {
   width: 100%;
@@ -135,42 +253,81 @@
 
   display: flex;
   align-items: center;
+
   gap: 10px;
 
   padding: 0 15px;
   margin-bottom: 25px;
 
-  background: linear-gradient(
-    90deg,
-    rgba(115, 45, 197, 0.8),
-    rgba(43, 7, 84, 0.85)
-  );
+  color: #B8A7CE;
+
+  background: linear-gradient(90deg,
+      rgba(115, 45, 197, 0.8),
+      rgba(43, 7, 84, 0.85));
 
   border: 1px solid rgba(145, 111, 190, 0.35);
   border-radius: 20px;
 
-  color: #B8A7CE;
   transition: 0.3s;
 }
 
 .campo-login:focus-within {
   border-color: #A659FF;
+
   box-shadow: 0 0 15px rgba(166, 89, 255, 0.3);
 }
 
+
+/* Input */
+
 .campo-login input {
   flex: 1;
+
+  min-width: 0;
   height: 100%;
+
+  color: #ffffff;
+
+  background: transparent;
 
   border: none;
   outline: none;
 
-  background: transparent;
-  color: white;
-
   font-family: 'Amethysta', serif;
   font-size: 14px;
 }
+
+.campo-login input::placeholder {
+  color: rgba(237, 227, 251, 0.55);
+}
+
+
+/* Mostrar senha */
+
+.mostrar-senha {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  padding: 0;
+
+  color: #B8A7CE;
+
+  background: transparent;
+
+  border: none;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.mostrar-senha:hover {
+  color: #ffffff;
+}
+
 
 /* Opções */
 
@@ -178,6 +335,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  gap: 10px;
 
   margin-top: -15px;
   margin-bottom: 25px;
@@ -189,13 +348,17 @@
 .lembrar-login {
   display: flex;
   align-items: center;
+
   gap: 6px;
+
   color: #B8A7CE;
 }
 
 .opcoes-login a {
   color: #916FBE;
+
   text-decoration: none;
+
   transition: 0.3s;
 }
 
@@ -203,14 +366,18 @@
   color: #A659FF;
 }
 
+
 /* Erro */
 
 .erro-login {
-  color: #EDE3FB;
+  margin-bottom: 12px;
+
+  color: #FF8F8F;
+
   font-family: 'Amethysta', serif;
   font-size: 13px;
-  margin-bottom: 12px;
 }
+
 
 /* Botões */
 
@@ -219,64 +386,165 @@
   width: 100%;
   height: 42px;
 
+  color: #ffffff;
+
   border: none;
   border-radius: 12px;
 
-  color: white;
   cursor: pointer;
 
   font-family: 'Abyssinica SIL', serif;
+
   transition: 0.3s;
 }
 
+
+/* Entrar */
+
 .botao-login {
-  background: linear-gradient(
-    90deg,
-    #4800EF,
-    #732DC5,
-    #A659FF
-  );
+  background: linear-gradient(90deg,
+      #4800EF,
+      #732DC5,
+      #A659FF);
 }
 
+
+/* Cadastro */
+
 .botao-cadastro {
-  background: linear-gradient(
-    90deg,
-    #2b0754,
-    #732DC5
-  );
+  background: linear-gradient(90deg,
+      #2b0754,
+      #732DC5);
 }
 
 .botao-login:hover,
 .botao-cadastro:hover {
   transform: translateY(-2px);
+
   filter: brightness(1.15);
 }
+
+
+/* Acessos de demonstração */
+
+.login-demonstracao {
+  margin-top: 18px;
+
+  padding: 14px 16px;
+
+  background: rgba(115, 45, 197, 0.12);
+
+  border: 1px solid rgba(145, 111, 190, 0.3);
+  border-radius: 10px;
+
+  font-family: 'Amethysta', serif;
+}
+
+.login-demonstracao>span {
+  display: block;
+
+  margin-bottom: 9px;
+
+  color: #A659FF;
+
+  font-family: 'Alexandria', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+
+  letter-spacing: 1px;
+
+  text-transform: uppercase;
+}
+
+.login-demonstracao p {
+  margin: 4px 0;
+
+  color: #B8A7CE;
+
+  font-size: 11px;
+
+  overflow-wrap: anywhere;
+}
+
+.login-demonstracao p strong {
+  color: #EDE3FB;
+
+  font-weight: 500;
+}
+
+.login-demonstracao small {
+  display: block;
+
+  margin-top: 9px;
+
+  color: #B8A7CE;
+
+  font-size: 11px;
+}
+
+.login-demonstracao small strong {
+  color: #ffffff;
+}
+
 
 /* Ou */
 
 .ou-login {
-  text-align: center;
   margin: 15px 0;
+
+  color: #B8A7CE;
+
+  text-align: center;
 
   font-family: 'Amethysta', serif;
   font-size: 12px;
-  color: #B8A7CE;
 }
+
 
 /* Responsividade */
 
 @media (max-width: 850px) {
+
   .login-esquerda {
     display: none;
   }
 
   .login-direita {
     width: 100%;
+
     padding: 30px;
   }
 
   .formulario-login {
     width: 100%;
     max-width: 410px;
+  }
+}
+
+
+@media (max-width: 480px) {
+
+  .login-direita {
+    align-items: flex-start;
+
+    padding: 20px 16px;
+  }
+
+  .formulario-login {
+    padding: 26px 22px;
+
+    border-radius: 14px;
+  }
+
+  .formulario-login h1 {
+    font-size: 25px;
+  }
+
+  .subtitulo-login {
+    margin-bottom: 25px;
+  }
+
+  .opcoes-login {
+    flex-wrap: wrap;
   }
 }

@@ -1,6 +1,7 @@
 import NaoEncontrada from './paginas/NaoEncontrada'
 import Professor from './paginas/Professor'
 import Administrador from './paginas/Administrador'
+import Responsavel from './paginas/Responsavel'
 import SobreNos from './paginas/SobreNos.jsx'
 import SobrePlataforma from './paginas/SobrePlataforma.jsx'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
@@ -17,10 +18,11 @@ function App() {
         <Route path="/sobre-nos" element={<SobreNos />} />
         <Route path="/administrador" element={<Administrador />} />
         <Route path="/professor" element={<Professor />} />
+        <Route path="/responsavel" element={<Responsavel />} />
         <Route path="*" element={<NaoEncontrada />} />
       </Routes>
     </BrowserRouter>
-  );
+  )
 }
 
 export default App
