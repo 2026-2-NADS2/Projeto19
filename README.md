@@ -25,12 +25,10 @@ Vide tutoriais do PI.
   Game by <a href="http://www.nyphotographic.com/">Nick Youngson</a> <a rel="license" href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a> <a href="http://pix4free.org/">Pix4free</a>
 </p>
 
-
-De um a dois parágrafos sobre o que é seu projeto e o que ele faz.
 <br><br>
-Meu projeto ajuda estudantes FECAP a configurarem seus githubs.
+O KFKA facilita a comunicação entre escola e responsável, permitindo acompanhar informações e o desenvolvimento dos alunos de forma centralizada e organizada.
 <br><br>
-May the force be with you!
+O KFKA reúne essas informações em um único ambiente, organizado de acordo com o perfil de cada usuário.
 <br><br>
 
 ## 🛠 Estrutura de pastas
