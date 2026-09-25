@@ -21,7 +21,8 @@ Vide tutoriais do PI.
 ## Descrição
 
 <p align="center">
-<img src="https://pix4free.org/assets/library/2021-01-20/originals/game.jpg" alt="NOME DO JOGO" border="0">
+<img src="<img width="1600" height="860" alt="Home KFKA 2026-09-25 at 19 54 10" src="https://github.com/user-attachments/assets/0a121d01-f227-4f37-9d76-8d79c2bc09f1" />
+" alt="NOME DO JOGO" border="0">
   Game by <a href="http://www.nyphotographic.com/">Nick Youngson</a> <a rel="license" href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a> <a href="http://pix4free.org/">Pix4free</a>
 </p>
 
