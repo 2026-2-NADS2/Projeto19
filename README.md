@@ -21,7 +21,7 @@ Vide tutoriais do PI.
 ## Descrição
 
 <p align="center">
-  <img src="imagens/capa.jpeg" alt="Capa KFKA" width="100%">
+  <img src="./imagens/kfka_logo.jpeg" alt="Capa KFKA" width="100%">
 </p>
 
 <br><br>
