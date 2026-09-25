@@ -1,0 +1,172 @@
+.professor {
+    min-height: 100vh;
+    padding: 40px 20px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: linear-gradient(135deg,
+            #170025 0%,
+            #2b0754 55%,
+            #4800EF 100%);
+
+    color: #ffffff;
+}
+
+.professor-container {
+    width: 100%;
+    max-width: 850px;
+    margin: 0 auto;
+
+}
+
+.professor h1 {
+    margin: 0 0 8px;
+    font-size: 30px;
+}
+
+.professor h2 {
+    margin: 0 0 30px;
+    color: #b8a7ce;
+    font-size: 17px;
+    font-weight: 400;
+}
+
+.professor-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+    padding: 32px;
+
+    background: rgba(15, 12, 20, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+}
+
+.professor-form div {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.professor-form label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #ede3fb;
+}
+
+.professor-form input,
+.professor-form select,
+.professor-form textarea {
+    width: 100%;
+    padding: 13px 14px;
+
+    color: #ffffff;
+    background: #15121b;
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+}
+
+.professor-form input:focus,
+.professor-form select:focus,
+.professor-form textarea:focus {
+    border-color: #916fbe;
+}
+
+.professor-form select option {
+    background: #15121b;
+}
+
+.professor-form div:has(textarea) {
+    grid-column: 1 / -1;
+}
+
+.professor-form textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+
+.professor-form button {
+    grid-column: 1 / -1;
+
+    padding: 14px;
+
+    color: #ffffff;
+    background: linear-gradient(135deg,
+            #732dc5,
+            #4800ef);
+
+    border: none;
+    border-radius: 8px;
+
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.professor-form button:hover {
+    transform: translateY(-1px);
+    opacity: 0.9;
+}
+
+.professor-erro,
+.professor-sucesso {
+    grid-column: 1 / -1;
+    margin: 0;
+    font-size: 13px;
+}
+
+.professor-erro {
+    color: #ff8f8f;
+}
+
+.professor-sucesso {
+    color: #9ee6ad;
+}
+
+@media (max-width: 650px) {
+    .professor {
+        padding: 30px 16px;
+    }
+
+    .professor-form {
+        grid-template-columns: 1fr;
+        padding: 22px;
+    }
+
+    .professor-form div:has(textarea),
+    .professor-form button,
+    .professor-erro,
+    .professor-sucesso {
+        grid-column: 1;
+    }
+}
+
+.professor-voltar {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    margin-bottom: 22px;
+
+    color: #b8a7ce;
+    text-decoration: none;
+
+    font-size: 14px;
+    font-weight: 500;
+
+    transition: 0.2s;
+}
+
+.professor-voltar:hover {
+    color: #ffffff;
+    transform: translateX(-3px);
+}

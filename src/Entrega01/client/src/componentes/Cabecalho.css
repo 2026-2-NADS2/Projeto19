@@ -176,3 +176,29 @@
   transform: translateX(5px);
 }
 
+/* RESPONSIVIDADE DO CABEÇALHO */
+
+@media (max-width: 850px) {
+
+  .cabecalho {
+    padding: 0 20px;
+  }
+
+  .menu {
+    display: none;
+  }
+
+  .menu-lateral {
+    position: fixed;
+    top: 72px;
+    left: 0;
+
+    width: 250px;
+    height: calc(100vh - 72px);
+
+    background: #170025;
+
+    z-index: 999;
+  }
+}
+

@@ -1,3 +1,6 @@
+import NaoEncontrada from './paginas/NaoEncontrada'
+import Professor from './paginas/Professor'
+import Administrador from './paginas/Administrador'
 import SobreNos from './paginas/SobreNos.jsx'
 import SobrePlataforma from './paginas/SobrePlataforma.jsx'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
@@ -12,6 +15,9 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/sobre-plataforma" element={<SobrePlataforma />} />
         <Route path="/sobre-nos" element={<SobreNos />} />
+        <Route path="/administrador" element={<Administrador />} />
+        <Route path="/professor" element={<Professor />} />
+        <Route path="*" element={<NaoEncontrada />} />
       </Routes>
     </BrowserRouter>
   );

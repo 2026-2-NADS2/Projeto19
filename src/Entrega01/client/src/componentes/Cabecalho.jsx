@@ -34,8 +34,8 @@ function Cabecalho() {
             <div className="dropdown-servicos">
               <Link to="/sobre-plataforma">Sobre a Plataforma</Link>
               <a href="#">Responsável</a>
-              <a href="#">Professor</a>
-              <a href="#">Administrador</a>
+              <Link to="/professor">Professor</Link>
+              <Link to="/administrador">Administrador</Link>
             </div>
           </div>
 
