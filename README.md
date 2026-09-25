@@ -21,10 +21,7 @@ Vide tutoriais do PI.
 ## Descrição
 
 <p align="center">
-<img src="<img width="1600" height="860" alt="WhatsApp Image 2026-09-25 at 19 54 10" src="https://github.com/user-attachments/assets/2aecfbef-b95c-442a-a630-6522cfa2a10f" />
-" />
-" alt="NOME DO JOGO" border="0">
-  Game by <a href="http://www.nyphotographic.com/">Nick Youngson</a> <a rel="license" href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a> <a href="http://pix4free.org/">Pix4free</a>
+  <img src="imagens/capa.jpeg" alt="Capa KFKA" width="100%">
 </p>
 
 <br><br>
