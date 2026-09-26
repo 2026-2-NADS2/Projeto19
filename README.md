@@ -54,30 +54,20 @@ Projeto19/
 |-- README.md
 </pre>
 
-## 🛠 Instalação
+## 🎯 Sobre o Projeto
 
-<b>Android:</b>
+O **KFKA** é uma plataforma web para acompanhamento acadêmico bimestral
+em escolas de Ensino Fundamental, conectando professores, administração
+escolar e responsáveis.
 
-Faça o Download do JOGO.apk no seu celular.
-Execute o APK e siga as instruções de seu telefone.
+O professor registra o desempenho do aluno (descrição, média e tags);
+o Administrador revisa e publica; o Responsável consulta os relatórios
+publicados e pode gerar PDF.
 
-```sh
-Coloque código do prompt de comnando se for necessário
-```
-
-<b>Windows:</b>
-
-Não há instalação! Apenas executável!
-Encontre o JOGO.exe na pasta executáveis e execute-o como qualquer outro programa.
-
-```sh
-Coloque código do prompt de comnando se for necessário
-```
-
-<b>HTML:</b>
-
-Não há instalação!
-Encontre o index.html na pasta executáveis e execute-o como uma página WEB (através de algum browser).
+### Módulos
+- **Administrador** — cadastros, vínculos, períodos bimestrais e publicação de relatórios.
+- **Professor** — registro e consulta do acompanhamento de suas turmas.
+- **Pai/Responsável** — consulta de relatórios publicados e geração de PDF.
 
 ## 💻 Configuração para Desenvolvimento
 
