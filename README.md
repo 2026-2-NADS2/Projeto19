@@ -138,15 +138,13 @@ O projeto foi desenvolvido utilizando tecnologias e ferramentas modernas para a 
 
 ## 🎓 Referências
 
-Aqui estão as referências usadas no projeto.
+Aqui estão as principais referências e documentações utilizadas como apoio durante o desenvolvimento do projeto.
 
-1. <https://github.com/iuricode/readme-template>
-2. <https://github.com/gabrieldejesus/readme-model>
-3. <https://chooser-beta.creativecommons.org/>
-4. <https://freesound.org/>
-5. <https://www.toptal.com/developers/gitignore>
-<<<<<<< HEAD
-6. Músicas por: <a href="https://freesound.org/people/DaveJf/sounds/616544/"> DaveJf </a> e <a href="https://freesound.org/people/DRFX/sounds/338986/"> DRFX </a> ambas com Licença CC 0.
-=======
-6. Músicas por: <a href="https://freesound.org/people/DaveJf/sounds/616544/"> DaveJf </a> e <a href="https://freesound.org/people/DRFX/sounds/338986/"> DRFX </a> ambas com Licença CC 0.
->>>>>>> 52f04581b6be3bbed242abb2c3704d390df65a66
+1. [React](https://react.dev/) — Documentação oficial do React.
+2. [MDN Web Docs](https://developer.mozilla.org/pt-BR/) — Documentação e referência para HTML, CSS e JavaScript.
+3. [Vite](https://vite.dev/) — Documentação oficial da ferramenta utilizada no ambiente de desenvolvimento.
+4. [Git](https://git-scm.com/doc) — Documentação oficial do sistema de controle de versão Git.
+5. [GitHub Docs](https://docs.github.com/pt) — Documentação oficial do GitHub.
+6. [Toptal Gitignore](https://www.toptal.com/developers/gitignore) — Ferramenta para geração e configuração do arquivo `.gitignore`.
+7. [README Template - Iuri Silva](https://github.com/iuricode/readme-template) — Referência para estruturação do README.
+8. [README Model - Gabriel de Jesus](https://github.com/gabrieldejesus/readme-model) — Modelo utilizado como referência para documentação do projeto.
