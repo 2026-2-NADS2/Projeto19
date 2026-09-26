@@ -81,18 +81,41 @@ Encontre o index.html na pasta executáveis e execute-o como uma página WEB (at
 
 ## 💻 Configuração para Desenvolvimento
 
-Descreva como instalar todas as dependências para desenvolvimento e como rodar um test-suite automatizado de algum tipo. Se necessário, faça isso para múltiplas plataformas.
+Para executar e desenvolver o projeto *KFKA*, é necessário ter as seguintes ferramentas instaladas:
+- Node.js
+- GitHub Desktop
+- Visual Studio Code
 
-Para abrir este projeto você necessita das seguintes ferramentas:
+### 🚀 Execução rápida
 
--<a href="https://godotengine.org/download">GODOT</a>
+Após baixar ou clonar o repositório, acesse a pasta do projeto *FullStack* e execute o arquivo:
+text
+iniciar.bat
 
-```sh
-make install
-npm test
-Coloque código do prompt de comnando se for necessário
-```
+O arquivo irá verificar as dependências necessárias e iniciar a aplicação automaticamente.
 
+### ⚙️ Execução manual
+
+Caso prefira executar o projeto pelo terminal, abra a pasta *FullStack* no Visual Studio Code.
+
+Primeiro, instale as dependências:
+bash
+npm install
+
+Em seguida, inicie a aplicação:
+bash
+npm run dev
+
+Após executar o comando, o terminal exibirá o endereço local da aplicação, geralmente:
+
+text
+http://localhost:5173/
+
+Abra o endereço no navegador para acessar a plataforma *KFKA*.
+
+Para encerrar o servidor de desenvolvimento, pressione:
+text
+Ctrl + C
 ## 📋 Licença/License
 Utilize o link <https://chooser-beta.creativecommons.org/> para fazer uma licença CC BY 4.0.
 
