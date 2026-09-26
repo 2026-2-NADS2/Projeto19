@@ -117,8 +117,24 @@ Para encerrar o servidor de desenvolvimento, pressione:
 Ctrl + C
 ```
 
-## 📋 Licença/License
-Utilize o link <https://chooser-beta.creativecommons.org/> para fazer uma licença CC BY 4.0.
+## 🛠️ Tecnologias Utilizadas
+
+<div align="center">
+
+<img src="https://skillicons.dev/icons?i=html,css,js,react,nodejs,git,github,vscode" />
+
+</div>
+
+O projeto foi desenvolvido utilizando tecnologias e ferramentas modernas para a construção e organização da aplicação web.
+
+- **HTML5** — Estruturação das páginas.
+- **CSS3** — Estilização e responsividade da interface.
+- **JavaScript** — Lógica e interatividade da aplicação.
+- **React** — Desenvolvimento da interface através de componentes.
+- **Node.js** — Ambiente utilizado para execução e gerenciamento das dependências.
+- **Git** — Controle de versão do projeto.
+- **GitHub** — Hospedagem e colaboração no repositório.
+- **Visual Studio Code** — Ambiente utilizado durante o desenvolvimento.
 
 ## 🎓 Referências
 
