@@ -72,6 +72,7 @@ publicados e pode gerar PDF.
 ## 💻 Configuração para Desenvolvimento
 
 Para executar e desenvolver o projeto *KFKA*, é necessário ter as seguintes ferramentas instaladas:
+
 - Node.js
 - GitHub Desktop
 - Visual Studio Code
@@ -79,8 +80,10 @@ Para executar e desenvolver o projeto *KFKA*, é necessário ter as seguintes fe
 ### 🚀 Execução rápida
 
 Após baixar ou clonar o repositório, acesse a pasta do projeto *FullStack* e execute o arquivo:
-text
+
+```text
 iniciar.bat
+```
 
 O arquivo irá verificar as dependências necessárias e iniciar a aplicação automaticamente.
 
@@ -89,23 +92,31 @@ O arquivo irá verificar as dependências necessárias e iniciar a aplicação a
 Caso prefira executar o projeto pelo terminal, abra a pasta *FullStack* no Visual Studio Code.
 
 Primeiro, instale as dependências:
-bash
+
+```bash
 npm install
+```
 
 Em seguida, inicie a aplicação:
-bash
+
+```bash
 npm run dev
+```
 
 Após executar o comando, o terminal exibirá o endereço local da aplicação, geralmente:
 
-text
+```text
 http://localhost:5173/
+```
 
 Abra o endereço no navegador para acessar a plataforma *KFKA*.
 
 Para encerrar o servidor de desenvolvimento, pressione:
-text
+
+```text
 Ctrl + C
+```
+
 ## 📋 Licença/License
 Utilize o link <https://chooser-beta.creativecommons.org/> para fazer uma licença CC BY 4.0.
 
