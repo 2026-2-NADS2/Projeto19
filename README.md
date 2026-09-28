@@ -48,7 +48,7 @@ Projeto19/
 |       |-- Estrutura_de_Dados/
 |       |-- FullStack/
 |       |   |-- iniciar.bat
-|       |-- POO
+|       |-- POO/
 |
 |-- .gitignore
 |-- README.md
