@@ -56,8 +56,6 @@ Projeto19/
 └── README.md
 ```
 
-> **Importante:** o bloco acima utiliza ` ```text ` para que nomes de pastas, como `POO/`, sejam exibidos exatamente como estão escritos.
-
 
 ## 🎯 Sobre o Projeto
 
