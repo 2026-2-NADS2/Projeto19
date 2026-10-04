@@ -1,81 +1,89 @@
-@import url('https://fonts.googleapis.com/css2?family=Abyssinica+SIL&family=Alexandria:wght@400;500;600;700&family=Amethysta&display=swap');
-
-/* Página */
-
 .sobre-plataforma {
   min-height: 100vh;
 
-  color: #ffffff;
+  color: var(--texto);
 
-  background: linear-gradient(135deg,
-      #170025 0%,
-      #2b0754 55%,
-      #4800EF 100%);
+  background: linear-gradient(
+    110deg,
+    var(--fundo-inicio) 0%,
+    var(--fundo-meio) 55%,
+    var(--fundo-fim) 100%
+  );
 }
 
-/* Conteúdo */
+
+/* CONTEÚDO */
 
 .conteudo-plataforma {
   display: flex;
+  align-items: flex-start;
 
   min-height: calc(100vh - 72px);
 
-  padding: 60px 8%;
+  padding: 190px 8% 70px;
 
   gap: 80px;
 }
 
+
+/* COLUNAS */
+
 .lado-esquerdo-plataforma,
 .lado-direito-plataforma {
   width: 50%;
-}
 
-/* Lado esquerdo */
-
-.lado-esquerdo-plataforma {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
 }
+
+
+/* LADO ESQUERDO */
 
 .plataforma-etiqueta {
   margin: 0 0 18px;
 
-  color: #A659FF;
+  color: var(--destaque-claro);
 
-  font-family: 'Alexandria', sans-serif;
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
 
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
 }
 
 .lado-esquerdo-plataforma h1 {
+  max-width: 600px;
+
   margin: 0;
 
-  font-family: 'Alexandria', sans-serif;
-  font-size: 64px;
-  line-height: 1.05;
+  color: var(--texto);
+
+  font-size: clamp(42px, 3.6vw, 55px);
   font-weight: 600;
+
+  line-height: 1.1;
+  letter-spacing: -2px;
 }
 
 .lado-esquerdo-plataforma h1 span {
-  color: #916FBE;
+  color: var(--destaque-claro);
 }
 
 .plataforma-descricao {
-  max-width: 500px;
+  max-width: 540px;
 
-  margin-top: 35px;
+  margin-top: 28px;
 
-  color: #B8A7CE;
+  color: var(--texto-secundario);
 
-  font-family: 'Amethysta', serif;
-  font-size: 16px;
-  line-height: 1.65;
+  font-size: 14px;
+  font-weight: 400;
+
+  line-height: 1.7;
 }
 
-/* Fluxo */
+
+/* FLUXO */
 
 .fluxo-plataforma {
   display: flex;
@@ -88,131 +96,156 @@
 }
 
 .fluxo-plataforma span {
-  padding: 8px 12px;
+  padding: 9px 13px;
 
-  color: #EDE3FB;
+  color: var(--texto);
 
-  background: rgba(115, 45, 197, 0.18);
+  background: var(--campo);
 
-  border: 1px solid rgba(184, 167, 206, 0.22);
+  border: 1px solid var(--borda);
   border-radius: 7px;
 
-  font-family: 'Alexandria', sans-serif;
   font-size: 11px;
+  font-weight: 500;
 }
 
 .fluxo-plataforma strong {
-  color: #A659FF;
+  color: var(--destaque-claro);
 
   font-size: 15px;
   font-weight: 400;
 }
 
-/* Lado direito */
 
-.lado-direito-plataforma {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-
-  padding-top: 15px;
-}
+/* LADO DIREITO */
 
 .subtitulo-plataforma {
-  margin: 0 0 15px;
+  margin: 0 0 18px;
 
-  color: #A659FF;
+  color: var(--destaque-claro);
 
-  font-family: 'Alexandria', sans-serif;
   font-size: 12px;
+  font-weight: 700;
 
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
 }
 
 .lado-direito-plataforma h2 {
   margin: 0;
 
-  font-family: 'Alexandria', sans-serif;
-  font-size: 40px;
-  font-weight: 500;
+  color: var(--texto);
+
+  font-size: 32px;
+  font-weight: 600;
+
+  line-height: 1.2;
 }
 
 .lado-direito-plataforma h2 span {
-  color: #916FBE;
+  color: var(--destaque-claro);
 }
 
 .descricao-plataforma {
   max-width: 620px;
 
-  margin-top: 10px;
-  margin-bottom: 35px;
+  margin-top: 16px;
+  margin-bottom: 28px;
 
-  color: #B8A7CE;
+  color: var(--texto-secundario);
 
-  font-family: 'Amethysta', serif;
-  line-height: 1.6;
+  font-size: 14px;
+
+  line-height: 1.65;
 }
 
-/* Cards */
+
+/* CARDS */
 
 .cards-plataforma {
   display: grid;
 
   grid-template-columns: repeat(3, 1fr);
 
-  gap: 15px;
+  gap: 14px;
 }
 
 .card-plataforma {
   min-height: 190px;
 
-  padding: 22px;
+  padding: 20px;
 
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(86, 38, 128, 0.42);
 
-  border: 1px solid rgba(184, 167, 206, 0.25);
+  border: 1px solid rgba(184, 167, 206, 0.28);
   border-radius: 10px;
 
-  transition: 0.3s;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+  transition: 0.2s;
 }
 
 .card-plataforma:hover {
-  transform: translateY(-4px);
+  transform: translateY(-3px);
 
-  border-color: #916FBE;
+  background: rgba(100, 47, 148, 0.48);
+
+  border-color: var(--destaque-claro);
 }
 
 .numero-plataforma {
   display: block;
 
-  margin-bottom: 18px;
+  margin-bottom: 15px;
 
-  color: #A659FF;
+  color: var(--destaque-claro);
 
-  font-family: 'Alexandria', sans-serif;
-  font-size: 14px;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .card-plataforma h3 {
-  margin: 0 0 12px;
+  margin: 0 0 10px;
 
-  font-family: 'Alexandria', sans-serif;
-  font-size: 19px;
+  color: var(--texto);
+
+  font-size: 16px;
+  font-weight: 600;
 }
 
 .card-plataforma p {
   margin: 0;
 
-  color: #B8A7CE;
+  color: var(--texto-secundario);
 
-  font-family: 'Amethysta', serif;
-  font-size: 13px;
-  line-height: 1.55;
+  font-size: 12px;
+
+  line-height: 1.6;
 }
 
-/* Responsividade */
 
-/* Responsividade */
+/* RESPONSIVIDADE */
+
+@media (max-width: 1100px) {
+
+  .conteudo-plataforma {
+    padding: 130px 5% 60px;
+
+    gap: 45px;
+  }
+
+  .lado-esquerdo-plataforma h1 {
+    font-size: 46px;
+  }
+
+  .cards-plataforma {
+    grid-template-columns: 1fr;
+  }
+
+  .card-plataforma {
+    min-height: auto;
+  }
+}
+
 
 @media (max-width: 768px) {
 
@@ -221,9 +254,9 @@
 
     min-height: auto;
 
-    padding: 45px 22px 60px;
+    padding: 50px 30px 60px;
 
-    gap: 50px;
+    gap: 55px;
   }
 
   .lado-esquerdo-plataforma,
@@ -231,110 +264,34 @@
     width: 100%;
   }
 
-  /* Título principal */
-
-  .plataforma-etiqueta {
-    margin-bottom: 14px;
-
-    font-size: 10px;
-  }
-
   .lado-esquerdo-plataforma h1 {
-    font-size: 40px;
-    line-height: 1.08;
+    max-width: 550px;
+
+    font-size: 42px;
+
+    letter-spacing: -1px;
   }
 
   .plataforma-descricao {
-    max-width: 100%;
-
-    margin-top: 24px;
-
-    font-size: 14px;
-    line-height: 1.65;
-  }
-
-  /* Fluxo */
-
-  .fluxo-plataforma {
-    gap: 7px;
-
-    margin-top: 24px;
-  }
-
-  .fluxo-plataforma span {
-    padding: 7px 9px;
-
-    font-size: 9px;
-  }
-
-  .fluxo-plataforma strong {
-    font-size: 12px;
-  }
-
-  /* Parte dos perfis */
-
-  .lado-direito-plataforma {
-    padding-top: 0;
-  }
-
-  .subtitulo-plataforma {
-    margin-bottom: 12px;
-
-    font-size: 10px;
+    max-width: 600px;
   }
 
   .lado-direito-plataforma h2 {
     font-size: 30px;
-    line-height: 1.15;
   }
-
-  .descricao-plataforma {
-    margin-top: 12px;
-    margin-bottom: 25px;
-
-    font-size: 14px;
-    line-height: 1.6;
-  }
-
-  /* Cards */
 
   .cards-plataforma {
     grid-template-columns: 1fr;
-
-    gap: 12px;
-  }
-
-  .card-plataforma {
-    min-height: auto;
-
-    padding: 20px;
-  }
-
-  .numero-plataforma {
-    margin-bottom: 12px;
-
-    font-size: 12px;
-  }
-
-  .card-plataforma h3 {
-    margin-bottom: 8px;
-
-    font-size: 18px;
-  }
-
-  .card-plataforma p {
-    font-size: 13px;
   }
 }
 
-/* Celulares menores */
 
-@media (max-width: 420px) {
+@media (max-width: 480px) {
 
   .conteudo-plataforma {
-    padding: 38px 18px 50px;
+    padding: 42px 20px 50px;
 
-    gap: 42px;
+    gap: 45px;
   }
 
   .lado-esquerdo-plataforma h1 {
@@ -345,7 +302,18 @@
     font-size: 27px;
   }
 
+  .plataforma-etiqueta,
+  .subtitulo-plataforma {
+    font-size: 11px;
+  }
+
   .fluxo-plataforma {
-    flex-wrap: wrap;
+    gap: 7px;
+  }
+
+  .fluxo-plataforma span {
+    padding: 8px 10px;
+
+    font-size: 10px;
   }
 }

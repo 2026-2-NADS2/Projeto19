@@ -1,4 +1,5 @@
 import { useState } from 'react'
+
 import {
   CircleUserRound,
   ChevronDown,
@@ -6,6 +7,7 @@ import {
 } from 'lucide-react'
 
 import { Link } from 'react-router-dom'
+
 import './Cabecalho.css'
 
 function Cabecalho() {
@@ -37,6 +39,7 @@ function Cabecalho() {
 
         </div>
 
+
         <nav
           className="menu"
           aria-label="Navegação principal"
@@ -48,6 +51,7 @@ function Cabecalho() {
           >
             Home
           </Link>
+
 
           <div className="servicos-menu">
 
@@ -81,17 +85,21 @@ function Cabecalho() {
 
           </div>
 
-          <a href="#">
+
+          <Link to="/recursos">
             Recursos
-          </a>
+          </Link>
+
 
           <Link to="/sobre-nos">
             Sobre Nós
           </Link>
 
-          <a href="#">
+
+          <Link to="/contato">
             Contato
-          </a>
+          </Link>
+
 
           <Link
             className="botao-entrar"
@@ -99,6 +107,7 @@ function Cabecalho() {
           >
             Entrar
           </Link>
+
 
           <Link
             to="/login"
@@ -111,6 +120,7 @@ function Cabecalho() {
         </nav>
 
       </header>
+
 
       {menuAberto && (
 
@@ -126,6 +136,7 @@ function Cabecalho() {
             Home
           </Link>
 
+
           <Link
             to="/sobre-plataforma"
             onClick={() => setMenuAberto(false)}
@@ -133,9 +144,14 @@ function Cabecalho() {
             Plataforma
           </Link>
 
-          <a href="#">
+
+          <Link
+            to="/recursos"
+            onClick={() => setMenuAberto(false)}
+          >
             Recursos
-          </a>
+          </Link>
+
 
           <Link
             to="/sobre-nos"
@@ -144,9 +160,13 @@ function Cabecalho() {
             Sobre Nós
           </Link>
 
-          <a href="#">
+
+          <Link
+            to="/contato"
+            onClick={() => setMenuAberto(false)}
+          >
             Contato
-          </a>
+          </Link>
 
         </aside>
 

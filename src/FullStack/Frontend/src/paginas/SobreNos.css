@@ -1,183 +1,258 @@
-@import url('https://fonts.googleapis.com/css2?family=Abyssinica+SIL&family=Alexandria:wght@400;500;600;700&family=Amethysta&display=swap');
-
-/* Página */
-
 .sobre-nos {
   min-height: 100vh;
 
-  color: #ffffff;
+  color: var(--texto);
 
-  background: linear-gradient(135deg,
-      #170025 0%,
-      #2b0754 55%,
-      #4800EF 100%);
+  background: linear-gradient(
+    110deg,
+    var(--fundo-inicio) 0%,
+    var(--fundo-meio) 55%,
+    var(--fundo-fim) 100%
+  );
 }
 
-/* Conteúdo */
+
+/* CONTEÚDO */
 
 .conteudo-sobre {
   display: flex;
+  align-items: flex-start;
 
   min-height: calc(100vh - 72px);
 
-  padding: 60px 8%;
+  padding: 190px 8% 70px;
 
   gap: 80px;
 }
 
+
+/* COLUNAS */
+
 .lado-esquerdo-sobre,
 .lado-direito-sobre {
   width: 50%;
-}
 
-/* Lado esquerdo */
-
-.lado-esquerdo-sobre {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
+
+/* LADO ESQUERDO */
+
 .sobre-etiqueta {
-  margin: 0 0 18px !important;
+  margin: 0 0 18px;
 
-  color: #A659FF !important;
+  color: var(--destaque-claro);
 
-  font-family: 'Alexandria', sans-serif !important;
-  font-size: 11px !important;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
 
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
 }
 
 .lado-esquerdo-sobre h1 {
+  max-width: 600px;
+
   margin: 0;
 
-  font-family: 'Alexandria', sans-serif;
-  font-size: 64px;
-  line-height: 1.05;
+  color: var(--texto);
+
+  font-size: clamp(42px, 3.6vw, 55px);
   font-weight: 600;
+
+  line-height: 1.1;
+  letter-spacing: -2px;
 }
 
 .lado-esquerdo-sobre h1 span {
-  color: #916FBE;
+  color: var(--destaque-claro);
 }
 
-.lado-esquerdo-sobre .sobre-descricao {
-  max-width: 500px;
+.sobre-descricao {
+  max-width: 540px;
 
-  margin-top: 35px;
+  margin-top: 28px;
 
-  color: #B8A7CE;
+  color: var(--texto-secundario);
 
-  font-family: 'Amethysta', serif;
-  font-size: 16px;
-  line-height: 1.65;
+  font-size: 14px;
+  font-weight: 400;
+
+  line-height: 1.7;
 }
 
-/* Lado direito */
 
-.lado-direito-sobre {
+/* INFORMAÇÕES DA KFKA */
+
+.informacoes-kfka {
+  display: flex;
+  align-items: stretch;
+
+  gap: 10px;
+
+  margin-top: 28px;
+}
+
+.informacoes-kfka div {
+  min-width: 120px;
+
+  padding: 11px 13px;
+
   display: flex;
   flex-direction: column;
-  justify-content: center;
 
-  padding-top: 15px;
+  background: var(--campo);
+
+  border: 1px solid var(--borda);
+  border-radius: 7px;
 }
 
+.informacoes-kfka strong {
+  color: var(--texto);
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.informacoes-kfka span {
+  margin-top: 3px;
+
+  color: var(--texto-secundario);
+
+  font-size: 10px;
+}
+
+
+/* LADO DIREITO */
+
 .subtitulo-metodo {
-  margin: 0 0 15px;
+  margin: 0 0 18px;
 
-  color: #A659FF;
+  color: var(--destaque-claro);
 
-  font-family: 'Alexandria', sans-serif;
   font-size: 12px;
+  font-weight: 700;
 
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
 }
 
 .lado-direito-sobre h2 {
   margin: 0;
 
-  font-family: 'Alexandria', sans-serif;
-  font-size: 40px;
-  font-weight: 500;
+  color: var(--texto);
+
+  font-size: 32px;
+  font-weight: 600;
+
+  line-height: 1.2;
 }
 
 .lado-direito-sobre h2 span {
-  color: #916FBE;
+  color: var(--destaque-claro);
 }
 
 .descricao-metodo {
   max-width: 620px;
 
-  margin-top: 10px;
-  margin-bottom: 35px;
+  margin-top: 16px;
+  margin-bottom: 28px;
 
-  color: #B8A7CE;
+  color: var(--texto-secundario);
 
-  font-family: 'Amethysta', serif;
-  line-height: 1.6;
+  font-size: 14px;
+
+  line-height: 1.65;
 }
 
-/* Cards */
+
+/* CARDS */
 
 .cards-metodo {
   display: grid;
 
   grid-template-columns: repeat(3, 1fr);
 
-  gap: 15px;
+  gap: 14px;
 }
 
 .card-metodo {
   min-height: 190px;
 
-  padding: 22px;
+  padding: 20px;
 
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(86, 38, 128, 0.42);
 
-  border: 1px solid rgba(184, 167, 206, 0.25);
+  border: 1px solid rgba(184, 167, 206, 0.28);
   border-radius: 10px;
 
-  transition: 0.3s;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+  transition: 0.2s;
 }
 
 .card-metodo:hover {
-  transform: translateY(-4px);
+  transform: translateY(-3px);
 
-  border-color: #916FBE;
+  background: rgba(100, 47, 148, 0.48);
+
+  border-color: var(--destaque-claro);
 }
 
 .numero-card {
   display: block;
 
-  margin-bottom: 18px;
+  margin-bottom: 15px;
 
-  color: #A659FF;
+  color: var(--destaque-claro);
 
-  font-family: 'Alexandria', sans-serif;
-  font-size: 14px;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .card-metodo h3 {
-  margin: 0 0 12px;
+  margin: 0 0 10px;
 
-  font-family: 'Alexandria', sans-serif;
-  font-size: 19px;
+  color: var(--texto);
+
+  font-size: 16px;
+  font-weight: 600;
 }
 
 .card-metodo p {
   margin: 0;
 
-  color: #B8A7CE;
+  color: var(--texto-secundario);
 
-  font-family: 'Amethysta', serif;
-  font-size: 13px;
-  line-height: 1.55;
+  font-size: 12px;
+
+  line-height: 1.6;
 }
 
-/* Responsividade */
+
+/* RESPONSIVIDADE */
+
+@media (max-width: 1100px) {
+
+  .conteudo-sobre {
+    padding: 130px 5% 60px;
+
+    gap: 45px;
+  }
+
+  .lado-esquerdo-sobre h1 {
+    font-size: 46px;
+  }
+
+  .cards-metodo {
+    grid-template-columns: 1fr;
+  }
+
+  .card-metodo {
+    min-height: auto;
+  }
+}
+
 
 @media (max-width: 768px) {
 
@@ -188,7 +263,7 @@
 
     padding: 50px 30px 60px;
 
-    gap: 60px;
+    gap: 55px;
   }
 
   .lado-esquerdo-sobre,
@@ -197,31 +272,57 @@
   }
 
   .lado-esquerdo-sobre h1 {
+    max-width: 550px;
+
     font-size: 42px;
-    line-height: 1.1;
+
+    letter-spacing: -1px;
   }
 
-  .lado-esquerdo-sobre .sobre-descricao {
-    max-width: 100%;
-
-    margin-top: 25px;
-
-    font-size: 15px;
+  .sobre-descricao {
+    max-width: 600px;
   }
 
-  .lado-direito-sobre {
-    padding-top: 0;
+  .informacoes-kfka {
+    flex-wrap: wrap;
   }
 
   .lado-direito-sobre h2 {
-    font-size: 32px;
+    font-size: 30px;
   }
 
   .cards-metodo {
     grid-template-columns: 1fr;
   }
+}
 
-  .card-metodo {
-    min-height: auto;
+
+@media (max-width: 480px) {
+
+  .conteudo-sobre {
+    padding: 42px 20px 50px;
+
+    gap: 45px;
+  }
+
+  .lado-esquerdo-sobre h1 {
+    font-size: 36px;
+  }
+
+  .lado-direito-sobre h2 {
+    font-size: 27px;
+  }
+
+  .sobre-etiqueta,
+  .subtitulo-metodo {
+    font-size: 11px;
+  }
+
+  .informacoes-kfka {
+    flex-direction: column;
+  }
+
+  .informacoes-kfka div {
+    width: 100%;
   }
 }

@@ -15,20 +15,21 @@ function SobrePlataforma() {
           </p>
 
           <h1>
-            Tecnologia<br />
-            que <span>aproxima</span><br />
-            escola e<br />
-            família.
+            Tecnologia que
+            <span> aproxima escola e família.</span>
           </h1>
 
           <p className="plataforma-descricao">
-            A KFKA é uma plataforma voltada ao acompanhamento
-            escolar, criada para tornar a comunicação entre
-            professores, responsáveis e administradores mais
-            simples, próxima e organizada.
+            A KFKA é uma plataforma de acompanhamento escolar
+            criada para facilitar a comunicação entre professores,
+            administradores e responsáveis durante o desenvolvimento
+            acadêmico dos alunos.
           </p>
 
-          <div className="fluxo-plataforma">
+          <div
+            className="fluxo-plataforma"
+            aria-label="Fluxo do acompanhamento escolar"
+          >
             <span>Professor</span>
             <strong>→</strong>
             <span>Administrador</span>
@@ -38,24 +39,29 @@ function SobrePlataforma() {
 
         </section>
 
+
         <section className="lado-direito-plataforma">
 
           <p className="subtitulo-plataforma">
-            • COMO FUNCIONA •
+            COMO FUNCIONA
           </p>
 
           <h2>
-            Uma plataforma, <span>3 perfis</span>
+            Uma plataforma,
+            <span> três perfis.</span>
           </h2>
 
           <p className="descricao-plataforma">
-            Cada perfil possui uma função específica no processo
-            de acompanhamento escolar.
+            Cada perfil participa de uma etapa do acompanhamento,
+            mantendo as informações organizadas até a publicação
+            para a família.
           </p>
+
 
           <div className="cards-plataforma">
 
             <article className="card-plataforma">
+
               <span className="numero-plataforma">
                 01
               </span>
@@ -63,12 +69,16 @@ function SobrePlataforma() {
               <h3>Professor</h3>
 
               <p>
-                Registra o acompanhamento dos alunos e envia
-                as informações para revisão.
+                Registra o acompanhamento bimestral do aluno,
+                incluindo seu desenvolvimento,
+                média e observações.
               </p>
+
             </article>
 
+
             <article className="card-plataforma">
+
               <span className="numero-plataforma">
                 02
               </span>
@@ -76,12 +86,15 @@ function SobrePlataforma() {
               <h3>Administrador</h3>
 
               <p>
-                Revisa os acompanhamentos recebidos e publica
-                as informações para as famílias.
+                Revisa os acompanhamentos enviados pelos professores
+                e publica as informações aprovadas.
               </p>
+
             </article>
 
+
             <article className="card-plataforma">
+
               <span className="numero-plataforma">
                 03
               </span>
@@ -89,9 +102,10 @@ function SobrePlataforma() {
               <h3>Responsável</h3>
 
               <p>
-                Acompanha as informações publicadas e participa
-                do acompanhamento escolar do aluno.
+                Consulta os acompanhamentos publicados e acompanha
+                a evolução escolar dos alunos vinculados.
               </p>
+
             </article>
 
           </div>

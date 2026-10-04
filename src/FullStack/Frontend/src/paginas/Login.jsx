@@ -54,23 +54,33 @@ function Login() {
     navigate(usuario.rota)
   }
 
+  function preencherAcesso(emailDemonstracao) {
+    setEmail(emailDemonstracao)
+    setSenha('kfka1234')
+    setErro('')
+  }
+
   return (
     <main className="pagina-login">
 
       <section className="login-esquerda">
 
-        <h2 className="login-logo">
+        <Link to="/" className="login-logo">
           K<span>F</span>KA
-        </h2>
+        </Link>
 
         <div className="conteudo-login-esquerda">
+
+          <p className="login-etiqueta">
+            ACOMPANHAMENTO ESCOLAR
+          </p>
 
           <h1>
             Acompanhar de perto
             <span>faz a diferença.</span>
           </h1>
 
-          <p>
+          <p className="login-descricao">
             Conectando escola e família para um
             acompanhamento escolar mais próximo,
             claro e organizado.
@@ -79,6 +89,7 @@ function Login() {
         </div>
 
       </section>
+
 
       <section className="login-direita">
 
@@ -92,11 +103,16 @@ function Login() {
             Voltar ao início
           </Link>
 
-          <h1>Bem-vindo de volta!</h1>
+          <p className="login-form-etiqueta">
+            ACESSO À PLATAFORMA
+          </p>
+
+          <h1>Bem-vindo!</h1>
 
           <p className="subtitulo-login">
-            Faça Login na sua conta KFKA.
+            Entre com sua conta para acessar seu perfil.
           </p>
+
 
           <label htmlFor="email">
             Email
@@ -114,9 +130,11 @@ function Login() {
                 setEmail(evento.target.value)
               }
               placeholder="Digite seu email"
+              autoComplete="email"
             />
 
           </div>
+
 
           <label htmlFor="senha">
             Senha
@@ -134,6 +152,7 @@ function Login() {
                 setSenha(evento.target.value)
               }
               placeholder="Digite sua senha"
+              autoComplete="current-password"
             />
 
             <button
@@ -157,6 +176,7 @@ function Login() {
 
           </div>
 
+
           <div className="opcoes-login">
 
             <label className="lembrar-login">
@@ -164,11 +184,12 @@ function Login() {
               Lembrar de mim
             </label>
 
-            <a href="#">
-              Esqueci minha senha
-            </a>
+            <span>
+              Acesso demonstrativo
+            </span>
 
           </div>
+
 
           {erro && (
             <p className="erro-login">
@@ -176,12 +197,14 @@ function Login() {
             </p>
           )}
 
+
           <button
             className="botao-login"
             type="submit"
           >
-            Entrar ›
+            Entrar
           </button>
+
 
           <div className="login-demonstracao">
 
@@ -189,38 +212,42 @@ function Login() {
               Acessos para demonstração
             </span>
 
-            <p>
-              <strong>Professor:</strong>{' '}
-              professor@kfka.com
-            </p>
+            <button
+              type="button"
+              onClick={() =>
+                preencherAcesso('professor@kfka.com')
+              }
+            >
+              <strong>Professor</strong>
+              <small>professor@kfka.com</small>
+            </button>
 
-            <p>
-              <strong>Administrador:</strong>{' '}
-              admin@kfka.com
-            </p>
+            <button
+              type="button"
+              onClick={() =>
+                preencherAcesso('admin@kfka.com')
+              }
+            >
+              <strong>Administrador</strong>
+              <small>admin@kfka.com</small>
+            </button>
 
-            <p>
-              <strong>Responsável:</strong>{' '}
-              responsavel@kfka.com
-            </p>
+            <button
+              type="button"
+              onClick={() =>
+                preencherAcesso('responsavel@kfka.com')
+              }
+            >
+              <strong>Responsável</strong>
+              <small>responsavel@kfka.com</small>
+            </button>
 
-            <small>
-              Senha para todos:{' '}
-              <strong>kfka1234</strong>
-            </small>
+            <p className="senha-demonstracao">
+              Senha para todos:
+              <strong> kfka1234</strong>
+            </p>
 
           </div>
-
-          <p className="ou-login">
-            ou
-          </p>
-
-          <button
-            className="botao-cadastro"
-            type="button"
-          >
-            Cadastre-se
-          </button>
 
         </form>
 

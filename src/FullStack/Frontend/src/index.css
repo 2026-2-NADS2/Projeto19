@@ -1,11 +1,115 @@
+@import url('https://fonts.googleapis.com/css2?family=Alexandria:wght@400;500;600;700&display=swap');
+
+/* Tema escuro - padrão da KFKA */
+
+:root {
+    --fundo-inicio: #170025;
+    --fundo-meio: #24003d;
+    --fundo-fim: #350078;
+
+    --sidebar: rgba(15, 0, 25, 0.62);
+
+    --painel: rgba(20, 9, 30, 0.92);
+    --painel-secundario: rgba(86, 38, 128, 0.42);
+
+    --campo: rgba(255, 255, 255, 0.07);
+    --campo-hover: rgba(255, 255, 255, 0.10);
+
+    --borda: rgba(255, 255, 255, 0.14);
+
+    --texto: #ffffff;
+    --texto-secundario: #c4b4cf;
+
+    --destaque: #732dc5;
+    --destaque-hover: #8439da;
+    --destaque-claro: #a659ff;
+
+    --sucesso: #54c878;
+    --atencao: #e3b341;
+    --erro: #e56a6a;
+}
+
+/* Tema claro - acessibilidade */
+
+.tema-claro {
+    --fundo-inicio: #f4f1f6;
+    --fundo-meio: #eee8f2;
+    --fundo-fim: #e4daeb;
+
+    --sidebar: rgba(255, 255, 255, 0.72);
+
+    --painel: #ffffff;
+    --painel-secundario: #f1e9f7;
+
+    --campo: #ffffff;
+    --campo-hover: #f7f3f9;
+
+    --borda: #d7ccde;
+
+    --texto: #211627;
+    --texto-secundario: #65596c;
+
+    --destaque: #6825b4;
+    --destaque-hover: #571b9e;
+    --destaque-claro: #732dc5;
+
+    --sucesso: #26733c;
+    --atencao: #806000;
+    --erro: #a12d2d;
+}
+
+/* Configurações gerais */
+
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+    width: 100%;
+    min-height: 100%;
+}
+
+html {
+    font-family: 'Alexandria', sans-serif;
 }
 
 body {
-  margin: 0;
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+
+    font-family: 'Alexandria', sans-serif;
+
+    background: var(--fundo-inicio);
+
+    color: var(--texto);
+
+    overflow-x: hidden;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+    font-family: inherit;
+}
+
+button,
+a {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Formulários */
+
+input,
+select,
+textarea {
+    font-size: inherit;
 }
 
 /* Acessibilidade - navegação por teclado */
@@ -15,31 +119,13 @@ button:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 3px solid #A659FF;
-  outline-offset: 3px;
+    outline: 3px solid var(--destaque-claro);
+    outline-offset: 3px;
 }
 
-button,
-a,
-input,
-select,
-textarea {
-  font-family: inherit;
-}
+/* Seleção de texto */
 
-* {
-  box-sizing: border-box;
-}
-
-html,
-body,
-#root {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  min-height: 100%;
-}
-
-body {
-  overflow-x: hidden;
+::selection {
+    background: var(--destaque);
+    color: #ffffff;
 }

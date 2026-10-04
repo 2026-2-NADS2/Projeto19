@@ -9,7 +9,9 @@ function Home() {
       <Cabecalho />
 
       <main className="conteudo-home">
-        <div className="texto-home">
+
+        <section className="texto-home">
+
           <h1>
             Transformando a Educação com <span>KFKA</span>
           </h1>
@@ -20,23 +22,35 @@ function Home() {
           </p>
 
           <div className="botoes-home">
-            <Link to="/sobre-plataforma" className="botao-saiba-mais">
+
+            <Link
+              to="/sobre-plataforma"
+              className="botao-saiba-mais"
+            >
               Saiba Mais
             </Link>
 
-            <Link to="/login" className="botao-plataforma">
+            <Link
+              to="/login"
+              className="botao-plataforma"
+            >
               Acessar Plataforma
             </Link>
-          </div>
-        </div>
 
-        <div className="area-imagem">
+          </div>
+
+        </section>
+
+        <section className="area-imagem">
+
           <img
             className="imagem-home"
             src={notebook}
             alt="Plataforma escolar KFKA"
           />
-        </div>
+
+        </section>
+
       </main>
     </div>
   )

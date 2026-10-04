@@ -3,8 +3,12 @@ import Professor from './paginas/Professor'
 import Administrador from './paginas/Administrador'
 import Responsavel from './paginas/Responsavel'
 import SobreNos from './paginas/SobreNos.jsx'
+import Contato from './paginas/Contato.jsx'
+import Recursos from './paginas/Recursos.jsx'
 import SobrePlataforma from './paginas/SobrePlataforma.jsx'
+
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+
 import Home from './paginas/Home.jsx'
 import Login from './paginas/Login.jsx'
 
@@ -12,14 +16,57 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/sobre-plataforma" element={<SobrePlataforma />} />
-        <Route path="/sobre-nos" element={<SobreNos />} />
-        <Route path="/administrador" element={<Administrador />} />
-        <Route path="/professor" element={<Professor />} />
-        <Route path="/responsavel" element={<Responsavel />} />
-        <Route path="*" element={<NaoEncontrada />} />
+
+        <Route
+          path="/"
+          element={<Home />}
+        />
+
+        <Route
+          path="/login"
+          element={<Login />}
+        />
+
+        <Route
+          path="/sobre-plataforma"
+          element={<SobrePlataforma />}
+        />
+
+        <Route
+          path="/recursos"
+          element={<Recursos />}
+        />
+
+        <Route
+          path="/sobre-nos"
+          element={<SobreNos />}
+        />
+
+        <Route
+          path="/contato"
+          element={<Contato />}
+        />
+
+        <Route
+          path="/administrador/*"
+          element={<Administrador />}
+        />
+
+        <Route
+          path="/professor"
+          element={<Professor />}
+        />
+
+        <Route
+          path="/responsavel"
+          element={<Responsavel />}
+        />
+
+        <Route
+          path="*"
+          element={<NaoEncontrada />}
+        />
+
       </Routes>
     </BrowserRouter>
   )
