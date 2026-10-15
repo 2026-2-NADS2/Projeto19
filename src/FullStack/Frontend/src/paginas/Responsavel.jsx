@@ -16,7 +16,8 @@ import {
   X,
   Save,
   Clock3,
-  Eye
+  Eye,
+  Menu
 } from 'lucide-react'
 
 import './Responsavel.css'
@@ -161,6 +162,7 @@ const acompanhamentos = [
 
 
 function Responsavel() {
+  const [menuAberto, setMenuAberto] = useState(false)
   const [alunoSelecionado, setAlunoSelecionado] = useState(1)
 
   const [anoSelecionado, setAnoSelecionado] = useState('Todos')
@@ -343,34 +345,49 @@ function Responsavel() {
 
       <aside className="responsavel-sidebar">
 
-        <h1 className="responsavel-logo">
-          K<span>F</span>KA
-        </h1>
+        <div className="responsavel-sidebar-topo">
+          <h1 className="responsavel-logo">
+            K<span>F</span>KA
+          </h1>
+
+          <button
+            type="button"
+            className="responsavel-menu-botao"
+            aria-label={menuAberto ? 'Fechar menu' : 'Abrir menu'}
+            aria-expanded={menuAberto}
+            aria-controls="responsavel-navegacao"
+            onClick={() => setMenuAberto(!menuAberto)}
+          >
+            {menuAberto ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
 
         <nav
-          className="responsavel-menu"
+          id="responsavel-navegacao"
+          className={menuAberto ? 'responsavel-menu responsavel-menu-aberto' : 'responsavel-menu'}
           aria-label="Menu do responsável"
         >
 
           <a
             href="#dashboard"
+            onClick={() => setMenuAberto(false)}
             className="responsavel-menu-ativo"
           >
             <LayoutDashboard size={19} />
             Dashboard
           </a>
 
-          <a href="#acompanhamentos">
+          <a href="#acompanhamentos" onClick={() => setMenuAberto(false)}>
             <BookOpen size={19} />
             Acompanhamentos
           </a>
 
-          <a href="#evolucao">
+          <a href="#evolucao" onClick={() => setMenuAberto(false)}>
             <TrendingUp size={19} />
             Evolução do aluno
           </a>
 
-          <a href="#historico">
+          <a href="#historico" onClick={() => setMenuAberto(false)}>
             <Clock3 size={19} />
             Histórico
           </a>

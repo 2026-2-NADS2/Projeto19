@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, Tag, CalendarDays, ChartNoAxesCombined,
   Users, BookOpen, UserRound, ArrowLeft, Eye, X,
-  Plus, Pencil, Trash2, Save, Search
+  Plus, Pencil, Trash2, Save, Search, Menu
 } from 'lucide-react'
 
 import { buscarAlunos } from '../servicos/alunoService'
@@ -11,6 +11,7 @@ import './Administrador.css'
 
 
 function Administrador() {
+  const [menuMobileAberto, setMenuMobileAberto] = useState(false)
   const location = useLocation()
 
   const [alunos, setAlunos] = useState([])
@@ -237,9 +238,9 @@ function Administrador() {
       lista.map((usuario) =>
         usuario.id === id
           ? {
-              ...usuario,
-              status: usuario.status === 'Ativo' ? 'Inativo' : 'Ativo'
-            }
+            ...usuario,
+            status: usuario.status === 'Ativo' ? 'Inativo' : 'Ativo'
+          }
           : usuario
       )
     )
@@ -373,9 +374,9 @@ function Administrador() {
       lista.map((periodo) =>
         periodo.id === id
           ? {
-              ...periodo,
-              status: periodo.status === 'Aberto' ? 'Encerrado' : 'Aberto'
-            }
+            ...periodo,
+            status: periodo.status === 'Aberto' ? 'Encerrado' : 'Aberto'
+          }
           : periodo
       )
     )
@@ -811,9 +812,8 @@ function Administrador() {
                   <h3>{periodo.nome}</h3>
                 </div>
 
-                <span className={`admin-badge ${
-                  periodo.status === 'Aberto' ? 'publicado' : ''
-                }`}>
+                <span className={`admin-badge ${periodo.status === 'Aberto' ? 'publicado' : ''
+                  }`}>
                   {periodo.status}
                 </span>
               </div>
@@ -1124,11 +1124,23 @@ function Administrador() {
   return (
     <div className="admin">
       <aside className="admin-sidebar">
-        <h1 className="admin-logo">
-          K<span>F</span>KA
-        </h1>
+        <div className="admin-sidebar-topo">
+          <h1 className="admin-logo">
+            K<span>F</span>KA
+          </h1>
+          <button
+            type="button"
+            className="admin-menu-mobile-botao"
+            aria-label={menuMobileAberto ? 'Fechar menu' : 'Abrir menu'}
+            aria-expanded={menuMobileAberto}
+            aria-controls="admin-navegacao"
+            onClick={() => setMenuMobileAberto(!menuMobileAberto)}
+          >
+            {menuMobileAberto ? <X size={23} /> : <Menu size={23} />}
+          </button>
+        </div>
 
-        <nav className="admin-menu">
+        <nav id="admin-navegacao" className={`admin-menu ${menuMobileAberto ? 'admin-menu-aberto' : ''}`} onClick={() => setMenuMobileAberto(false)}>
           <Link
             className={itemAtivo('/administrador')}
             to="/administrador"

@@ -2,12 +2,10 @@
   min-height: 100vh;
   display: flex;
 
-  background: linear-gradient(
-    110deg,
-    var(--fundo-inicio) 0%,
-    var(--fundo-meio) 55%,
-    var(--fundo-fim) 100%
-  );
+  background: linear-gradient(110deg,
+      var(--fundo-inicio) 0%,
+      var(--fundo-meio) 55%,
+      var(--fundo-fim) 100%);
 
   background-size: 100vw 100vh;
   background-attachment: fixed;
@@ -44,13 +42,11 @@
 }
 
 .admin-logo span {
-  background: linear-gradient(
-    135deg,
-    #ffffff,
-    #916fbe,
-    #732dc5,
-    #4800ef
-  );
+  background: linear-gradient(135deg,
+      #ffffff,
+      #916fbe,
+      #732dc5,
+      #4800ef);
 
   background-clip: text;
   -webkit-background-clip: text;
@@ -330,7 +326,7 @@
   line-height: 1.6;
 }
 
-.admin-painel-topo > svg {
+.admin-painel-topo>svg {
   color: var(--destaque-claro);
 }
 
@@ -630,7 +626,7 @@
   border-radius: 8px;
 }
 
-.admin-item > div:first-child {
+.admin-item>div:first-child {
   display: flex;
   align-items: center;
 
@@ -704,7 +700,7 @@
   margin-bottom: 20px;
 }
 
-.admin-periodo-topo > div {
+.admin-periodo-topo>div {
   display: flex;
   align-items: center;
 
@@ -723,7 +719,7 @@
   margin-bottom: 13px;
 }
 
-.admin-periodo > button {
+.admin-periodo>button {
   width: 100%;
 
   margin-top: 5px;
@@ -1077,5 +1073,64 @@
 
   .admin-modal-rodape button {
     width: 100%;
+  }
+}
+
+/* Menu responsivo */
+.admin-sidebar-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.admin-menu-mobile-botao {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  color: var(--texto);
+  background: var(--campo);
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+@media (max-width: 650px) {
+  .admin-sidebar {
+    padding: 16px 18px;
+  }
+
+  .admin-sidebar-topo {
+    width: 100%;
+  }
+
+  .admin-logo {
+    margin: 0;
+  }
+
+  .admin-menu-mobile-botao {
+    display: inline-flex;
+  }
+
+  .admin-menu {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+    margin-top: 14px;
+    padding: 0;
+    overflow: visible;
+  }
+
+  .admin-menu.admin-menu-aberto {
+    display: flex;
+  }
+
+  .admin-menu a {
+    width: 100%;
+    flex-shrink: 1;
+    padding: 12px 14px;
+    font-size: 12px;
   }
 }

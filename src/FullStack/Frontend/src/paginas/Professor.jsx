@@ -14,7 +14,8 @@ import {
   Tag,
   CheckCircle2,
   Clock3,
-  AlertCircle
+  AlertCircle,
+  Menu
 } from 'lucide-react'
 
 import './Professor.css'
@@ -169,6 +170,7 @@ const formularioVazio = {
 
 
 function Professor() {
+  const [menuMobileAberto, setMenuMobileAberto] = useState(false)
   const [pagina, setPagina] = useState('novo')
   const [formulario, setFormulario] = useState(formularioVazio)
   const [acompanhamentos, setAcompanhamentos] = useState(dadosIniciais)
@@ -440,27 +442,27 @@ function Professor() {
 
   const detalhesModal = selecionado
     ? [
-        {
-          titulo: 'Descrição geral',
-          texto: selecionado.descricao
-        },
-        {
-          titulo: 'Pontos positivos',
-          texto: selecionado.pontosPositivos
-        },
-        {
-          titulo: 'Dificuldades identificadas',
-          texto: selecionado.dificuldades
-        },
-        {
-          titulo: 'Evolução no período',
-          texto: selecionado.evolucao
-        },
-        {
-          titulo: 'Orientação à família',
-          texto: selecionado.orientacao
-        }
-      ]
+      {
+        titulo: 'Descrição geral',
+        texto: selecionado.descricao
+      },
+      {
+        titulo: 'Pontos positivos',
+        texto: selecionado.pontosPositivos
+      },
+      {
+        titulo: 'Dificuldades identificadas',
+        texto: selecionado.dificuldades
+      },
+      {
+        titulo: 'Evolução no período',
+        texto: selecionado.evolucao
+      },
+      {
+        titulo: 'Orientação à família',
+        texto: selecionado.orientacao
+      }
+    ]
     : []
 
 
@@ -469,12 +471,25 @@ function Professor() {
 
       <aside className="professor-sidebar">
 
-        <h1 className="professor-logo">
-          K<span>F</span>KA
-        </h1>
+        <div className="professor-sidebar-topo">
+          <h1 className="professor-logo">
+            K<span>F</span>KA
+          </h1>
+          <button
+            type="button"
+            className="professor-menu-mobile-botao"
+            aria-label={menuMobileAberto ? 'Fechar menu' : 'Abrir menu'}
+            aria-expanded={menuMobileAberto}
+            aria-controls="professor-navegacao"
+            onClick={() => setMenuMobileAberto(!menuMobileAberto)}
+          >
+            {menuMobileAberto ? <X size={23} /> : <Menu size={23} />}
+          </button>
+        </div>
 
         <nav
-          className="professor-menu"
+          className={`professor-menu ${menuMobileAberto ? 'professor-menu-aberto' : ''}`}
+          id="professor-navegacao"
           aria-label="Menu do professor"
         >
 
@@ -487,6 +502,7 @@ function Professor() {
             }
             onClick={() => {
               setPagina('novo')
+              setMenuMobileAberto(false)
               setErro('')
               setSucesso('')
             }}
@@ -504,6 +520,7 @@ function Professor() {
             }
             onClick={() => {
               setPagina('acompanhamentos')
+              setMenuMobileAberto(false)
               setErro('')
               setSucesso('')
             }}
@@ -971,21 +988,21 @@ function Professor() {
                           {(item.status === 'Rascunho' ||
                             item.status === 'Devolvido') && (
 
-                            <button
-                              type="button"
-                              className="professor-editar"
-                              onClick={() =>
-                                editarAcompanhamento(item)
-                              }
-                            >
-                              <Pencil size={15} />
+                              <button
+                                type="button"
+                                className="professor-editar"
+                                onClick={() =>
+                                  editarAcompanhamento(item)
+                                }
+                              >
+                                <Pencil size={15} />
 
-                              {item.status === 'Devolvido'
-                                ? 'Corrigir'
-                                : 'Editar'}
-                            </button>
+                                {item.status === 'Devolvido'
+                                  ? 'Corrigir'
+                                  : 'Editar'}
+                              </button>
 
-                          )}
+                            )}
 
                         </div>
 
@@ -1136,26 +1153,26 @@ function Professor() {
             {(selecionado.status === 'Rascunho' ||
               selecionado.status === 'Devolvido') && (
 
-              <footer className="professor-modal-rodape">
+                <footer className="professor-modal-rodape">
 
-                <button
-                  type="button"
-                  className="professor-editar"
-                  onClick={() => {
-                    editarAcompanhamento(selecionado)
-                    setSelecionado(null)
-                  }}
-                >
-                  <Pencil size={16} />
+                  <button
+                    type="button"
+                    className="professor-editar"
+                    onClick={() => {
+                      editarAcompanhamento(selecionado)
+                      setSelecionado(null)
+                    }}
+                  >
+                    <Pencil size={16} />
 
-                  {selecionado.status === 'Devolvido'
-                    ? 'Corrigir acompanhamento'
-                    : 'Editar rascunho'}
-                </button>
+                    {selecionado.status === 'Devolvido'
+                      ? 'Corrigir acompanhamento'
+                      : 'Editar rascunho'}
+                  </button>
 
-              </footer>
+                </footer>
 
-            )}
+              )}
 
           </section>
 

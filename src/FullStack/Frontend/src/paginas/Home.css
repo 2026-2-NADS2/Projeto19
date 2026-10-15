@@ -1,18 +1,17 @@
 .home {
+    width: 100%;
+    min-width: 0;
     min-height: 100vh;
 
     color: var(--texto);
 
-    background: linear-gradient(
-        110deg,
-        var(--fundo-inicio) 0%,
-        var(--fundo-meio) 55%,
-        var(--fundo-fim) 100%
-    );
+    background: linear-gradient(110deg,
+            var(--fundo-inicio) 0%,
+            var(--fundo-meio) 55%,
+            var(--fundo-fim) 100%);
 
-    overflow: hidden;
+    overflow-x: clip;
 }
-
 
 /* CONTEÚDO */
 
@@ -20,9 +19,10 @@
     display: flex;
     align-items: stretch;
 
+    width: 100%;
+    min-width: 0;
     min-height: calc(100vh - 72px);
 }
-
 
 /* TEXTO */
 
@@ -31,6 +31,7 @@
     z-index: 2;
 
     width: 57%;
+    min-width: 0;
 
     padding: 0 40px 0 10%;
 
@@ -43,6 +44,7 @@
 
 .texto-home h1 {
     max-width: 760px;
+    overflow-wrap: break-word;
 
     margin: 0;
 
@@ -72,20 +74,20 @@
     line-height: 1.6;
 }
 
-
 /* BOTÕES */
 
 .botoes-home {
     display: flex;
+    flex-wrap: wrap;
 
     gap: 18px;
-
     margin-top: 28px;
 }
 
 .botoes-home .botao-saiba-mais,
 .botoes-home .botao-plataforma {
     width: 180px;
+    max-width: 100%;
     height: 45px;
 
     display: flex;
@@ -132,31 +134,27 @@
     transform: translateY(-2px);
 }
 
-
 /* IMAGEM */
 
 .area-imagem {
     position: relative;
 
     width: 43%;
+    min-width: 0;
 
     min-height: calc(100vh - 72px);
 
     overflow: hidden;
 
-    -webkit-mask-image: linear-gradient(
-        to right,
-        transparent 0%,
-        black 30%,
-        black 100%
-    );
+    -webkit-mask-image: linear-gradient(to right,
+            transparent 0%,
+            black 30%,
+            black 100%);
 
-    mask-image: linear-gradient(
-        to right,
-        transparent 0%,
-        black 30%,
-        black 100%
-    );
+    mask-image: linear-gradient(to right,
+            transparent 0%,
+            black 30%,
+            black 100%);
 }
 
 .imagem-home {
@@ -171,14 +169,12 @@
     object-position: center;
 }
 
-
 /* RESPONSIVIDADE */
 
 @media (max-width: 900px) {
 
     .texto-home {
         width: 60%;
-
         padding-left: 6%;
     }
 
@@ -191,16 +187,10 @@
     }
 }
 
-
 @media (max-width: 768px) {
-
-    .home {
-        overflow: visible;
-    }
 
     .conteudo-home {
         flex-direction: column;
-
         min-height: auto;
     }
 
@@ -221,19 +211,17 @@
 
     .texto-home p {
         margin-top: 20px;
-
         font-size: 15px;
     }
 
     .botoes-home {
         width: 100%;
-
         gap: 12px;
     }
 
     .botoes-home .botao-saiba-mais,
     .botoes-home .botao-plataforma {
-        width: 100%;
+        flex: 1 1 160px;
     }
 
     .area-imagem {
@@ -241,22 +229,17 @@
         height: 420px;
         min-height: 420px;
 
-        -webkit-mask-image: linear-gradient(
-            to bottom,
-            transparent 0%,
-            black 20%,
-            black 100%
-        );
+        -webkit-mask-image: linear-gradient(to bottom,
+                transparent 0%,
+                black 20%,
+                black 100%);
 
-        mask-image: linear-gradient(
-            to bottom,
-            transparent 0%,
-            black 20%,
-            black 100%
-        );
+        mask-image: linear-gradient(to bottom,
+                transparent 0%,
+                black 20%,
+                black 100%);
     }
 }
-
 
 @media (max-width: 480px) {
 
@@ -270,6 +253,13 @@
 
     .botoes-home {
         flex-direction: column;
+        flex-wrap: nowrap;
+    }
+
+    .botoes-home .botao-saiba-mais,
+    .botoes-home .botao-plataforma {
+        flex: none;
+        width: 100%;
     }
 
     .area-imagem {
