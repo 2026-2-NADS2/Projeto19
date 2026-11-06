@@ -1,5 +1,6 @@
+
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import {
   Mail,
   LockKeyhole,
@@ -11,13 +12,16 @@ import {
 import './Login.css'
 
 function Login() {
+  const navigate = useNavigate()
+
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
   const [erro, setErro] = useState('')
+  const [carregando, setCarregando] = useState(false)
   const [mostrarSenha, setMostrarSenha] = useState(false)
   const [mostrarRecuperacao, setMostrarRecuperacao] = useState(false)
 
-  function fazerLogin(evento) {
+  async function fazerLogin(evento) {
     evento.preventDefault()
     setErro('')
 
@@ -26,9 +30,54 @@ function Login() {
       return
     }
 
-    // Integre a chamada POST /login neste ponto.
-    // Depois, guarde o token e redirecione conforme o perfil.
-    setErro('O acesso à plataforma ainda não está disponível.')
+    setCarregando(true)
+
+    try {
+      const resposta = await fetch('http://localhost:3333/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: email.trim(),
+          senha
+        })
+      })
+
+      const dados = await resposta.json()
+
+      if (!resposta.ok) {
+        throw new Error(dados.mensagem || 'Erro ao realizar login.')
+      }
+
+      const destinos = {
+        administrador: '/administrador',
+        professor: '/professor',
+        responsavel: '/responsavel'
+      }
+
+      const destino = destinos[dados.usuario?.perfil]
+
+      if (!dados.token || !destino) {
+        throw new Error('Resposta de autenticação inválida.')
+      }
+
+      sessionStorage.setItem('kfka_token', dados.token)
+      sessionStorage.setItem(
+        'kfka_usuario',
+        JSON.stringify(dados.usuario)
+      )
+
+      navigate(destino, { replace: true })
+    } catch (erro) {
+      setErro(
+        erro instanceof TypeError
+          ? 'Não foi possível conectar ao servidor. Verifique se o backend está ligado.'
+          : erro.message
+      )
+    } finally {
+      setCarregando(false)
+    }
   }
 
   return (
@@ -57,10 +106,7 @@ function Login() {
       </section>
 
       <section className="login-direita">
-        <form
-          className="formulario-login"
-          onSubmit={fazerLogin}
-        >
+        <form className="formulario-login" onSubmit={fazerLogin}>
           <Link to="/" className="login-voltar">
             <ArrowLeft size={18} />
             Voltar ao início
@@ -76,9 +122,7 @@ function Login() {
             Entre com a conta fornecida pela escola.
           </p>
 
-          <label htmlFor="email">
-            E-mail
-          </label>
+          <label htmlFor="email">E-mail</label>
 
           <div className="campo-login">
             <Mail size={17} aria-hidden="true" />
@@ -98,9 +142,7 @@ function Login() {
             />
           </div>
 
-          <label htmlFor="senha">
-            Senha
-          </label>
+          <label htmlFor="senha">Senha</label>
 
           <div className="campo-login">
             <LockKeyhole size={17} aria-hidden="true" />
@@ -190,8 +232,12 @@ function Login() {
             </p>
           )}
 
-          <button className="botao-login" type="submit">
-            Entrar
+          <button
+            className="botao-login"
+            type="submit"
+            disabled={carregando}
+          >
+            {carregando ? 'Entrando...' : 'Entrar'}
           </button>
 
           <p

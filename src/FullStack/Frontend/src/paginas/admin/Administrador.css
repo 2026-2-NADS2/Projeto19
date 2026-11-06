@@ -1134,3 +1134,59 @@
     font-size: 12px;
   }
 }
+
+
+
+/* Logo KFKA - identidade original */
+
+.admin-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 7px;
+  margin: 8px 0 45px 12px;
+}
+
+.admin-logo strong {
+  display: block;
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -1px;
+
+  background: linear-gradient(
+    110deg,
+    #ffffff 0%,
+    #ffffff 70%,
+    #a855f7 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.admin-logo span {
+  display: block;
+  max-width: 205px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+
+  color: #d8cde5;
+  background: none;
+  -webkit-text-fill-color: #d8cde5;
+}
+
+@media (max-width: 650px) {
+  .admin-logo {
+    margin: 0;
+  }
+
+  .admin-logo strong {
+    font-size: 28px;
+  }
+
+  .admin-logo span {
+    font-size: 12px;
+  }
+}

@@ -67,9 +67,5 @@ if (!process.env.JWT_SECRET) {
 }
 
 app.listen(PORT, () => {
-    console.log(`Servidor KFKA rodando na porta ${PORT}`);
-});
-
-app.listen(PORT, () => {
     console.log(`Servidor KFKA rodando em http://localhost:${PORT}`);
 });
