@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import {
   Mail,
   LockKeyhole,
@@ -15,62 +15,30 @@ function Login() {
   const [senha, setSenha] = useState('')
   const [erro, setErro] = useState('')
   const [mostrarSenha, setMostrarSenha] = useState(false)
-
-  const navigate = useNavigate()
-
-  const usuarios = {
-    'professor@kfka.com': {
-      senha: 'kfka1234',
-      rota: '/professor'
-    },
-
-    'admin@kfka.com': {
-      senha: 'kfka1234',
-      rota: '/administrador'
-    },
-
-    'responsavel@kfka.com': {
-      senha: 'kfka1234',
-      rota: '/responsavel'
-    }
-  }
+  const [mostrarRecuperacao, setMostrarRecuperacao] = useState(false)
 
   function fazerLogin(evento) {
     evento.preventDefault()
+    setErro('')
 
-    if (email.trim() === '' || senha.trim() === '') {
-      setErro('Preencha o email e a senha.')
+    if (!email.trim() || !senha) {
+      setErro('Preencha o e-mail e a senha.')
       return
     }
 
-    const usuario = usuarios[email.toLowerCase().trim()]
-
-    if (!usuario || usuario.senha !== senha) {
-      setErro('Email ou senha inválidos.')
-      return
-    }
-
-    setErro('')
-    navigate(usuario.rota)
-  }
-
-  function preencherAcesso(emailDemonstracao) {
-    setEmail(emailDemonstracao)
-    setSenha('kfka1234')
-    setErro('')
+    // Integre a chamada POST /login neste ponto.
+    // Depois, guarde o token e redirecione conforme o perfil.
+    setErro('O acesso à plataforma ainda não está disponível.')
   }
 
   return (
     <main className="pagina-login">
-
       <section className="login-esquerda">
-
         <Link to="/" className="login-logo">
           K<span>F</span>KA
         </Link>
 
         <div className="conteudo-login-esquerda">
-
           <p className="login-etiqueta">
             ACOMPANHAMENTO ESCOLAR
           </p>
@@ -85,19 +53,14 @@ function Login() {
             acompanhamento escolar mais próximo,
             claro e organizado.
           </p>
-
         </div>
-
       </section>
 
-
       <section className="login-direita">
-
         <form
           className="formulario-login"
           onSubmit={fazerLogin}
         >
-
           <Link to="/" className="login-voltar">
             <ArrowLeft size={18} />
             Voltar ao início
@@ -110,62 +73,60 @@ function Login() {
           <h1>Bem-vindo!</h1>
 
           <p className="subtitulo-login">
-            Entre com sua conta para acessar seu perfil.
+            Entre com a conta fornecida pela escola.
           </p>
 
-
           <label htmlFor="email">
-            Email
+            E-mail
           </label>
 
           <div className="campo-login">
-
-            <Mail size={17} />
+            <Mail size={17} aria-hidden="true" />
 
             <input
               id="email"
+              name="email"
               type="email"
               value={email}
-              onChange={(evento) =>
+              onChange={(evento) => {
                 setEmail(evento.target.value)
-              }
-              placeholder="Digite seu email"
-              autoComplete="email"
+                setErro('')
+              }}
+              placeholder="Digite seu e-mail"
+              autoComplete="username"
+              required
             />
-
           </div>
-
 
           <label htmlFor="senha">
             Senha
           </label>
 
           <div className="campo-login">
-
-            <LockKeyhole size={17} />
+            <LockKeyhole size={17} aria-hidden="true" />
 
             <input
               id="senha"
+              name="senha"
               type={mostrarSenha ? 'text' : 'password'}
               value={senha}
-              onChange={(evento) =>
+              onChange={(evento) => {
                 setSenha(evento.target.value)
-              }
+                setErro('')
+              }}
               placeholder="Digite sua senha"
               autoComplete="current-password"
+              required
             />
 
             <button
               type="button"
               className="mostrar-senha"
-              onClick={() =>
-                setMostrarSenha(!mostrarSenha)
-              }
+              onClick={() => setMostrarSenha(!mostrarSenha)}
               aria-label={
-                mostrarSenha
-                  ? 'Ocultar senha'
-                  : 'Mostrar senha'
+                mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'
               }
+              aria-pressed={mostrarSenha}
             >
               {mostrarSenha ? (
                 <EyeOff size={17} />
@@ -173,86 +134,80 @@ function Login() {
                 <Eye size={17} />
               )}
             </button>
-
           </div>
-
 
           <div className="opcoes-login">
-
-            <label className="lembrar-login">
-              <input type="checkbox" />
-              Lembrar de mim
-            </label>
-
-            <span>
-              Acesso demonstrativo
-            </span>
-
+            <button
+              type="button"
+              onClick={() =>
+                setMostrarRecuperacao(!mostrarRecuperacao)
+              }
+              aria-expanded={mostrarRecuperacao}
+              aria-controls="orientacao-recuperacao"
+              style={{
+                background: 'transparent',
+                border: 0,
+                padding: '4px 0',
+                color: 'var(--destaque-claro)',
+                font: 'inherit',
+                cursor: 'pointer',
+                textDecoration: 'underline'
+              }}
+            >
+              Esqueceu sua senha?
+            </button>
           </div>
 
+          {mostrarRecuperacao && (
+            <div
+              id="orientacao-recuperacao"
+              role="status"
+              style={{
+                marginBottom: 16,
+                padding: 14,
+                border: '1px solid var(--borda)',
+                borderRadius: 8,
+                background: 'var(--campo)',
+                color: 'var(--texto)',
+                fontSize: 13,
+                lineHeight: 1.6
+              }}
+            >
+              <strong>Como recuperar seu acesso</strong>
+
+              <p style={{ marginTop: 8 }}>
+                Procure a administração da sua escola e
+                informe o e-mail cadastrado. Após confirmar
+                sua identidade, o administrador poderá
+                redefinir sua senha.
+              </p>
+            </div>
+          )}
 
           {erro && (
-            <p className="erro-login">
+            <p className="erro-login" role="alert">
               {erro}
             </p>
           )}
 
-
-          <button
-            className="botao-login"
-            type="submit"
-          >
+          <button className="botao-login" type="submit">
             Entrar
           </button>
 
-
-          <div className="login-demonstracao">
-
-            <span>
-              Acessos para demonstração
-            </span>
-
-            <button
-              type="button"
-              onClick={() =>
-                preencherAcesso('professor@kfka.com')
-              }
-            >
-              <strong>Professor</strong>
-              <small>professor@kfka.com</small>
-            </button>
-
-            <button
-              type="button"
-              onClick={() =>
-                preencherAcesso('admin@kfka.com')
-              }
-            >
-              <strong>Administrador</strong>
-              <small>admin@kfka.com</small>
-            </button>
-
-            <button
-              type="button"
-              onClick={() =>
-                preencherAcesso('responsavel@kfka.com')
-              }
-            >
-              <strong>Responsável</strong>
-              <small>responsavel@kfka.com</small>
-            </button>
-
-            <p className="senha-demonstracao">
-              Senha para todos:
-              <strong> kfka1234</strong>
-            </p>
-
-          </div>
-
+          <p
+            style={{
+              marginTop: 20,
+              color: 'var(--texto-secundario)',
+              fontSize: 12,
+              lineHeight: 1.6,
+              textAlign: 'center'
+            }}
+          >
+            Ainda não tem uma conta? Solicite seu cadastro
+            à administração da escola.
+          </p>
         </form>
-
       </section>
-
     </main>
   )
 }
