@@ -1,25 +1,3 @@
-import { criarContexto, falha, id, texto } from './apoioRotas.js';
-
-export function criarAcompanhamentoRoutes(pool) {
-    const { router, rota, equipe, todos, acompanhamento } = criarContexto(pool);
-    rota('get', '/:id', todos, async (req, db) => ({ dados: await acompanhamento(req, db) }));
-    rota('patch', '/:id', ['professor'], async (req, db) => {
-        const ac = await acompanhamento(req, db, true);
-        const corpo = req.body ?? {};
-        if (!Object.keys(corpo).length || Object.keys(corpo).some(k => !['descricao', 'media'].includes(k))) throw falha(400, 'Informe somente descrição e/ou média.');
-        const descricao = corpo.descricao === undefined ? ac.descricao : texto(corpo.descricao, 16000);
-        const media = corpo.media === undefined ? ac.media : corpo.media;
-        if (corpo.media !== undefined && media !== null && (typeof media !== 'number' || !Number.isFinite(media) || media < 0 || media > 10)) throw falha(400, 'A média deve estar entre 0 e 10 ou ser nula.');
-        await db.query('UPDATE acompanhamentos SET descricao = ?, media = ? WHERE id = ?', [descricao, media, ac.id]);
-    });
-    // O professor envia à revisão; apenas o administrador publica.
-    rota('patch', '/:id/enviar', ['professor'], async (req, db) => {
-        const ac = await acompanhamento(req, db, true);
-        await db.query("UPDATE acompanhamentos SET status = 'pendente', publicado_em = NULL WHERE id = ?", [ac.id]);
-    });
-    return router;
-}
-
 
 import { Router } from 'express';
 import bancoDados from '../bancoDados.js';
@@ -29,17 +7,76 @@ const router = Router();
 
 router.use(autenticar);
 
-// GET - Listar acompanhamentos
-router.get('/', async (req, res) => {
+// Opções disponíveis para o professor.
+router.get('/opcoes', async (req, res) => {
+    if (req.usuario.perfil !== 'professor') {
+        return res.status(403).json({
+            mensagem: 'Acesso permitido apenas para professores.'
+        });
+    }
+
     try {
-        if (!['administrador', 'professor'].includes(req.usuario.perfil)) {
-            return res.status(403).json({
-                mensagem: 'Acesso não autorizado.'
-            });
+        const [vinculos] = await bancoDados.query(
+            `SELECT DISTINCT
+                a.id AS aluno_id,
+                a.nome AS aluno,
+                t.id AS turma_id,
+                t.nome AS turma,
+                t.ano_letivo,
+                d.id AS disciplina_id,
+                d.nome AS disciplina
+             FROM professores_turmas_disciplinas ptd
+             JOIN turmas t
+                ON t.id = ptd.turma_id AND t.ativo = 1
+             JOIN alunos_turmas at
+                ON at.turma_id = t.id
+             JOIN alunos a
+                ON a.id = at.aluno_id AND a.ativo = 1
+             JOIN disciplinas d
+                ON d.id = ptd.disciplina_id AND d.ativo = 1
+             WHERE ptd.professor_id = ?
+             ORDER BY a.nome, d.nome`,
+            [req.usuario.id]
+        );
+
+        const [periodos] = await bancoDados.query(
+            `SELECT id, nome, ano_letivo
+             FROM periodos_avaliativos
+             WHERE ativo = 1
+             ORDER BY ano_letivo DESC, data_inicio`
+        );
+
+        res.json({ vinculos, periodos });
+    } catch (erro) {
+        console.error('Erro ao carregar opções:', erro.message);
+
+        res.status(500).json({
+            mensagem: 'Erro ao carregar dados do professor.'
+        });
+    }
+});
+
+// Listar acompanhamentos.
+router.get('/', async (req, res) => {
+    if (!['administrador', 'professor'].includes(req.usuario.perfil)) {
+        return res.status(403).json({
+            mensagem: 'Acesso não autorizado.'
+        });
+    }
+
+    try {
+        const parametros = [];
+
+        const filtro = req.usuario.perfil === 'professor'
+            ? 'WHERE ac.professor_id = ?'
+            : '';
+
+        if (filtro) {
+            parametros.push(req.usuario.id);
         }
 
-        let sql = `
-            SELECT
+        const [dados] = await bancoDados.query(
+            `SELECT
                 ac.id,
                 ac.aluno_id,
                 a.nome AS aluno,
@@ -54,43 +91,52 @@ router.get('/', async (req, res) => {
                 ac.status,
                 ac.criado_em,
                 ac.atualizado_em,
-                ac.publicado_em
-            FROM acompanhamentos ac
-            INNER JOIN alunos a ON a.id = ac.aluno_id
-            INNER JOIN usuarios u ON u.id = ac.professor_id
-            INNER JOIN disciplinas d ON d.id = ac.disciplina_id
-            INNER JOIN periodos_avaliativos p ON p.id = ac.periodo_id
-        `;
+                ac.publicado_em,
+                (
+                    SELECT t.nome
+                    FROM alunos_turmas at
+                    JOIN turmas t
+                        ON t.id = at.turma_id
+                    JOIN professores_turmas_disciplinas ptd
+                        ON ptd.turma_id = t.id
+                    WHERE at.aluno_id = ac.aluno_id
+                      AND ptd.professor_id = ac.professor_id
+                      AND ptd.disciplina_id = ac.disciplina_id
+                      AND t.ano_letivo = p.ano_letivo
+                    LIMIT 1
+                ) AS turma
+             FROM acompanhamentos ac
+             JOIN alunos a ON a.id = ac.aluno_id
+             JOIN usuarios u ON u.id = ac.professor_id
+             JOIN disciplinas d ON d.id = ac.disciplina_id
+             JOIN periodos_avaliativos p ON p.id = ac.periodo_id
+             ${filtro}
+             ORDER BY ac.criado_em DESC, ac.id DESC`,
+            parametros
+        );
 
-        const parametros = [];
-
-        if (req.usuario.perfil === 'professor') {
-            sql += ' WHERE ac.professor_id = ?';
-            parametros.push(req.usuario.id);
-        }
-
-        sql += ' ORDER BY ac.criado_em DESC, ac.id DESC';
-
-        const [acompanhamentos] = await bancoDados.query(sql, parametros);
-
-        res.json(acompanhamentos);
+        res.json(dados);
     } catch (erro) {
-        console.error('Erro ao listar acompanhamentos:', erro.message);
+        console.error(
+            'Erro ao listar acompanhamentos:',
+            erro.message
+        );
+
         res.status(500).json({
             mensagem: 'Erro ao listar acompanhamentos.'
         });
     }
 });
 
-// POST - Professor cria acompanhamento
+// Criar acompanhamento.
 router.post('/', async (req, res) => {
-    try {
-        if (req.usuario.perfil !== 'professor') {
-            return res.status(403).json({
-                mensagem: 'Somente professores podem criar acompanhamentos.'
-            });
-        }
+    if (req.usuario.perfil !== 'professor') {
+        return res.status(403).json({
+            mensagem: 'Somente professores podem criar acompanhamentos.'
+        });
+    }
 
+    try {
         const {
             aluno_id,
             disciplina_id,
@@ -99,114 +145,307 @@ router.post('/', async (req, res) => {
             media
         } = req.body ?? {};
 
-        const alunoId = Number(aluno_id);
-        const disciplinaId = Number(disciplina_id);
-        const periodoId = Number(periodo_id);
+        const ids = [
+            aluno_id,
+            disciplina_id,
+            periodo_id
+        ].map(Number);
 
         if (
-            !Number.isInteger(alunoId) || alunoId <= 0 ||
-            !Number.isInteger(disciplinaId) || disciplinaId <= 0 ||
-            !Number.isInteger(periodoId) || periodoId <= 0 ||
+            ids.some(valor =>
+                !Number.isSafeInteger(valor) || valor <= 0
+            ) ||
             typeof descricao !== 'string' ||
-            !descricao.trim()
+            !descricao.trim() ||
+            descricao.trim().length > 16000
         ) {
             return res.status(400).json({
                 mensagem: 'Informe aluno, disciplina, período e descrição válidos.'
             });
         }
 
-        let mediaFinal = null;
-
-        if (media !== undefined && media !== null && media !== '') {
-            if (
+        if (
+            media !== null &&
+            media !== undefined &&
+            (
                 typeof media !== 'number' ||
                 !Number.isFinite(media) ||
                 media < 0 ||
                 media > 10
-            ) {
-                return res.status(400).json({
-                    mensagem: 'A média deve estar entre 0 e 10.'
-                });
-            }
-
-            mediaFinal = media;
+            )
+        ) {
+            return res.status(400).json({
+                mensagem: 'A média deve estar entre 0 e 10.'
+            });
         }
 
-        // Verificar se o aluno pertence a uma turma
-        // em que o professor leciona a disciplina,
-        // no mesmo ano letivo do período.
+        // Verifica se o professor pode acompanhar esse aluno.
         const [vinculos] = await bancoDados.query(
             `SELECT ptd.id
              FROM professores_turmas_disciplinas ptd
-             INNER JOIN turmas t
-                 ON t.id = ptd.turma_id
-             INNER JOIN alunos_turmas at
-                 ON at.turma_id = t.id
-             INNER JOIN alunos a
-                 ON a.id = at.aluno_id
-             INNER JOIN disciplinas d
-                 ON d.id = ptd.disciplina_id
-             INNER JOIN periodos_avaliativos p
-                 ON p.ano_letivo = t.ano_letivo
+             JOIN turmas t
+                ON t.id = ptd.turma_id AND t.ativo = 1
+             JOIN alunos_turmas at
+                ON at.turma_id = t.id
+             JOIN alunos a
+                ON a.id = at.aluno_id AND a.ativo = 1
+             JOIN disciplinas d
+                ON d.id = ptd.disciplina_id AND d.ativo = 1
+             JOIN periodos_avaliativos p
+                ON p.ano_letivo = t.ano_letivo AND p.ativo = 1
              WHERE ptd.professor_id = ?
                AND at.aluno_id = ?
                AND ptd.disciplina_id = ?
                AND p.id = ?
-               AND a.ativo = 1
-               AND t.ativo = 1
-               AND d.ativo = 1
-               AND p.ativo = 1
              LIMIT 1`,
-            [
-                req.usuario.id,
-                alunoId,
-                disciplinaId,
-                periodoId
-            ]
+            [req.usuario.id, ...ids]
         );
 
-        if (vinculos.length === 0) {
+        if (!vinculos.length) {
             return res.status(403).json({
-                mensagem: 'Professor sem vínculo válido com esse aluno, disciplina ou período.'
+                mensagem: 'Professor sem vínculo válido com aluno, disciplina e período.'
             });
         }
 
         const [resultado] = await bancoDados.query(
             `INSERT INTO acompanhamentos
-             (aluno_id, professor_id, disciplina_id,
-              periodo_id, descricao, media, status)
+                (
+                    aluno_id,
+                    professor_id,
+                    disciplina_id,
+                    periodo_id,
+                    descricao,
+                    media,
+                    status
+                )
              VALUES (?, ?, ?, ?, ?, ?, 'rascunho')`,
             [
-                alunoId,
+                ids[0],
                 req.usuario.id,
-                disciplinaId,
-                periodoId,
+                ids[1],
+                ids[2],
                 descricao.trim(),
-                mediaFinal
+                media ?? null
             ]
         );
 
         res.status(201).json({
-            mensagem: 'Acompanhamento criado com sucesso!',
+            mensagem: 'Acompanhamento criado.',
             acompanhamento: {
-                id: resultado.insertId,
-                aluno_id: alunoId,
-                professor_id: req.usuario.id,
-                disciplina_id: disciplinaId,
-                periodo_id: periodoId,
-                descricao: descricao.trim(),
-                media: mediaFinal,
-                status: 'rascunho'
+                id: resultado.insertId
             }
         });
     } catch (erro) {
-        console.error('Erro ao criar acompanhamento:', erro.message);
+        console.error(
+            'Erro ao criar acompanhamento:',
+            erro.message
+        );
+
         res.status(500).json({
-            mensagem: 'Erro interno ao criar acompanhamento.'
+            mensagem: 'Erro ao criar acompanhamento.'
         });
     }
 });
 
-router.use(criarAcompanhamentoRoutes());
+// Busca um registro e verifica as permissões.
+async function buscarRegistro(req, res) {
+    const id = Number(req.params.id);
+
+    if (!Number.isSafeInteger(id) || id <= 0) {
+        res.status(400).json({
+            mensagem: 'ID inválido.'
+        });
+
+        return null;
+    }
+
+    const [linhas] = await bancoDados.query(
+        'SELECT * FROM acompanhamentos WHERE id = ?',
+        [id]
+    );
+
+    const registro = linhas[0];
+
+    if (!registro) {
+        res.status(404).json({
+            mensagem: 'Acompanhamento não encontrado.'
+        });
+
+        return null;
+    }
+
+    if (req.usuario.perfil === 'responsavel') {
+        const [vinculos] = await bancoDados.query(
+            `SELECT id
+             FROM responsaveis_alunos
+             WHERE responsavel_id = ?
+               AND aluno_id = ?`,
+            [req.usuario.id, registro.aluno_id]
+        );
+
+        if (
+            registro.status !== 'publicado' ||
+            !vinculos.length
+        ) {
+            res.status(403).json({
+                mensagem: 'Acompanhamento não disponível.'
+            });
+
+            return null;
+        }
+    } else if (
+        req.usuario.perfil !== 'administrador' &&
+        (
+            req.usuario.perfil !== 'professor' ||
+            Number(registro.professor_id) !== Number(req.usuario.id)
+        )
+    ) {
+        res.status(403).json({
+            mensagem: 'Acesso não autorizado.'
+        });
+
+        return null;
+    }
+
+    return registro;
+}
+
+// Buscar acompanhamento por ID.
+router.get('/:id', async (req, res) => {
+    try {
+        const registro = await buscarRegistro(req, res);
+
+        if (registro) {
+            res.json(registro);
+        }
+    } catch (erro) {
+        console.error(erro.message);
+
+        res.status(500).json({
+            mensagem: 'Erro ao buscar acompanhamento.'
+        });
+    }
+});
+
+// Editar acompanhamento.
+router.patch('/:id', async (req, res) => {
+    if (req.usuario.perfil !== 'professor') {
+        return res.status(403).json({
+            mensagem: 'Somente professores podem editar.'
+        });
+    }
+
+    try {
+        const registro = await buscarRegistro(req, res);
+
+        if (!registro) return;
+
+        if (!['rascunho', 'devolvido'].includes(registro.status)) {
+            return res.status(409).json({
+                mensagem: 'Registro não pode mais ser editado.'
+            });
+        }
+
+        const corpo = req.body ?? {};
+
+        if (
+            !Object.keys(corpo).length ||
+            Object.keys(corpo).some(
+                k => !['descricao', 'media'].includes(k)
+            )
+        ) {
+            return res.status(400).json({
+                mensagem: 'Informe somente descrição e/ou média.'
+            });
+        }
+
+        const descricao = corpo.descricao === undefined
+            ? registro.descricao
+            : corpo.descricao;
+
+        const media = corpo.media === undefined
+            ? registro.media
+            : corpo.media;
+
+        if (
+            typeof descricao !== 'string' ||
+            !descricao.trim() ||
+            descricao.trim().length > 16000 ||
+            (
+                media !== null &&
+                (
+                    typeof media !== 'number' ||
+                    !Number.isFinite(media) ||
+                    media < 0 ||
+                    media > 10
+                )
+            )
+        ) {
+            return res.status(400).json({
+                mensagem: 'Descrição ou média inválida.'
+            });
+        }
+
+        await bancoDados.query(
+            `UPDATE acompanhamentos
+             SET descricao = ?, media = ?
+             WHERE id = ?`,
+            [
+                descricao.trim(),
+                media,
+                registro.id
+            ]
+        );
+
+        res.json({
+            mensagem: 'Acompanhamento atualizado.'
+        });
+    } catch (erro) {
+        console.error(erro.message);
+
+        res.status(500).json({
+            mensagem: 'Erro ao atualizar acompanhamento.'
+        });
+    }
+});
+
+// Enviar acompanhamento para revisão.
+router.patch('/:id/enviar', async (req, res) => {
+    if (req.usuario.perfil !== 'professor') {
+        return res.status(403).json({
+            mensagem: 'Somente professores podem enviar.'
+        });
+    }
+
+    try {
+        const registro = await buscarRegistro(req, res);
+
+        if (!registro) return;
+
+        if (!['rascunho', 'devolvido'].includes(registro.status)) {
+            return res.status(409).json({
+                mensagem: 'Registro não pode ser enviado.'
+            });
+        }
+
+        await bancoDados.query(
+            `UPDATE acompanhamentos
+             SET status = 'pendente',
+                 publicado_em = NULL
+             WHERE id = ?`,
+            [registro.id]
+        );
+
+        res.json({
+            mensagem: 'Acompanhamento enviado para revisão.'
+        });
+    } catch (erro) {
+        console.error(erro.message);
+
+        res.status(500).json({
+            mensagem: 'Erro ao enviar acompanhamento.'
+        });
+    }
+});
 
 export default router;

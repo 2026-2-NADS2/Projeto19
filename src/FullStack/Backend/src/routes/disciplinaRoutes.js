@@ -5,6 +5,7 @@ import autenticar from '../middlewares/autenticar.js';
 
 const router = Router();
 
+// Exigir login
 router.use(autenticar);
 
 // Somente administradores
@@ -14,10 +15,11 @@ router.use((req, res, next) => {
             mensagem: 'Acesso permitido apenas para administradores.'
         });
     }
+
     next();
 });
 
-// GET - Listar disciplinas
+// Listar disciplinas
 router.get('/', async (req, res) => {
     try {
         const [disciplinas] = await bancoDados.query(
@@ -27,13 +29,48 @@ router.get('/', async (req, res) => {
         res.json(disciplinas);
     } catch (erro) {
         console.error('Erro ao listar disciplinas:', erro.message);
+
         res.status(500).json({
             mensagem: 'Erro ao listar disciplinas.'
         });
     }
 });
 
-// POST - Cadastrar disciplina
+// Buscar disciplina por ID
+router.get('/:id', async (req, res) => {
+    try {
+        const disciplinaId = Number(req.params.id);
+
+        if (!Number.isSafeInteger(disciplinaId) || disciplinaId <= 0) {
+            return res.status(400).json({
+                mensagem: 'ID da disciplina inválido.'
+            });
+        }
+
+        const [disciplinas] = await bancoDados.query(
+            `SELECT id, nome, ativo
+             FROM disciplinas
+             WHERE id = ?`,
+            [disciplinaId]
+        );
+
+        if (disciplinas.length === 0) {
+            return res.status(404).json({
+                mensagem: 'Disciplina não encontrada.'
+            });
+        }
+
+        res.json(disciplinas[0]);
+    } catch (erro) {
+        console.error('Erro ao buscar disciplina:', erro.message);
+
+        res.status(500).json({
+            mensagem: 'Erro interno ao buscar disciplina.'
+        });
+    }
+});
+
+// Cadastrar disciplina
 router.post('/', async (req, res) => {
     try {
         const { nome } = req.body ?? {};
@@ -78,6 +115,7 @@ router.post('/', async (req, res) => {
         }
 
         console.error('Erro ao cadastrar disciplina:', erro.message);
+
         res.status(500).json({
             mensagem: 'Erro interno ao cadastrar disciplina.'
         });

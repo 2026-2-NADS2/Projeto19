@@ -1,27 +1,16 @@
 
-const API_URL = 'http://localhost:3333'
+import { api } from './api'
 
 export async function buscarAlunos() {
-  const token = sessionStorage.getItem('kfka_token')
+  try {
+    const dados = await api('/alunos', {
+      method: 'GET'
+    })
 
-  if (!token) {
-    throw new Error('Usuário não autenticado.')
-  }
-
-  const resposta = await fetch(`${API_URL}/alunos`, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  })
-
-  const dados = await resposta.json()
-
-  if (!resposta.ok) {
+    return dados
+  } catch (erro) {
     throw new Error(
-      dados.mensagem || 'Não foi possível carregar os alunos.'
+      erro.message || 'Não foi possível carregar os alunos.'
     )
   }
-
-  return dados
 }

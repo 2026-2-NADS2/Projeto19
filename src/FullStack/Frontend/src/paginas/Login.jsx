@@ -1,5 +1,4 @@
-
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   Mail,
@@ -20,6 +19,19 @@ function Login() {
   const [carregando, setCarregando] = useState(false)
   const [mostrarSenha, setMostrarSenha] = useState(false)
   const [mostrarRecuperacao, setMostrarRecuperacao] = useState(false)
+
+  // Verifica se o usuário foi redirecionado por sessão expirada
+  useEffect(() => {
+    const sessaoExpirada = sessionStorage.getItem(
+      'kfka_sessao_expirada'
+    )
+
+    if (sessaoExpirada === 'true') {
+      setErro('Sua sessão expirou. Faça login novamente.')
+
+      sessionStorage.removeItem('kfka_sessao_expirada')
+    }
+  }, [])
 
   async function fazerLogin(evento) {
     evento.preventDefault()
@@ -47,7 +59,9 @@ function Login() {
       const dados = await resposta.json()
 
       if (!resposta.ok) {
-        throw new Error(dados.mensagem || 'Erro ao realizar login.')
+        throw new Error(
+          dados.mensagem || 'Erro ao realizar login.'
+        )
       }
 
       const destinos = {
@@ -62,11 +76,16 @@ function Login() {
         throw new Error('Resposta de autenticação inválida.')
       }
 
+      // Salva o token e os dados do usuário
       sessionStorage.setItem('kfka_token', dados.token)
+
       sessionStorage.setItem(
         'kfka_usuario',
         JSON.stringify(dados.usuario)
       )
+
+      // Limpa qualquer aviso antigo de sessão expirada
+      sessionStorage.removeItem('kfka_sessao_expirada')
 
       navigate(destino, { replace: true })
     } catch (erro) {

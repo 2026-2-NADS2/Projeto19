@@ -1,163 +1,17 @@
-import { useState } from 'react'
+
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-
 import {
-  LayoutDashboard,
-  BookOpen,
-  UserRound,
-  ArrowLeft,
-  Save,
-  Send,
-  Eye,
-  Pencil,
-  X,
-  Tag,
-  CheckCircle2,
-  Clock3,
-  AlertCircle,
-  Menu
+  LayoutDashboard, BookOpen, UserRound, ArrowLeft, Save, Send,
+  Eye, Pencil, X, Tag, CheckCircle2, Clock3, AlertCircle, Menu
 } from 'lucide-react'
-
+import { api } from '../servicos/api'
 import './Professor.css'
 
-
-const alunos = [
-  { id: 1, nome: 'Eric Carvalho', turma: '7º A' },
-  { id: 2, nome: 'Gustavo Cocoloti', turma: '9º A' },
-  { id: 3, nome: 'Douglas Macario', turma: '9º B' },
-  { id: 4, nome: 'Gabriel Vaz', turma: '8º C' }
-]
-
-const disciplinas = [
-  'Matemática',
-  'Português',
-  'Geografia',
-  'Ciências'
-]
-
-const bimestres = [
-  '1º Bimestre',
-  '2º Bimestre',
-  '3º Bimestre',
-  '4º Bimestre'
-]
-
-const situacoes = [
-  'Precisa de atenção',
-  'Em desenvolvimento',
-  'Em evolução',
-  'Bom desenvolvimento',
-  'Excelente desenvolvimento'
-]
-
-const tagsDisponiveis = [
-  'Boa evolução',
-  'Participação',
-  'Bom desempenho',
-  'Atenção necessária',
-  'Dificuldade de aprendizagem',
-  'Autonomia'
-]
-
-
-const dadosIniciais = [
-  {
-    id: 1,
-    aluno: 'Eric Carvalho',
-    turma: '7º A',
-    disciplina: 'Matemática',
-    bimestre: '3º Bimestre',
-    media: '8.5',
-    descricao:
-      'O aluno apresentou bom desenvolvimento durante o período, participando das aulas e demonstrando interesse pelos conteúdos trabalhados.',
-    situacao: 'Em evolução',
-    tags: ['Boa evolução', 'Participação'],
-    pontosPositivos:
-      'Participa das atividades e demonstra interesse pelos conteúdos apresentados.',
-    dificuldades:
-      'Apresenta dificuldade em alguns exercícios que envolvem interpretação de problemas.',
-    evolucao:
-      'Apresentou melhora na participação e maior segurança durante as atividades do período.',
-    orientacao:
-      'Continuar incentivando a realização das atividades e a revisão dos conteúdos em casa.',
-    status: 'Enviado para revisão'
-  },
-  {
-    id: 2,
-    aluno: 'Gustavo Cocoloti',
-    turma: '9º A',
-    disciplina: 'Português',
-    bimestre: '3º Bimestre',
-    media: '7.8',
-    descricao:
-      'O aluno mantém bom desenvolvimento na disciplina e participa das atividades propostas durante as aulas.',
-    situacao: 'Bom desenvolvimento',
-    tags: ['Participação'],
-    pontosPositivos:
-      'Demonstra boa participação nas aulas e interesse nas atividades propostas.',
-    dificuldades:
-      'Ainda apresenta dificuldade na organização de algumas produções escritas.',
-    evolucao:
-      'Teve evolução na leitura e passou a participar com mais frequência das atividades.',
-    orientacao:
-      'Manter o hábito de leitura e incentivar pequenas produções de texto.',
-    status: 'Em Revisão'
-  },
-  {
-    id: 3,
-    aluno: 'Douglas Macario',
-    turma: '9º B',
-    disciplina: 'Geografia',
-    bimestre: '3º Bimestre',
-    media: '6.4',
-    descricao:
-      'O aluno apresenta avanços pontuais, mas ainda necessita de acompanhamento mais próximo durante as atividades.',
-    situacao: 'Precisa de atenção',
-    tags: [
-      'Atenção necessária',
-      'Dificuldade de aprendizagem'
-    ],
-    pontosPositivos:
-      'Participa das atividades quando recebe orientação durante a aula.',
-    dificuldades:
-      'Apresenta dificuldade para relacionar alguns conteúdos e organizar as informações estudadas.',
-    evolucao:
-      'Apresentou pequenos avanços, mas ainda necessita de acompanhamento mais frequente.',
-    orientacao:
-      'Revisar os conteúdos trabalhados e incentivar uma rotina de estudos durante a semana.',
-    status: 'Devolvido',
-    motivoDevolucao:
-      'Detalhe melhor a evolução apresentada pelo aluno durante o período.'
-  },
-  {
-    id: 4,
-    aluno: 'Gabriel Vaz',
-    turma: '8º C',
-    disciplina: 'Ciências',
-    bimestre: '2º Bimestre',
-    media: '9.0',
-    descricao:
-      'O aluno demonstrou ótimo desenvolvimento durante o bimestre, com participação constante e autonomia nas atividades.',
-    situacao: 'Bom desenvolvimento',
-    tags: ['Bom desempenho', 'Autonomia'],
-    pontosPositivos:
-      'Apresenta interesse pelos conteúdos e boa participação nas atividades.',
-    dificuldades:
-      'Possui algumas dúvidas pontuais durante atividades mais complexas.',
-    evolucao:
-      'Demonstrou evolução durante o período e maior autonomia na realização das atividades.',
-    orientacao:
-      'Continuar acompanhando as atividades e incentivar a revisão dos conteúdos estudados.',
-    status: 'Publicado'
-  }
-]
-
-
-const formularioVazio = {
-  aluno: '',
-  turma: '',
-  disciplina: '',
-  bimestre: '',
+const vazio = {
+  aluno_id: '',
+  disciplina_id: '',
+  periodo_id: '',
   media: '',
   descricao: '',
   situacao: '',
@@ -168,337 +22,426 @@ const formularioVazio = {
   tags: []
 }
 
+const situacoes = [
+  'Precisa de atenção',
+  'Em desenvolvimento',
+  'Em evolução',
+  'Bom desenvolvimento',
+  'Excelente desenvolvimento'
+]
 
-function Professor() {
-  const [menuMobileAberto, setMenuMobileAberto] = useState(false)
+const campos = [
+  ['pontosPositivos', 'Pontos positivos *'],
+  ['dificuldades', 'Dificuldades identificadas *'],
+  ['evolucao', 'Evolução no período *'],
+  ['orientacao', 'Orientação à família *']
+]
+
+// Salva os detalhes no campo descricao do MySQL.
+function montarDescricao(formulario) {
+  return JSON.stringify({
+    formato: 'kfka-professor-v1',
+    descricao: formulario.descricao.trim(),
+    situacao: formulario.situacao,
+    pontosPositivos: formulario.pontosPositivos.trim(),
+    dificuldades: formulario.dificuldades.trim(),
+    evolucao: formulario.evolucao.trim(),
+    orientacao: formulario.orientacao.trim()
+  })
+}
+
+function lerDescricao(valor) {
+  try {
+    const dados = JSON.parse(valor)
+    if (dados?.formato === 'kfka-professor-v1') return dados
+  } catch {
+    // Registros antigos podem conter texto simples.
+  }
+
+  return {
+    descricao: valor || '',
+    situacao: '',
+    pontosPositivos: '',
+    dificuldades: '',
+    evolucao: '',
+    orientacao: ''
+  }
+}
+
+function nomeStatus(status) {
+  return {
+    rascunho: 'Rascunho',
+    pendente: 'Em Revisão',
+    devolvido: 'Devolvido',
+    publicado: 'Publicado'
+  }[status] || status
+}
+
+function classeStatus(status) {
+  return {
+    rascunho: 'professor-rascunho',
+    pendente: 'professor-revisao',
+    devolvido: 'professor-devolvido',
+    publicado: 'professor-publicado'
+  }[status] || ''
+}
+
+export default function Professor() {
   const [pagina, setPagina] = useState('novo')
-  const [formulario, setFormulario] = useState(formularioVazio)
-  const [acompanhamentos, setAcompanhamentos] = useState(dadosIniciais)
-
-  const [selecionado, setSelecionado] = useState(null)
+  const [menuMobileAberto, setMenuMobileAberto] = useState(false)
+  const [formulario, setFormulario] = useState({ ...vazio })
+  const [vinculos, setVinculos] = useState([])
+  const [periodos, setPeriodos] = useState([])
+  const [tags, setTags] = useState([])
+  const [registros, setRegistros] = useState([])
+  const [tagsPorRegistro, setTagsPorRegistro] = useState({})
   const [editandoId, setEditandoId] = useState(null)
-
+  const [selecionado, setSelecionado] = useState(null)
   const [erro, setErro] = useState('')
   const [sucesso, setSucesso] = useState('')
+  const [carregando, setCarregando] = useState(true)
+  const [salvando, setSalvando] = useState(false)
 
-
-  function alterarCampo(evento) {
-    const { name, value } = evento.target
-
-    setFormulario({
-      ...formulario,
-      [name]: value
-    })
-  }
-
-
-  function selecionarAluno(evento) {
-    const nome = evento.target.value
-    const alunoEncontrado = alunos.find(
-      (item) => item.nome === nome
-    )
-
-    setFormulario({
-      ...formulario,
-      aluno: nome,
-      turma: alunoEncontrado?.turma || ''
-    })
-  }
-
-
-  function selecionarTag(tag) {
-    const selecionada = formulario.tags.includes(tag)
-
-    setFormulario({
-      ...formulario,
-      tags: selecionada
-        ? formulario.tags.filter((item) => item !== tag)
-        : [...formulario.tags, tag]
-    })
-  }
-
-
-  function limparFormulario() {
-    setFormulario(formularioVazio)
-    setEditandoId(null)
-  }
-
-
-  function validarFormulario() {
-    const {
-      aluno,
-      turma,
-      disciplina,
-      bimestre,
-      media,
-      descricao,
-      situacao,
-      pontosPositivos,
-      dificuldades,
-      evolucao,
-      orientacao,
-      tags
-    } = formulario
-
-    if (
-      !aluno ||
-      !turma ||
-      !disciplina ||
-      !bimestre ||
-      !media ||
-      !descricao.trim() ||
-      !situacao ||
-      !pontosPositivos.trim() ||
-      !dificuldades.trim() ||
-      !evolucao.trim() ||
-      !orientacao.trim()
-    ) {
-      setErro('Preencha todos os campos obrigatórios.')
-      return false
+  const [usuario] = useState(() => {
+    try {
+      return JSON.parse(sessionStorage.getItem('kfka_usuario') || '{}')
+    } catch {
+      return {}
     }
+  })
 
-    const mediaNumero = Number(
-      String(media).replace(',', '.')
-    )
+  // Busca os dados reais do backend.
+  const carregar = useCallback(async () => {
+    setCarregando(true)
 
-    if (
-      Number.isNaN(mediaNumero) ||
-      mediaNumero < 0 ||
-      mediaNumero > 10
-    ) {
-      setErro('A média deve ser um valor entre 0 e 10.')
-      return false
-    }
+    try {
+      const [opcoes, lista, tagsDisponiveis] = await Promise.all([
+        api('/acompanhamentos/opcoes'),
+        api('/acompanhamentos'),
+        api('/tags')
+      ])
 
-    if (tags.length === 0) {
-      setErro(
-        'Selecione pelo menos uma tag de acompanhamento.'
-      )
-      return false
-    }
+      setVinculos(opcoes.vinculos || [])
+      setPeriodos(opcoes.periodos || [])
+      setRegistros(lista || [])
+      setTags(tagsDisponiveis.filter(item => item.ativo))
 
-    setErro('')
-    return true
-  }
-
-
-  function salvarRegistro(status) {
-    const registro = {
-      id: editandoId || Date.now(),
-      ...formulario,
-      status
-    }
-
-    if (editandoId) {
-      setAcompanhamentos(
-        acompanhamentos.map((item) =>
-          item.id === editandoId ? registro : item
+      const resultados = await Promise.allSettled(
+        (lista || []).map(item =>
+          api(`/acompanhamentos/${item.id}/tags`)
         )
       )
-    } else {
-      setAcompanhamentos([
-        registro,
-        ...acompanhamentos
+
+      const mapa = {}
+
+      resultados.forEach((resultado, indice) => {
+        if (resultado.status === 'fulfilled') {
+          mapa[lista[indice].id] = resultado.value
+        }
+      })
+
+      setTagsPorRegistro(mapa)
+      setErro('')
+    } catch (e) {
+      setErro(e.message)
+    } finally {
+      setCarregando(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    carregar()
+  }, [carregar])
+
+  const alunos = useMemo(() => {
+    const mapa = new Map()
+
+    vinculos.forEach(v => {
+      if (!mapa.has(v.aluno_id)) {
+        mapa.set(v.aluno_id, {
+          id: v.aluno_id,
+          nome: v.aluno,
+          turma: v.turma
+        })
+      }
+    })
+
+    return [...mapa.values()]
+  }, [vinculos])
+
+  const vinculosAluno = vinculos.filter(
+    v => String(v.aluno_id) === String(formulario.aluno_id)
+  )
+
+  const disciplinas = [
+    ...new Map(
+      vinculosAluno.map(v => [
+        v.disciplina_id,
+        { id: v.disciplina_id, nome: v.disciplina }
       ])
-    }
+    ).values()
+  ]
 
-    limparFormulario()
-  }
+  const vinculoEscolhido = vinculosAluno.find(
+    v => String(v.disciplina_id) === String(formulario.disciplina_id)
+  )
 
+  const periodosDisponiveis = periodos.filter(
+    p => !vinculoEscolhido ||
+      Number(p.ano_letivo) === Number(vinculoEscolhido.ano_letivo)
+  )
 
-  function salvarRascunho() {
-    if (
-      !formulario.aluno ||
-      !formulario.disciplina ||
-      !formulario.bimestre
-    ) {
-      setErro(
-        'Para salvar como rascunho, informe pelo menos aluno, disciplina e bimestre.'
-      )
-      setSucesso('')
-      return
-    }
-
-    salvarRegistro('Rascunho')
-
-    setErro('')
-    setSucesso('Rascunho salvo com sucesso.')
-  }
-
-
-  function enviarParaRevisao(evento) {
-    evento.preventDefault()
-
-    if (!validarFormulario()) {
-      setSucesso('')
-      return
-    }
-
-    salvarRegistro('Enviado para revisão')
-
-    setErro('')
-    setSucesso(
-      'Acompanhamento enviado para revisão.'
-    )
-    setPagina('acompanhamentos')
-  }
-
-
-  function editarAcompanhamento(item) {
-    setFormulario({
-      aluno: item.aluno || '',
-      turma: item.turma || '',
-      disciplina: item.disciplina || '',
-      bimestre: item.bimestre || '',
-      media: item.media || '',
-      descricao: item.descricao || '',
-      situacao: item.situacao || '',
-      pontosPositivos: item.pontosPositivos || '',
-      dificuldades: item.dificuldades || '',
-      evolucao: item.evolucao || '',
-      orientacao: item.orientacao || '',
-      tags: item.tags || []
-    })
-
-    setEditandoId(item.id)
-    setErro('')
-    setSucesso('')
-    setPagina('novo')
-
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    })
-  }
-
-
-  function cancelarEdicao() {
-    limparFormulario()
-    setErro('')
-    setSucesso('')
-  }
-
-
-  function classeStatus(status) {
-    const classes = {
-      Publicado: 'professor-publicado',
-      Devolvido: 'professor-devolvido',
-      'Em Revisão': 'professor-revisao',
-      Rascunho: 'professor-rascunho'
-    }
-
-    return classes[status] || 'professor-enviado'
-  }
-
+  const alunoEscolhido = alunos.find(
+    a => String(a.id) === String(formulario.aluno_id)
+  )
 
   const resumo = {
-    rascunhos: acompanhamentos.filter(
-      (item) => item.status === 'Rascunho'
+    rascunhos: registros.filter(
+      r => r.status === 'rascunho'
     ).length,
 
-    aguardando: acompanhamentos.filter(
-      (item) =>
-        item.status === 'Enviado para revisão' ||
-        item.status === 'Em Revisão'
+    aguardando: registros.filter(
+      r => r.status === 'pendente'
     ).length,
 
-    devolvidos: acompanhamentos.filter(
-      (item) => item.status === 'Devolvido'
+    devolvidos: registros.filter(
+      r => r.status === 'devolvido'
     ).length,
 
-    publicados: acompanhamentos.filter(
-      (item) => item.status === 'Publicado'
+    publicados: registros.filter(
+      r => r.status === 'publicado'
     ).length
   }
 
+  function alterarCampo(e) {
+    const { name, value } = e.target
 
-  const camposTexto = [
-    {
-      name: 'pontosPositivos',
-      label: 'Pontos positivos *',
-      placeholder:
-        'Descreva os pontos positivos observados durante o período...'
-    },
-    {
-      name: 'dificuldades',
-      label: 'Dificuldades identificadas *',
-      placeholder:
-        'Descreva as principais dificuldades identificadas...'
-    },
-    {
-      name: 'evolucao',
-      label: 'Evolução no período *',
-      placeholder:
-        'Descreva como o aluno evoluiu durante o período...'
-    },
-    {
-      name: 'orientacao',
-      label: 'Orientação à família *',
-      placeholder:
-        'Registre orientações para continuidade do acompanhamento...'
+    setFormulario(atual => ({
+      ...atual,
+      [name]: value,
+      ...(name === 'disciplina_id' ? { periodo_id: '' } : {})
+    }))
+  }
+
+  function selecionarAluno(e) {
+    setFormulario(atual => ({
+      ...atual,
+      aluno_id: e.target.value,
+      disciplina_id: '',
+      periodo_id: ''
+    }))
+  }
+
+  function selecionarTag(id) {
+    setFormulario(atual => ({
+      ...atual,
+      tags: atual.tags.includes(id)
+        ? atual.tags.filter(t => t !== id)
+        : [...atual.tags, id]
+    }))
+  }
+
+  function limpar() {
+    setFormulario({ ...vazio, tags: [] })
+    setEditandoId(null)
+  }
+
+  function validar(completo) {
+    if (
+      !formulario.aluno_id ||
+      !formulario.disciplina_id ||
+      !formulario.periodo_id ||
+      !formulario.descricao.trim()
+    ) {
+      throw new Error(
+        'Informe aluno, disciplina, período e descrição para salvar.'
+      )
     }
-  ]
 
+    const media = formulario.media === ''
+      ? null
+      : Number(String(formulario.media).replace(',', '.'))
 
-  const detalhesModal = selecionado
-    ? [
-      {
-        titulo: 'Descrição geral',
-        texto: selecionado.descricao
-      },
-      {
-        titulo: 'Pontos positivos',
-        texto: selecionado.pontosPositivos
-      },
-      {
-        titulo: 'Dificuldades identificadas',
-        texto: selecionado.dificuldades
-      },
-      {
-        titulo: 'Evolução no período',
-        texto: selecionado.evolucao
-      },
-      {
-        titulo: 'Orientação à família',
-        texto: selecionado.orientacao
+    if (
+      media !== null &&
+      (!Number.isFinite(media) || media < 0 || media > 10)
+    ) {
+      throw new Error('A média deve estar entre 0 e 10.')
+    }
+
+    if (
+      completo &&
+      (
+        !formulario.situacao ||
+        !formulario.pontosPositivos.trim() ||
+        !formulario.dificuldades.trim() ||
+        !formulario.evolucao.trim() ||
+        !formulario.orientacao.trim()
+      )
+    ) {
+      throw new Error(
+        'Preencha todos os campos de avaliação antes de enviar para revisão.'
+      )
+    }
+
+    if (completo && !formulario.tags.length) {
+      throw new Error('Selecione pelo menos uma tag.')
+    }
+
+    if (montarDescricao(formulario).length > 16000) {
+      throw new Error('A descrição está muito longa.')
+    }
+
+    return media
+  }
+
+  // Cria ou atualiza um acompanhamento.
+  async function salvar(enviar = false) {
+    if (salvando) return
+
+    setSalvando(true)
+    setErro('')
+    setSucesso('')
+
+    try {
+      const media = validar(enviar)
+      const descricao = montarDescricao(formulario)
+      let registroId = editandoId
+
+      if (editandoId) {
+        const anterior = registros.find(r => r.id === editandoId)
+
+        if (
+          !anterior ||
+          String(anterior.aluno_id) !== String(formulario.aluno_id) ||
+          String(anterior.disciplina_id) !== String(formulario.disciplina_id) ||
+          String(anterior.periodo_id) !== String(formulario.periodo_id)
+        ) {
+          throw new Error(
+            'Não é possível trocar aluno, disciplina ou período de um registro existente.'
+          )
+        }
+
+        await api(`/acompanhamentos/${editandoId}`, {
+          method: 'PATCH',
+          body: JSON.stringify({ descricao, media })
+        })
+      } else {
+        const resultado = await api('/acompanhamentos', {
+          method: 'POST',
+          body: JSON.stringify({
+            aluno_id: Number(formulario.aluno_id),
+            disciplina_id: Number(formulario.disciplina_id),
+            periodo_id: Number(formulario.periodo_id),
+            descricao,
+            media
+          })
+        })
+
+        registroId = resultado.acompanhamento.id
       }
-    ]
-    : []
 
+      // Sincroniza as tags do registro.
+      const anteriores = (
+        tagsPorRegistro[registroId] || []
+      ).map(t => t.id)
+
+      for (const id of formulario.tags.filter(
+        t => !anteriores.includes(t)
+      )) {
+        await api(`/acompanhamentos/${registroId}/tags`, {
+          method: 'POST',
+          body: JSON.stringify({ tag_id: id })
+        })
+      }
+
+      for (const id of anteriores.filter(
+        t => !formulario.tags.includes(t)
+      )) {
+        await api(`/acompanhamentos/${registroId}/tags/${id}`, {
+          method: 'DELETE'
+        })
+      }
+
+      if (enviar) {
+        await api(`/acompanhamentos/${registroId}/enviar`, {
+          method: 'PATCH'
+        })
+      }
+
+      limpar()
+      setPagina('acompanhamentos')
+      await carregar()
+
+      setSucesso(
+        enviar
+          ? 'Acompanhamento enviado para revisão.'
+          : 'Rascunho salvo com sucesso.'
+      )
+    } catch (e) {
+      setErro(
+        e.message +
+        (editandoId
+          ? ''
+          : ' Se o registro foi criado, confira a lista antes de tentar novamente.')
+      )
+    } finally {
+      setSalvando(false)
+    }
+  }
+
+  function editar(item) {
+    const detalhes = lerDescricao(item.descricao)
+
+    setFormulario({
+      ...vazio,
+      ...detalhes,
+      aluno_id: String(item.aluno_id),
+      disciplina_id: String(item.disciplina_id),
+      periodo_id: String(item.periodo_id),
+      media: item.media == null ? '' : String(item.media),
+      tags: (tagsPorRegistro[item.id] || []).map(t => t.id)
+    })
+
+    setEditandoId(item.id)
+    setSelecionado(null)
+    setPagina('novo')
+    setErro('')
+    setSucesso('')
+
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const detalhesSelecionado = selecionado
+    ? lerDescricao(selecionado.descricao)
+    : null
 
   return (
     <div className="professor">
-
       <aside className="professor-sidebar">
-
         <div className="professor-sidebar-topo">
           <h1 className="professor-logo">
             K<span>F</span>KA
           </h1>
+
           <button
             type="button"
             className="professor-menu-mobile-botao"
-            aria-label={menuMobileAberto ? 'Fechar menu' : 'Abrir menu'}
-            aria-expanded={menuMobileAberto}
-            aria-controls="professor-navegacao"
             onClick={() => setMenuMobileAberto(!menuMobileAberto)}
+            aria-label="Abrir menu"
           >
-            {menuMobileAberto ? <X size={23} /> : <Menu size={23} />}
+            {menuMobileAberto
+              ? <X size={23} />
+              : <Menu size={23} />}
           </button>
         </div>
 
-        <nav
-          className={`professor-menu ${menuMobileAberto ? 'professor-menu-aberto' : ''}`}
-          id="professor-navegacao"
-          aria-label="Menu do professor"
-        >
-
+        <nav className={`professor-menu ${menuMobileAberto ? 'professor-menu-aberto' : ''
+          }`}>
           <button
             type="button"
             className={
-              pagina === 'novo'
-                ? 'professor-menu-ativo'
-                : ''
+              pagina === 'novo' ? 'professor-menu-ativo' : ''
             }
             onClick={() => {
               setPagina('novo')
@@ -528,25 +471,16 @@ function Professor() {
             <LayoutDashboard size={19} />
             Meus acompanhamentos
           </button>
-
         </nav>
-
       </aside>
 
-
       <main className="professor-conteudo">
-
-        <Link
-          to="/"
-          className="professor-voltar"
-        >
+        <Link to="/" className="professor-voltar">
           <ArrowLeft size={18} />
           Voltar ao início
         </Link>
 
-
         <header className="professor-topo">
-
           <div>
             <span className="professor-area">
               ÁREA DO PROFESSOR
@@ -555,29 +489,23 @@ function Professor() {
             <h2>Acompanhamento escolar</h2>
 
             <p>
-              Registre e acompanhe o desenvolvimento
-              dos seus alunos.
+              Registre e acompanhe o desenvolvimento dos seus alunos.
             </p>
           </div>
 
           <div className="professor-usuario">
-
             <div className="professor-avatar">
               <UserRound size={21} />
             </div>
 
             <div>
-              <strong>Professor</strong>
+              <strong>{usuario.nome || 'Professor'}</strong>
               <span>Área docente</span>
             </div>
-
           </div>
-
         </header>
 
-
         <section className="professor-resumo">
-
           <div>
             <span>Rascunhos</span>
             <strong>{resumo.rascunhos}</strong>
@@ -597,9 +525,9 @@ function Professor() {
             <span>Publicados</span>
             <strong>{resumo.publicados}</strong>
           </div>
-
         </section>
 
+        {carregando && <p>Carregando dados...</p>}
 
         {sucesso && (
           <div className="professor-sucesso">
@@ -615,13 +543,9 @@ function Professor() {
           </div>
         )}
 
-
         {pagina === 'novo' && (
-
           <section className="professor-painel">
-
             <div className="professor-painel-topo">
-
               <div>
                 <span>
                   {editandoId ? 'EDIÇÃO' : 'NOVO REGISTRO'}
@@ -634,62 +558,50 @@ function Professor() {
                 </h3>
 
                 <p>
-                  Registre o desenvolvimento do aluno
-                  durante o período.
+                  Registre o desenvolvimento do aluno durante o período.
                 </p>
               </div>
 
               <BookOpen size={24} />
-
             </div>
-
 
             <form
               className="professor-formulario"
-              onSubmit={enviarParaRevisao}
+              onSubmit={e => {
+                e.preventDefault()
+                salvar(true)
+              }}
             >
-
               <div className="professor-form-grid">
-
                 <div className="professor-campo">
-                  <label htmlFor="aluno">
-                    Aluno *
-                  </label>
+                  <label htmlFor="aluno">Aluno *</label>
 
                   <select
                     id="aluno"
-                    value={formulario.aluno}
+                    value={formulario.aluno_id}
                     onChange={selecionarAluno}
+                    disabled={Boolean(editandoId)}
                   >
-                    <option value="">
-                      Selecione o aluno
-                    </option>
+                    <option value="">Selecione o aluno</option>
 
-                    {alunos.map((item) => (
-                      <option
-                        key={item.id}
-                        value={item.nome}
-                      >
-                        {item.nome}
+                    {alunos.map(a => (
+                      <option key={a.id} value={a.id}>
+                        {a.nome}
                       </option>
                     ))}
                   </select>
                 </div>
 
-
                 <div className="professor-campo">
-                  <label htmlFor="turma">
-                    Turma *
-                  </label>
+                  <label htmlFor="turma">Turma</label>
 
                   <input
                     id="turma"
-                    value={formulario.turma}
+                    value={alunoEscolhido?.turma || ''}
                     readOnly
                     placeholder="Turma do aluno"
                   />
                 </div>
-
 
                 <div className="professor-campo">
                   <label htmlFor="disciplina">
@@ -698,50 +610,44 @@ function Professor() {
 
                   <select
                     id="disciplina"
-                    name="disciplina"
-                    value={formulario.disciplina}
+                    name="disciplina_id"
+                    value={formulario.disciplina_id}
                     onChange={alterarCampo}
+                    disabled={Boolean(editandoId)}
                   >
-                    <option value="">
-                      Selecione
-                    </option>
+                    <option value="">Selecione</option>
 
-                    {disciplinas.map((item) => (
-                      <option key={item}>
-                        {item}
+                    {disciplinas.map(d => (
+                      <option key={d.id} value={d.id}>
+                        {d.nome}
                       </option>
                     ))}
                   </select>
                 </div>
 
-
                 <div className="professor-campo">
-                  <label htmlFor="bimestre">
-                    Bimestre *
-                  </label>
+                  <label htmlFor="bimestre">Período *</label>
 
                   <select
                     id="bimestre"
-                    name="bimestre"
-                    value={formulario.bimestre}
+                    name="periodo_id"
+                    value={formulario.periodo_id}
                     onChange={alterarCampo}
+                    disabled={Boolean(editandoId)}
                   >
-                    <option value="">
-                      Selecione
-                    </option>
+                    <option value="">Selecione</option>
 
-                    {bimestres.map((item) => (
-                      <option key={item}>
-                        {item}
+                    {periodosDisponiveis.map(p => (
+                      <option key={p.id} value={p.id}>
+                        {p.nome} — {p.ano_letivo}
                       </option>
                     ))}
                   </select>
                 </div>
 
-
                 <div className="professor-campo">
                   <label htmlFor="media">
-                    Média do período *
+                    Média do período
                   </label>
 
                   <input
@@ -757,7 +663,6 @@ function Professor() {
                   />
                 </div>
 
-
                 <div className="professor-campo">
                   <label htmlFor="situacao">
                     Situação atual *
@@ -769,119 +674,94 @@ function Professor() {
                     value={formulario.situacao}
                     onChange={alterarCampo}
                   >
-                    <option value="">
-                      Selecione
-                    </option>
+                    <option value="">Selecione</option>
 
-                    {situacoes.map((item) => (
-                      <option key={item}>
-                        {item}
+                    {situacoes.map(s => (
+                      <option key={s} value={s}>
+                        {s}
                       </option>
                     ))}
                   </select>
                 </div>
-
               </div>
 
+              <div className="professor-campo">
+                <label htmlFor="descricao">
+                  Descrição geral *
+                </label>
 
-              <div className="professor-textos">
+                <textarea
+                  id="descricao"
+                  name="descricao"
+                  rows={4}
+                  value={formulario.descricao}
+                  onChange={alterarCampo}
+                  placeholder="Descreva o acompanhamento escolar..."
+                />
+              </div>
 
-                <div className="professor-campo">
-                  <label htmlFor="descricao">
-                    Descrição geral do acompanhamento *
-                  </label>
+              {campos.map(([name, label]) => (
+                <div className="professor-campo" key={name}>
+                  <label htmlFor={name}>{label}</label>
 
                   <textarea
-                    id="descricao"
-                    name="descricao"
-                    value={formulario.descricao}
+                    id={name}
+                    name={name}
+                    rows={3}
+                    value={formulario[name]}
                     onChange={alterarCampo}
-                    placeholder="Descreva de forma geral o desenvolvimento e o acompanhamento do aluno durante o período..."
+                    placeholder={label.replace(' *', '')}
                   />
                 </div>
+              ))}
 
-              </div>
-
-
-              <div className="professor-bloco">
-
-                <div className="professor-bloco-titulo">
+              <div className="professor-campo">
+                <label>
                   <Tag size={17} />
-
-                  <div>
-                    <h4>
-                      Tags de acompanhamento *
-                    </h4>
-
-                    <p>
-                      Selecione uma ou mais classificações.
-                    </p>
-                  </div>
-                </div>
+                  Tags de acompanhamento *
+                </label>
 
                 <div className="professor-tags">
-
-                  {tagsDisponiveis.map((tag) => (
+                  {tags.map(tag => (
                     <button
-                      key={tag}
+                      key={tag.id}
                       type="button"
                       className={
-                        formulario.tags.includes(tag)
-                          ? 'professor-tag professor-tag-ativa'
-                          : 'professor-tag'
+                        formulario.tags.includes(tag.id)
+                          ? 'professor-tag-selecionada'
+                          : ''
                       }
-                      onClick={() => selecionarTag(tag)}
+                      onClick={() => selecionarTag(tag.id)}
+                      aria-pressed={
+                        formulario.tags.includes(tag.id)
+                      }
                     >
-                      {tag}
+                      {tag.nome}
                     </button>
                   ))}
-
                 </div>
-
               </div>
-
-
-              <div className="professor-textos">
-
-                {camposTexto.map((campo) => (
-                  <div
-                    className="professor-campo"
-                    key={campo.name}
-                  >
-                    <label htmlFor={campo.name}>
-                      {campo.label}
-                    </label>
-
-                    <textarea
-                      id={campo.name}
-                      name={campo.name}
-                      value={formulario[campo.name]}
-                      onChange={alterarCampo}
-                      placeholder={campo.placeholder}
-                    />
-                  </div>
-                ))}
-
-              </div>
-
 
               <div className="professor-form-acoes">
-
                 {editandoId && (
                   <button
                     type="button"
-                    className="professor-cancelar"
-                    onClick={cancelarEdicao}
+                    className="professor-botao-secundario"
+                    onClick={() => {
+                      limpar()
+                      setErro('')
+                      setSucesso('')
+                    }}
                   >
-                    <X size={17} />
                     Cancelar edição
                   </button>
                 )}
 
                 <button
                   type="button"
-                  className="professor-rascunho-botao"
-                  onClick={salvarRascunho}
+                  className="professor-botao-secundario"
+                  disabled={salvando || carregando}
+                  onClick={() => salvar(false)}
                 >
                   <Save size={17} />
                   Salvar rascunho
@@ -889,173 +769,132 @@ function Professor() {
 
                 <button
                   type="submit"
-                  className="professor-enviar"
+                  className="professor-botao-principal"
+                  disabled={salvando || carregando}
                 >
                   <Send size={17} />
-
-                  {editandoId
-                    ? 'Salvar e enviar'
+                  {salvando
+                    ? 'Salvando...'
                     : 'Enviar para revisão'}
                 </button>
-
               </div>
-
             </form>
-
           </section>
-
         )}
 
-
         {pagina === 'acompanhamentos' && (
-
           <section className="professor-painel">
-
             <div className="professor-painel-topo">
-
               <div>
                 <span>MEUS REGISTROS</span>
-
                 <h3>Acompanhamentos</h3>
 
                 <p>
-                  Consulte o andamento dos registros
-                  enviados para a escola.
+                  Consulte o andamento dos registros enviados para a escola.
                 </p>
               </div>
 
               <Clock3 size={24} />
-
             </div>
 
-
             <div className="professor-tabela-scroll">
-
               <table className="professor-tabela">
-
                 <thead>
                   <tr>
                     <th>Aluno</th>
                     <th>Turma</th>
                     <th>Disciplina</th>
-                    <th>Bimestre</th>
+                    <th>Período</th>
                     <th>Status</th>
                     <th>Ações</th>
                   </tr>
                 </thead>
 
                 <tbody>
-
-                  {acompanhamentos.map((item) => (
-
+                  {registros.map(item => (
                     <tr key={item.id}>
-
                       <td>
                         <strong>{item.aluno}</strong>
                       </td>
 
-                      <td>{item.turma}</td>
-
+                      <td>{item.turma || '—'}</td>
                       <td>{item.disciplina}</td>
-
-                      <td>{item.bimestre}</td>
+                      <td>{item.periodo}</td>
 
                       <td>
                         <span
-                          className={`professor-status ${classeStatus(
-                            item.status
-                          )}`}
+                          className={`professor-status ${classeStatus(item.status)
+                            }`}
                         >
-                          {item.status}
+                          {nomeStatus(item.status)}
                         </span>
                       </td>
 
                       <td>
-
                         <div className="professor-acoes">
-
                           <button
                             type="button"
                             className="professor-botao-secundario"
-                            onClick={() =>
-                              setSelecionado(item)
-                            }
+                            onClick={() => setSelecionado(item)}
                           >
                             <Eye size={15} />
                             Ver
                           </button>
 
-                          {(item.status === 'Rascunho' ||
-                            item.status === 'Devolvido') && (
-
+                          {[
+                            'rascunho',
+                            'devolvido'
+                          ].includes(item.status) && (
                               <button
                                 type="button"
                                 className="professor-editar"
-                                onClick={() =>
-                                  editarAcompanhamento(item)
-                                }
+                                onClick={() => editar(item)}
                               >
                                 <Pencil size={15} />
-
-                                {item.status === 'Devolvido'
-                                  ? 'Corrigir'
-                                  : 'Editar'}
+                                Editar
                               </button>
-
                             )}
-
                         </div>
-
                       </td>
-
                     </tr>
-
                   ))}
 
+                  {!registros.length && (
+                    <tr>
+                      <td colSpan={6}>
+                        Nenhum acompanhamento cadastrado.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
-
               </table>
-
             </div>
-
           </section>
-
         )}
-
       </main>
 
-
       {selecionado && (
-
         <div
           className="professor-modal-fundo"
           onClick={() => setSelecionado(null)}
         >
-
           <section
             className="professor-modal"
             role="dialog"
             aria-modal="true"
-            onClick={(evento) =>
-              evento.stopPropagation()
-            }
+            onClick={e => e.stopPropagation()}
           >
-
             <header className="professor-modal-topo">
-
               <div>
-                <span>
-                  ACOMPANHAMENTO ESCOLAR
-                </span>
-
+                <span>ACOMPANHAMENTO ESCOLAR</span>
                 <h3>{selecionado.aluno}</h3>
 
                 <p>
                   {selecionado.disciplina}
                   {' • '}
-                  {selecionado.bimestre}
+                  {selecionado.periodo}
                   {' • '}
-                  {selecionado.turma}
+                  {selecionado.turma || 'Turma não informada'}
                 </p>
               </div>
 
@@ -1067,121 +906,80 @@ function Professor() {
               >
                 <X size={20} />
               </button>
-
             </header>
 
-
             <div className="professor-modal-resumo">
-
               <div>
                 <span>Status</span>
-                <strong>{selecionado.status}</strong>
+                <strong>
+                  {nomeStatus(selecionado.status)}
+                </strong>
               </div>
 
               <div>
                 <span>Média</span>
                 <strong>
-                  {selecionado.media || 'Não informada'}
+                  {selecionado.media ?? 'Não informada'}
                 </strong>
               </div>
 
               <div>
                 <span>Situação</span>
                 <strong>
-                  {selecionado.situacao || 'Não informada'}
+                  {detalhesSelecionado.situacao ||
+                    'Não informada'}
                 </strong>
               </div>
-
             </div>
 
-
-            {selecionado.status === 'Devolvido' &&
-              selecionado.motivoDevolucao && (
-
-                <div className="professor-motivo">
-
-                  <AlertCircle size={18} />
-
-                  <div>
-                    <strong>
-                      Devolvido pelo administrador
-                    </strong>
-
-                    <p>
-                      {selecionado.motivoDevolucao}
-                    </p>
-                  </div>
-
-                </div>
-
-              )}
-
-
             <div className="professor-detalhe">
-
               <h4>Tags de acompanhamento</h4>
 
               <div className="professor-tags-modal">
-
-                {selecionado.tags?.map((tag) => (
-                  <span key={tag}>
-                    {tag}
-                  </span>
+                {(tagsPorRegistro[selecionado.id] || []).map(t => (
+                  <span key={t.id}>{t.nome}</span>
                 ))}
-
               </div>
-
             </div>
 
-
-            {detalhesModal.map((detalhe) => (
-
+            {[
+              ['descricao', 'Descrição geral'],
+              ...campos.map(([name, label]) => [
+                name,
+                label.replace(' *', '')
+              ])
+            ].map(([campo, titulo]) => (
               <div
                 className="professor-detalhe"
-                key={detalhe.titulo}
+                key={campo}
               >
-                <h4>{detalhe.titulo}</h4>
+                <h4>{titulo}</h4>
 
                 <p>
-                  {detalhe.texto || 'Não informado.'}
+                  {detalhesSelecionado[campo] ||
+                    'Não informado.'}
                 </p>
               </div>
-
             ))}
 
-
-            {(selecionado.status === 'Rascunho' ||
-              selecionado.status === 'Devolvido') && (
-
+            {[
+              'rascunho',
+              'devolvido'
+            ].includes(selecionado.status) && (
                 <footer className="professor-modal-rodape">
-
                   <button
                     type="button"
                     className="professor-editar"
-                    onClick={() => {
-                      editarAcompanhamento(selecionado)
-                      setSelecionado(null)
-                    }}
+                    onClick={() => editar(selecionado)}
                   >
                     <Pencil size={16} />
-
-                    {selecionado.status === 'Devolvido'
-                      ? 'Corrigir acompanhamento'
-                      : 'Editar rascunho'}
+                    Editar acompanhamento
                   </button>
-
                 </footer>
-
               )}
-
           </section>
-
         </div>
-
       )}
-
     </div>
   )
 }
-
-export default Professor

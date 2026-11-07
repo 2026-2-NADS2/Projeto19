@@ -1,3 +1,5 @@
+/* Estrutura principal */
+
 .admin {
   min-height: 100vh;
   display: flex;
@@ -13,8 +15,7 @@
   color: var(--texto);
 }
 
-
-/* SIDEBAR */
+/* Sidebar */
 
 .admin-sidebar {
   position: sticky;
@@ -31,6 +32,8 @@
 
   border-right: 1px solid var(--borda);
 }
+
+/* Logo */
 
 .admin-logo {
   margin: 0 0 42px 18px;
@@ -53,8 +56,7 @@
   -webkit-text-fill-color: transparent;
 }
 
-
-/* MENU */
+/* Menu */
 
 .admin-menu {
   display: flex;
@@ -95,8 +97,7 @@
   background: var(--destaque);
 }
 
-
-/* CONTEÚDO */
+/* Conteúdo */
 
 .admin-conteudo {
   flex: 1;
@@ -125,8 +126,7 @@
   color: var(--texto);
 }
 
-
-/* TOPO */
+/* Topo */
 
 .admin-topo {
   display: flex;
@@ -188,8 +188,7 @@
   font-size: 10px;
 }
 
-
-/* CARDS */
+/* Cards */
 
 .admin-cards {
   display: grid;
@@ -228,8 +227,7 @@
   font-size: 28px;
 }
 
-
-/* STATUS */
+/* Status */
 
 .admin-status {
   display: grid;
@@ -271,8 +269,7 @@
   font-size: 20px;
 }
 
-
-/* PAINÉIS */
+/* Painéis */
 
 .admin-painel {
   padding: 24px;
@@ -330,13 +327,13 @@
   color: var(--destaque-claro);
 }
 
-
-/* FORMULÁRIOS */
+/* Formulários */
 
 .admin-form-grid {
   display: grid;
 
   grid-template-columns: 1fr 180px;
+
   gap: 16px;
 
   align-items: end;
@@ -408,8 +405,7 @@
   flex: 1;
 }
 
-
-/* BOTÕES */
+/* Botões */
 
 .admin-botao-principal {
   min-height: 39px;
@@ -478,34 +474,51 @@
   border-color: var(--destaque-claro);
 }
 
+/* Botões de editar e excluir */
+
 .admin-botao-icone {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  color: var(--texto);
+  color: #ffffff;
+  background: #7625c9;
 
-  background: var(--campo);
-
-  border: 1px solid var(--borda);
-  border-radius: 7px;
+  border: 1px solid #a855f7;
+  border-radius: 8px;
 
   cursor: pointer;
+  transition: 0.2s;
+}
+
+.admin-botao-icone svg {
+  width: 16px;
+  height: 16px;
+
+  color: #ffffff;
+  stroke: #ffffff;
 }
 
 .admin-botao-icone:hover {
-  border-color: var(--destaque-claro);
+  background: #8e35e5;
+  border-color: #c084fc;
+
+  transform: translateY(-1px);
 }
 
 .admin-botao-icone.perigo {
-  color: var(--erro);
+  color: #ffffff;
 }
 
+.admin-botao-icone.perigo svg {
+  color: #ffffff;
+  stroke: #ffffff;
+}
 
-/* TABELAS */
+/* Tabelas */
 
 .admin-tabela-scroll {
   width: 100%;
@@ -558,11 +571,10 @@
   display: flex;
   align-items: center;
 
-  gap: 6px;
+  gap: 8px;
 }
 
-
-/* BADGES */
+/* Badges */
 
 .admin-badge {
   display: inline-block;
@@ -599,8 +611,7 @@
   background: rgba(229, 106, 106, 0.12);
 }
 
-
-/* LISTAS */
+/* Listas */
 
 .admin-lista-itens {
   display: flex;
@@ -657,8 +668,7 @@
   font-size: 9px;
 }
 
-
-/* ÁREAS E DISCIPLINAS */
+/* Áreas e disciplinas */
 
 .admin-duas-colunas {
   display: grid;
@@ -670,8 +680,7 @@
   align-items: start;
 }
 
-
-/* PERÍODOS */
+/* Períodos */
 
 .admin-periodos {
   display: grid;
@@ -725,8 +734,7 @@
   margin-top: 5px;
 }
 
-
-/* FILTROS */
+/* Filtros */
 
 .admin-filtros {
   display: grid;
@@ -738,8 +746,7 @@
   margin-bottom: 25px;
 }
 
-
-/* MENSAGENS */
+/* Mensagens */
 
 .admin-mensagem {
   color: var(--texto-secundario);
@@ -759,8 +766,7 @@
   font-size: 11px;
 }
 
-
-/* MODAL */
+/* Modal */
 
 .admin-modal-fundo {
   position: fixed;
@@ -927,11 +933,9 @@
   gap: 8px;
 }
 
-
-/* RESPONSIVIDADE */
+/* Responsividade */
 
 @media (max-width: 1000px) {
-
   .admin-sidebar {
     width: 215px;
   }
@@ -949,9 +953,7 @@
   }
 }
 
-
 @media (max-width: 800px) {
-
   .admin-cards {
     grid-template-columns: 1fr;
   }
@@ -969,9 +971,7 @@
   }
 }
 
-
 @media (max-width: 650px) {
-
   .admin {
     flex-direction: column;
   }
@@ -1077,6 +1077,7 @@
 }
 
 /* Menu responsivo */
+
 .admin-sidebar-topo {
   display: flex;
   align-items: center;
@@ -1087,12 +1088,17 @@
   display: none;
   align-items: center;
   justify-content: center;
+
   width: 40px;
   height: 40px;
+
   color: var(--texto);
+
   background: var(--campo);
+
   border: 1px solid var(--borda);
   border-radius: 8px;
+
   cursor: pointer;
 }
 
@@ -1116,10 +1122,14 @@
   .admin-menu {
     display: none;
     flex-direction: column;
+
     width: 100%;
+
     gap: 8px;
+
     margin-top: 14px;
     padding: 0;
+
     overflow: visible;
   }
 
@@ -1130,63 +1140,127 @@
   .admin-menu a {
     width: 100%;
     flex-shrink: 1;
+
     padding: 12px 14px;
+
     font-size: 12px;
   }
 }
 
-
-
-/* Logo KFKA - identidade original */
+/* Logo KFKA - igual à tela do professor */
 
 .admin-logo {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 7px;
-  margin: 8px 0 45px 12px;
-}
-
-.admin-logo strong {
   display: block;
-  font-size: 36px;
-  font-weight: 800;
-  line-height: 1.1;
-  letter-spacing: -1px;
+  margin: 0 0 42px 18px;
+  padding: 0;
 
-  background: linear-gradient(
-    110deg,
-    #ffffff 0%,
-    #ffffff 70%,
-    #a855f7 100%
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--texto);
+
+  font-size: 32px;
+  font-weight: 700;
+  line-height: normal;
+  letter-spacing: normal;
 }
 
 .admin-logo span {
-  display: block;
-  max-width: 205px;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1.4;
+  display: inline;
+  max-width: none;
 
-  color: #d8cde5;
-  background: none;
-  -webkit-text-fill-color: #d8cde5;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+
+  background: linear-gradient(135deg,
+      #ffffff,
+      #916fbe,
+      #732dc5,
+      #4800ef);
+
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 @media (max-width: 650px) {
   .admin-logo {
     margin: 0;
-  }
-
-  .admin-logo strong {
     font-size: 28px;
   }
+}
 
-  .admin-logo span {
-    font-size: 12px;
+/* Ajustes de cores dos cadastros */
+
+.admin-conteudo>.admin-painel,
+.admin-conteudo>section.admin-painel {
+  background: var(--painel);
+  color: var(--texto);
+}
+
+.admin-painel .admin-lista-itens .admin-item {
+  background: var(--campo);
+
+  border: 1px solid var(--borda);
+
+  color: var(--texto);
+}
+
+.admin-painel .admin-lista-itens .admin-item span {
+  color: var(--texto);
+}
+
+.admin-painel .admin-botao-secundario {
+  color: var(--texto);
+
+  background: var(--campo);
+
+  border-color: var(--borda);
+}
+
+.admin-painel .admin-botao-secundario:hover {
+  background: var(--campo-hover);
+
+  border-color: var(--destaque-claro);
+}
+
+/* Ajustes da tabela */
+
+.admin-painel .admin-tabela-scroll {
+  max-width: 100%;
+
+  overflow-x: auto;
+}
+
+.admin-painel .admin-tabela th,
+.admin-painel .admin-tabela td {
+  color: var(--texto);
+}
+
+.admin-painel .admin-tabela th {
+  color: var(--texto-secundario);
+}
+
+.admin-painel .admin-tabela tbody tr:hover {
+  background: var(--campo-hover);
+}
+
+/* Ajustes dos filtros */
+
+.admin-painel .admin-filtros {
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+}
+
+@media (max-width: 1000px) {
+  .admin-painel .admin-filtros {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 650px) {
+  .admin-painel .admin-filtros {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-painel .admin-tabela {
+    min-width: 720px;
   }
 }
