@@ -474,30 +474,48 @@
   border-color: var(--destaque-claro);
 }
 
+/* Botões de editar e excluir */
+
 .admin-botao-icone {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  color: var(--texto);
+  color: #ffffff;
+  background: #7625c9;
 
-  background: var(--campo);
-
-  border: 1px solid var(--borda);
-  border-radius: 7px;
+  border: 1px solid #a855f7;
+  border-radius: 8px;
 
   cursor: pointer;
+  transition: 0.2s;
+}
+
+.admin-botao-icone svg {
+  width: 16px;
+  height: 16px;
+
+  color: #ffffff;
+  stroke: #ffffff;
 }
 
 .admin-botao-icone:hover {
-  border-color: var(--destaque-claro);
+  background: #8e35e5;
+  border-color: #c084fc;
+
+  transform: translateY(-1px);
 }
 
 .admin-botao-icone.perigo {
-  color: var(--erro);
+  color: #ffffff;
+}
+
+.admin-botao-icone.perigo svg {
+  color: #ffffff;
+  stroke: #ffffff;
 }
 
 /* Tabelas */
@@ -553,7 +571,7 @@
   display: flex;
   align-items: center;
 
-  gap: 6px;
+  gap: 8px;
 }
 
 /* Badges */
@@ -1129,62 +1147,44 @@
   }
 }
 
-/* Logo KFKA */
+/* Logo KFKA - igual à tela do professor */
 
 .admin-logo {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-
-  gap: 7px;
-
-  margin: 8px 0 45px 12px;
-}
-
-.admin-logo strong {
   display: block;
+  margin: 0 0 42px 18px;
+  padding: 0;
 
-  font-size: 36px;
-  font-weight: 800;
-  line-height: 1.1;
-  letter-spacing: -1px;
+  color: var(--texto);
 
-  background: linear-gradient(110deg,
-      #ffffff 0%,
-      #ffffff 70%,
-      #a855f7 100%);
-
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: normal;
+  letter-spacing: normal;
 }
 
 .admin-logo span {
-  display: block;
+  display: inline;
+  max-width: none;
 
-  max-width: 205px;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
 
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1.4;
+  background: linear-gradient(135deg,
+      #ffffff,
+      #916fbe,
+      #732dc5,
+      #4800ef);
 
-  color: #d8cde5;
-
-  background: none;
-  -webkit-text-fill-color: #d8cde5;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 @media (max-width: 650px) {
   .admin-logo {
     margin: 0;
-  }
-
-  .admin-logo strong {
     font-size: 28px;
-  }
-
-  .admin-logo span {
-    font-size: 12px;
   }
 }
 

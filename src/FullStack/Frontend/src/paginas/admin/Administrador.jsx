@@ -693,10 +693,10 @@ export default function Administrador() {
       <div className="admin">
         <aside className="admin-sidebar">
           <div className="admin-sidebar-topo">
-            <div className="admin-logo">
-              <strong>KFKA</strong>
-              <span> Painel Administrativo</span>
-            </div>
+            {/* Logo igual à do professor, usando classe própria do admin */}
+            <h1 className="admin-logo">
+              K<span>F</span>KA
+            </h1>
 
             <button
               type="button"

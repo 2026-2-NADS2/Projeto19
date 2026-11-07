@@ -68,6 +68,7 @@ function Campo({
     )
 }
 
+
 function BotaoAcao({
     titulo,
     onClick,
@@ -77,6 +78,7 @@ function BotaoAcao({
     return (
         <button
             type="button"
+            className="admin-botao-icone"
             title={titulo}
             aria-label={titulo}
             onClick={onClick}
@@ -86,6 +88,7 @@ function BotaoAcao({
         </button>
     )
 }
+
 
 export default function Cadastros() {
     const {
