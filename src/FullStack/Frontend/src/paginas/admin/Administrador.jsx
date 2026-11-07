@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 
 import './Administrador.css'
+import { api, verificarSessao } from '../../servicos/api'
 import { AdminContext } from './AdminContext'
 import Dashboard from './Dashboard'
 import Cadastros from './Cadastros'
@@ -22,7 +23,6 @@ import Periodos from './Periodos'
 import Relatorios from './Relatorios'
 import Disciplinas from './Disciplinas'
 
-const API_URL = 'http://localhost:3333'
 const ANO_ATUAL = String(new Date().getFullYear())
 
 const cadastroInicial = {
@@ -171,31 +171,6 @@ export default function Administrador() {
 
   const [alunoSelecionado, setAlunoSelecionado] = useState(null)
 
-  async function api(caminho, opcoes = {}) {
-    const token = sessionStorage.getItem('kfka_token')
-
-    const resposta = await fetch(`${API_URL}${caminho}`, {
-      ...opcoes,
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        ...opcoes.headers
-      }
-    })
-
-    const dados = await resposta.json().catch(() => ({}))
-
-    if (!resposta.ok) {
-      throw new Error(
-        dados.erro ||
-        dados.mensagem ||
-        `Erro HTTP ${resposta.status}`
-      )
-    }
-
-    return dados
-  }
-
   async function carregarCadastros() {
     const [
       listaUsuarios,
@@ -246,6 +221,7 @@ export default function Administrador() {
       turmasDados.map(async turma => {
         try {
           const lista = await api(`/turmas/${turma.id}/alunos`)
+
           return [
             turma.id,
             Array.isArray(lista) ? lista : []
@@ -292,7 +268,23 @@ export default function Administrador() {
   }
 
   useEffect(() => {
+    // Confere a sessão ao abrir ou retornar à aba.
+    function conferirSessao() {
+      if (document.visibilityState === 'visible') {
+        verificarSessao()
+      }
+    }
+
+    verificarSessao()
     carregarTudo()
+
+    window.addEventListener('focus', conferirSessao)
+    document.addEventListener('visibilitychange', conferirSessao)
+
+    return () => {
+      window.removeEventListener('focus', conferirSessao)
+      document.removeEventListener('visibilitychange', conferirSessao)
+    }
   }, [])
 
   async function salvarCadastro(evento) {
@@ -453,7 +445,6 @@ export default function Administrador() {
 
   async function devolverAcompanhamento(id) {
     const motivo = window.prompt('Informe o motivo da devolução:')
-
     if (!motivo?.trim()) return
 
     try {
@@ -491,7 +482,6 @@ export default function Administrador() {
 
   function salvarTag(evento) {
     evento.preventDefault()
-
     if (!nomeTag.trim()) return
 
     if (tagEditando !== null) {
@@ -516,7 +506,6 @@ export default function Administrador() {
 
   function salvarArea(evento) {
     evento.preventDefault()
-
     if (!nomeArea.trim()) return
 
     if (areaEditando !== null) {
@@ -547,7 +536,6 @@ export default function Administrador() {
 
   async function salvarDisciplina(evento) {
     evento.preventDefault()
-
     if (!disciplinaForm.nome.trim()) return
 
     if (disciplinaEditando !== null) {
@@ -603,6 +591,7 @@ export default function Administrador() {
   })
 
   const contexto = {
+    carregarCadastros,
     usuarios,
     alunos,
     turmas,
