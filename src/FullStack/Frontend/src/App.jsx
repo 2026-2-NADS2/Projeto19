@@ -11,6 +11,7 @@ import Recursos from './paginas/Recursos.jsx'
 import SobrePlataforma from './paginas/SobrePlataforma.jsx'
 import Home from './paginas/Home.jsx'
 import Login from './paginas/Login.jsx'
+import WidgetAcessibilidade from './componentes/WidgetAcessibilidade.jsx'
 
 // Verifica se o usuário está autenticado
 function RotaProtegida({ perfil, children }) {
@@ -39,6 +40,8 @@ function RotaProtegida({ perfil, children }) {
 function App() {
   return (
     <BrowserRouter>
+      <WidgetAcessibilidade />
+      
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />

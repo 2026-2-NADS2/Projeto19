@@ -129,3 +129,69 @@ textarea:focus-visible {
     background: var(--destaque);
     color: #ffffff;
 }
+
+
+/* Acessibilidade -fonte-grande */
+
+html.acessibilidade-fonte-grande {
+    font-size: 112.5%;
+}
+
+html.acessibilidade-escala-cinza {
+    filter: grayscale(100%);
+}
+
+html.acessibilidade-alto-contraste {
+  --fundo-inicio: #000000;
+  --fundo-meio: #000000;
+  --fundo-fim: #000000;
+  --sidebar: #000000;
+  --painel: #000000;
+  --painel-secundario: #000000;
+  --campo: #111111;
+  --campo-hover: #222222;
+  --borda: #ffffff;
+  --texto: #ffffff;
+  --texto-secundario: #ffffff;
+  --destaque: #ffff00;
+  --destaque-hover: #ffff00;
+  --destaque-claro: #ffff00;
+  --sucesso: #00ff00;
+  --atencao: #ffff00;
+  --erro: #ff5555;
+}
+
+html.acessiblidade-alto-contraste
+    button,
+html.acessibilidade-alto-constraste
+    a {
+    border-color: #ffffff;
+    }
+
+html.acessibilidade-alto-contraste
+    a:focus-visible,
+html.acessibilidade-alto-contraste
+    button:focus-visible,
+html.acessibilidade-alto-contraste
+    input:focus-visible,
+html.acessibilidade-alto-contraste
+    select:focus-visible,
+html.acessibilidade-alto-contraste
+    textarea:focus-visible {
+    outline-color: #ffff00;
+}
+
+html.acessibilidade-sublinhar-links a {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+}
+
+html.acessibilidade-reduzir-movimento *,
+html.acessibilidade-reduzir-movimento *::before,
+html.acessibilidade-reduzir-movimento *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
+  transition-duration: 0.01ms !important;
+}
