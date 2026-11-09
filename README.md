@@ -9,7 +9,7 @@
 
 ## Sintonia Tech
 
-## Integrantes: <a href="https://www.linkedin.com/in/victorbarq/">Douglas Silva Gadelha Macario</a>, <a href="https://www.linkedin.com/in/victorbarq/">Eric Carvalho</a>, <a href="https://www.linkedin.com/in/victorbarq/">Gabriel Vaz Ferreira Neves</a>, <a href="https://www.linkedin.com/in/gustavo-cocoloti-melo-445713328/">Gustavo Cocoloti Melo</a>
+## Integrantes: <a href="https://www.linkedin.com/in/douglas-macario-2192a5247/">Douglas Silva Gadelha Macario</a>, <a href="https://www.linkedin.com/in/eric-carvalho-9319a4312/">Eric Carvalho</a>, <a href="https://www.linkedin.com/in/gabriel-vaz-1593a740a/">Gabriel Vaz Ferreira Neves</a>, <a href="https://www.linkedin.com/in/gustavo-cocoloti-melo-445713328/">Gustavo Cocoloti Melo</a>
 
 ## Professores Orientadores: <a href="https://www.linkedin.com/in/adriano-valente-534576135/" target="_blank" rel="noopener noreferrer"> Adriano Felix Valente </a>, <a href="https://www.linkedin.com/in/eduardo-savino-gomes-77833a10/" target="_blank" rel="noopener noreferrer"> Eduardo Savino Gomes </a>, <a href="https://www.linkedin.com/in/francisco-escobar/" target="_blank" rel="noopener noreferrer"> Francisco de Souza Escobar </a>, <a href="https://www.linkedin.com/in/jbuesso/" target="_blank" rel="noopener noreferrer"> José Carlos Buesso Jr </a>, <a href="https://www.linkedin.com/in/ronaldo-araujo-pinto-3542811a/" target="_blank" rel="noopener noreferrer"> Ronaldo Araujo Pinto </a>
 
