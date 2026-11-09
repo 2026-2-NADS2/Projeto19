@@ -33,21 +33,27 @@ O KFKA reúne essas informações em um único ambiente, organizado de acordo co
 ```text
 Projeto19/
 │
+├── database/
+│
 ├── documentos/
-│   └── Entrega_1/
-│       ├── Banco_de_Dados.pdf
-│       └── Design_de_Interface_Digital.pdf
+│   ├── Entrega_1/
+│   │   ├── Banco_de_Dados/
+│   │   └── Design_de_Interface_Digital/
+│   │
+│   └── Entrega_2/
+│       ├── Banco_de_Dados/
+│       └── Estrutura_de_Dados/
 │
 ├── imagens/
 │
 ├── src/
-│   └── Entrega_1/
-│       ├── Estrutura_de_Dados/
-│       ├── FullStack/
-│       │   └── iniciar.bat
-│       └── POO/
+│   ├── Estrutura_de_Dados/
+│   ├── FullStack/
+│   │   ├── backend/
+│   │   └── frontend/
+│   └── POO/
 │
-├── .gitignore
+├── package-lock.json
 └── README.md
 ```
 
