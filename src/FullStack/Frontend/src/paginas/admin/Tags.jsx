@@ -9,8 +9,7 @@ import {
   X
 } from 'lucide-react'
 import CabecalhoPagina from './CabecalhoPagina'
-
-const API_URL = 'http://localhost:3333'
+import { api } from '../../servicos/api'
 
 export default function Tags() {
   const [tags, setTags] = useState([])
@@ -23,33 +22,6 @@ export default function Tags() {
   const [salvando, setSalvando] = useState(false)
   const [erro, setErro] = useState('')
   const [mensagem, setMensagem] = useState('')
-
-  async function api(caminho, opcoes = {}) {
-    const token = sessionStorage.getItem('kfka_token')
-
-    const resposta = await fetch(`${API_URL}${caminho}`, {
-      ...opcoes,
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token
-          ? { Authorization: `Bearer ${token}` }
-          : {}),
-        ...opcoes.headers
-      }
-    })
-
-    const dados = await resposta.json().catch(() => ({}))
-
-    if (!resposta.ok) {
-      throw new Error(
-        dados.mensagem ||
-        dados.erro ||
-        `Erro HTTP ${resposta.status}`
-      )
-    }
-
-    return dados
-  }
 
   async function carregarTags() {
     setCarregando(true)

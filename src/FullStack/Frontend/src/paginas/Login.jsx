@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
@@ -8,6 +9,7 @@ import {
   ArrowLeft
 } from 'lucide-react'
 
+import { API_URL } from '../servicos/api'
 import './Login.css'
 
 function Login() {
@@ -45,7 +47,7 @@ function Login() {
     setCarregando(true)
 
     try {
-      const resposta = await fetch('http://localhost:3333/login', {
+      const resposta = await fetch(`${API_URL}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
