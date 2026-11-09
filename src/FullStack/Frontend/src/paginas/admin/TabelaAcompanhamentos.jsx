@@ -1,3 +1,4 @@
+
 import { Eye } from 'lucide-react'
 import { useAdmin } from './AdminContext'
 
@@ -7,10 +8,15 @@ export default function TabelaAcompanhamentos({
 }) {
   const {
     setAlunoSelecionado,
+    abrirDevolucao,
     publicarAcompanhamento,
-    devolverAcompanhamento,
     classeStatus
   } = useAdmin()
+
+  function abrirFormularioDevolucao(item) {
+    setAlunoSelecionado(item)
+    abrirDevolucao()
+  }
 
   return (
     <div className="admin-tabela-scroll">
@@ -29,12 +35,18 @@ export default function TabelaAcompanhamentos({
         <tbody>
           {lista.map(item => (
             <tr key={item.id}>
-              <td><strong>{item.nome}</strong></td>
+              <td>
+                <strong>{item.nome}</strong>
+              </td>
+
               <td>{item.turma}</td>
               <td>{item.disciplina}</td>
               <td>{item.bimestre}</td>
+
               <td>
-                <span className={`admin-badge ${classeStatus(item.status)}`}>
+                <span
+                  className={`admin-badge ${classeStatus(item.status)}`}
+                >
                   {item.status}
                 </span>
               </td>
@@ -55,7 +67,9 @@ export default function TabelaAcompanhamentos({
                         <button
                           type="button"
                           className="admin-botao-principal pequeno"
-                          onClick={() => publicarAcompanhamento(item.id)}
+                          onClick={() =>
+                            publicarAcompanhamento(item.id)
+                          }
                         >
                           Publicar
                         </button>
@@ -63,7 +77,9 @@ export default function TabelaAcompanhamentos({
                         <button
                           type="button"
                           className="admin-botao-secundario"
-                          onClick={() => devolverAcompanhamento(item.id)}
+                          onClick={() =>
+                            abrirFormularioDevolucao(item)
+                          }
                         >
                           Devolver
                         </button>

@@ -17,9 +17,11 @@ export default function CabecalhoPagina({ titulo, descricao }) {
       </div>
 
       <div className="admin-usuario">
-        <UserRound size={25} />
+        <div className="admin-avatar">
+          <UserRound size={20} />
+        </div>
 
-        <div>
+        <div className="admin-usuario-info">
           <strong>Administrador</strong>
           <span>Área administrativa</span>
         </div>

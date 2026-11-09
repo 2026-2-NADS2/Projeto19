@@ -1116,3 +1116,75 @@
     font-size: 12px;
   }
 }
+
+/* TAGS DE ACOMPANHAMENTO */
+
+.professor-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.professor-tags button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+
+  background: #29153c;
+  color: #e9d9f7;
+
+  border: 1px solid #75439c;
+  border-radius: 10px;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+  pointer-events: auto;
+
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.professor-tags button:hover {
+  background: #472365;
+  border-color: #a45ce2;
+}
+
+.professor-tags button.professor-tag-selecionada {
+  background: #7928ca;
+  border-color: #b875ff;
+  color: #ffffff;
+  box-shadow: 0 0 0 2px rgba(184, 117, 255, 0.15);
+}
+
+.professor-tags button:focus-visible {
+  outline: 2px solid #d8aaff;
+  outline-offset: 3px;
+}
+
+
+/* Ajuste do perfil do professor */
+
+.professor-usuario {
+  min-width: 0;
+  max-width: 240px;
+}
+
+.professor-avatar {
+  flex-shrink: 0;
+}
+
+.professor-usuario > div:last-child {
+  min-width: 0;
+}
+
+.professor-usuario strong {
+  color: var(--texto);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

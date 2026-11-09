@@ -12,7 +12,6 @@ import {
   X,
   ArrowLeft
 } from 'lucide-react'
-
 import './Administrador.css'
 import { api, verificarSessao } from '../../servicos/api'
 import { AdminContext } from './AdminContext'
@@ -59,6 +58,35 @@ function normalizarAcompanhamento(item) {
   }
 }
 
+function lerDescricaoAcompanhamento(valor) {
+  if (!valor) return { descricao: '' }
+  if (typeof valor !== 'string') return valor
+
+  try {
+    const dados = JSON.parse(valor)
+    if (dados && typeof dados === 'object' && !Array.isArray(dados)) {
+      return dados
+    }
+  } catch {
+    // Registros antigos podem conter apenas texto.
+  }
+
+  return { descricao: valor }
+}
+
+function CampoDetalhe({ titulo, valor }) {
+  return (
+    <div className="admin-detalhe">
+      <h4>{titulo}</h4>
+      <p style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
+        {valor === null || valor === undefined || valor === ''
+          ? 'Não informado.'
+          : String(valor)}
+      </p>
+    </div>
+  )
+}
+
 const itensMenu = [
   {
     caminho: '/administrador',
@@ -98,14 +126,12 @@ export default function Administrador() {
   const [menuAberto, setMenuAberto] = useState(false)
   const [carregando, setCarregando] = useState(true)
   const [erro, setErro] = useState('')
-
   const [usuarios, setUsuarios] = useState([])
   const [alunos, setAlunos] = useState([])
   const [turmas, setTurmas] = useState([])
   const [disciplinas, setDisciplinas] = useState([])
   const [periodos, setPeriodos] = useState([])
   const [acompanhamentos, setAcompanhamentos] = useState([])
-
   const [vinculosProfessores, setVinculosProfessores] = useState([])
   const [vinculosResponsaveis, setVinculosResponsaveis] = useState([])
   const [alunosTurmas, setAlunosTurmas] = useState({})
@@ -170,6 +196,10 @@ export default function Administrador() {
   })
 
   const [alunoSelecionado, setAlunoSelecionado] = useState(null)
+  const [modalDevolucao, setModalDevolucao] = useState(false)
+  const [motivoDevolucao, setMotivoDevolucao] = useState('')
+  const [erroDevolucao, setErroDevolucao] = useState('')
+  const [processandoRevisao, setProcessandoRevisao] = useState(false)
 
   async function carregarCadastros() {
     const [
@@ -268,7 +298,6 @@ export default function Administrador() {
   }
 
   useEffect(() => {
-    // Confere a sessão ao abrir ou retornar à aba.
     function conferirSessao() {
       if (document.visibilityState === 'visible') {
         verificarSessao()
@@ -443,23 +472,44 @@ export default function Administrador() {
     }
   }
 
+  function abrirDevolucao() {
+    setMotivoDevolucao('')
+    setErroDevolucao('')
+    setModalDevolucao(true)
+  }
+
   async function devolverAcompanhamento(id) {
-    const motivo = window.prompt('Informe o motivo da devolução:')
-    if (!motivo?.trim()) return
+    const motivo = motivoDevolucao.trim()
+
+    if (!motivo) {
+      setErroDevolucao('Escreva o motivo da devolução.')
+      return
+    }
+
+    if (processandoRevisao) return
+
+    setProcessandoRevisao(true)
+    setErroDevolucao('')
 
     try {
       await api(`/acompanhamentos/${id}/revisoes`, {
         method: 'POST',
         body: JSON.stringify({
           acao: 'devolvido',
-          observacao: motivo.trim()
+          observacao: motivo
         })
       })
 
       await carregarAcompanhamentos()
+      setModalDevolucao(false)
       setAlunoSelecionado(null)
+      setMotivoDevolucao('')
     } catch (error) {
-      window.alert(error.message)
+      setErroDevolucao(
+        error.message || 'Não foi possível devolver o acompanhamento.'
+      )
+    } finally {
+      setProcessandoRevisao(false)
     }
   }
 
@@ -536,6 +586,7 @@ export default function Administrador() {
 
   async function salvarDisciplina(evento) {
     evento.preventDefault()
+
     if (!disciplinaForm.nome.trim()) return
 
     if (disciplinaEditando !== null) {
@@ -601,11 +652,9 @@ export default function Administrador() {
     acompanhamentos,
     carregando,
     erro,
-
     vinculosProfessores,
     vinculosResponsaveis,
     alunosTurmas,
-
     tipoCadastro,
     setTipoCadastro,
     cadastroForm,
@@ -621,7 +670,6 @@ export default function Administrador() {
     salvandoCadastro,
     salvarCadastro,
     salvarTurma,
-
     periodoForm,
     setPeriodoForm,
     filtroPeriodoAno,
@@ -629,7 +677,6 @@ export default function Administrador() {
     mensagemPeriodo,
     erroPeriodo,
     salvarPeriodo,
-
     tags,
     setTags,
     nomeTag,
@@ -637,7 +684,6 @@ export default function Administrador() {
     tagEditando,
     setTagEditando,
     salvarTag,
-
     areas,
     nomeArea,
     setNomeArea,
@@ -645,21 +691,19 @@ export default function Administrador() {
     setAreaEditando,
     salvarArea,
     excluirArea,
-
     disciplinaForm,
     setDisciplinaForm,
     disciplinaEditando,
     setDisciplinaEditando,
     salvarDisciplina,
-
     filtros,
     setFiltros,
     alunosFiltrados,
-
     alunoSelecionado,
     setAlunoSelecionado,
     publicarAcompanhamento,
     devolverAcompanhamento,
+    abrirDevolucao,
     contarStatus,
     classeStatus
   }
@@ -693,7 +737,6 @@ export default function Administrador() {
       <div className="admin">
         <aside className="admin-sidebar">
           <div className="admin-sidebar-topo">
-            {/* Logo igual à do professor, usando classe própria do admin */}
             <h1 className="admin-logo">
               K<span>F</span>KA
             </h1>
@@ -737,83 +780,249 @@ export default function Administrador() {
           {renderizarPagina()}
         </main>
 
-        {alunoSelecionado && (
-          <div
-            className="admin-modal-fundo"
-            onClick={() => setAlunoSelecionado(null)}
-          >
+        {alunoSelecionado && (() => {
+          const detalhes = lerDescricaoAcompanhamento(
+            alunoSelecionado.descricao
+          )
+
+          const pendente =
+            alunoSelecionado.status === 'Enviado para revisão'
+
+          return (
             <div
-              className="admin-modal"
-              onClick={evento => evento.stopPropagation()}
+              className="admin-modal-fundo"
+              onClick={() => {
+                if (!processandoRevisao) {
+                  setAlunoSelecionado(null)
+                  setModalDevolucao(false)
+                }
+              }}
             >
-              <div className="admin-modal-topo">
-                <div>
-                  <span>ACOMPANHAMENTO</span>
-                  <h3>{alunoSelecionado.nome}</h3>
-                  <p>{alunoSelecionado.disciplina}</p>
-                </div>
+              <div
+                className="admin-modal"
+                role="dialog"
+                aria-modal="true"
+                aria-label="Detalhes do acompanhamento"
+                onClick={evento => evento.stopPropagation()}
+                style={{
+                  maxHeight: '88vh',
+                  overflowY: 'auto'
+                }}
+              >
+                <div className="admin-modal-topo">
+                  <div>
+                    <span>ACOMPANHAMENTO</span>
+                    <h3>{alunoSelecionado.nome}</h3>
+                    <p>
+                      {alunoSelecionado.disciplina}
+                      {' · '}
+                      {alunoSelecionado.bimestre}
+                    </p>
+                  </div>
 
-                <button
-                  type="button"
-                  className="admin-modal-fechar"
-                  onClick={() => setAlunoSelecionado(null)}
-                >
-                  <X size={20} />
-                </button>
-              </div>
-
-              <div className="admin-modal-resumo">
-                <div>
-                  <span>Período</span>
-                  <strong>{alunoSelecionado.bimestre}</strong>
-                </div>
-
-                <div>
-                  <span>Status</span>
-                  <strong>{alunoSelecionado.status}</strong>
-                </div>
-              </div>
-
-              <div className="admin-detalhe">
-                <h4>Descrição</h4>
-                <p>
-                  {alunoSelecionado.descricao || 'Sem descrição.'}
-                </p>
-              </div>
-
-              {alunoSelecionado.media != null && (
-                <div className="admin-detalhe">
-                  <h4>Média</h4>
-                  <p>{alunoSelecionado.media}</p>
-                </div>
-              )}
-
-              {alunoSelecionado.status === 'Enviado para revisão' && (
-                <div className="admin-modal-rodape">
                   <button
                     type="button"
-                    className="admin-botao-secundario"
-                    onClick={() =>
+                    className="admin-modal-fechar"
+                    aria-label="Fechar detalhes"
+                    onClick={() => {
+                      setAlunoSelecionado(null)
+                      setModalDevolucao(false)
+                    }}
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+
+                <div className="admin-modal-resumo">
+                  <div>
+                    <span>Período</span>
+                    <strong>{alunoSelecionado.bimestre}</strong>
+                  </div>
+
+                  <div>
+                    <span>Status</span>
+                    <strong>{alunoSelecionado.status}</strong>
+                  </div>
+                </div>
+
+                {alunoSelecionado.media != null && (
+                  <CampoDetalhe
+                    titulo="Média"
+                    valor={Number(alunoSelecionado.media).toLocaleString(
+                      'pt-BR',
+                      {
+                        minimumFractionDigits: 1,
+                        maximumFractionDigits: 2
+                      }
+                    )}
+                  />
+                )}
+
+                <CampoDetalhe
+                  titulo="Situação atual"
+                  valor={detalhes.situacao}
+                />
+
+                <CampoDetalhe
+                  titulo="Descrição geral"
+                  valor={detalhes.descricao}
+                />
+
+                <CampoDetalhe
+                  titulo="Pontos positivos"
+                  valor={detalhes.pontosPositivos}
+                />
+
+                <CampoDetalhe
+                  titulo="Dificuldades identificadas"
+                  valor={detalhes.dificuldades}
+                />
+
+                <CampoDetalhe
+                  titulo="Evolução no período"
+                  valor={detalhes.evolucao}
+                />
+
+                <CampoDetalhe
+                  titulo="Orientação à família"
+                  valor={detalhes.orientacao}
+                />
+
+                {pendente && !modalDevolucao && (
+                  <div className="admin-modal-rodape">
+                    <button
+                      type="button"
+                      className="admin-botao-secundario"
+                      onClick={abrirDevolucao}
+                    >
+                      Devolver
+                    </button>
+
+                    <button
+                      type="button"
+                      className="admin-botao-principal"
+                      onClick={() =>
+                        publicarAcompanhamento(alunoSelecionado.id)
+                      }
+                    >
+                      Publicar
+                    </button>
+                  </div>
+                )}
+
+                {pendente && modalDevolucao && (
+                  <form
+                    onSubmit={evento => {
+                      evento.preventDefault()
                       devolverAcompanhamento(alunoSelecionado.id)
-                    }
+                    }}
+                    style={{
+                      marginTop: 24,
+                      padding: 18,
+                      borderRadius: 12,
+                      background: '#23112f',
+                      border: '1px solid #69418a'
+                    }}
                   >
-                    Devolver
-                  </button>
+                    <h4
+                      style={{
+                        color: '#fff',
+                        margin: '0 0 8px'
+                      }}
+                    >
+                      Devolver ao professor
+                    </h4>
 
-                  <button
-                    type="button"
-                    className="admin-botao-principal"
-                    onClick={() =>
-                      publicarAcompanhamento(alunoSelecionado.id)
-                    }
-                  >
-                    Publicar
-                  </button>
-                </div>
-              )}
+                    <p
+                      style={{
+                        color: '#d3c0e1',
+                        fontSize: 13,
+                        marginBottom: 14
+                      }}
+                    >
+                      Explique o que precisa ser corrigido.
+                      A justificativa ficará registrada no acompanhamento.
+                    </p>
+
+                    <label
+                      htmlFor="motivo-devolucao"
+                      style={{
+                        display: 'block',
+                        color: '#fff',
+                        marginBottom: 8
+                      }}
+                    >
+                      Motivo da devolução *
+                    </label>
+
+                    <textarea
+                      id="motivo-devolucao"
+                      required
+                      rows={5}
+                      maxLength={5000}
+                      value={motivoDevolucao}
+                      onChange={evento => {
+                        setMotivoDevolucao(evento.target.value)
+                        setErroDevolucao('')
+                      }}
+                      placeholder="Ex.: Corrigir a média e detalhar as dificuldades identificadas."
+                      style={{
+                        width: '100%',
+                        boxSizing: 'border-box',
+                        resize: 'vertical',
+                        padding: 12,
+                        borderRadius: 9,
+                        border: '1px solid #76518c',
+                        background: '#160b20',
+                        color: '#fff',
+                        font: 'inherit'
+                      }}
+                    />
+
+                    {erroDevolucao && (
+                      <p
+                        role="alert"
+                        style={{
+                          color: '#ff9baf',
+                          marginTop: 10
+                        }}
+                      >
+                        {erroDevolucao}
+                      </p>
+                    )}
+
+                    <div
+                      className="admin-modal-rodape"
+                      style={{ marginTop: 16 }}
+                    >
+                      <button
+                        type="button"
+                        className="admin-botao-secundario"
+                        disabled={processandoRevisao}
+                        onClick={() => setModalDevolucao(false)}
+                      >
+                        Cancelar
+                      </button>
+
+                      <button
+                        type="submit"
+                        className="admin-botao-principal"
+                        disabled={
+                          processandoRevisao ||
+                          !motivoDevolucao.trim()
+                        }
+                      >
+                        {processandoRevisao
+                          ? 'Devolvendo...'
+                          : 'Confirmar devolução'}
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          )
+        })()}
       </div>
     </AdminContext.Provider>
   )

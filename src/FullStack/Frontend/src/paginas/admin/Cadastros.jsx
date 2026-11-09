@@ -1,12 +1,13 @@
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
     Plus,
     Save,
     Pencil,
     Trash2,
     RotateCcw,
-    X
+    X,
+    Eye
 } from 'lucide-react'
 import { useAdmin } from './AdminContext'
 import CabecalhoPagina from './CabecalhoPagina'
@@ -41,6 +42,30 @@ function dataParaISO(valor) {
     return String(valor).slice(0, 10)
 }
 
+function dataParaBR(valor) {
+    if (!valor) return ''
+    const iso = String(valor).slice(0, 10)
+    const partes = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso)
+    return partes ? `${partes[3]}/${partes[2]}/${partes[1]}` : ''
+}
+
+function dataValidaBR(valor) {
+    const partes = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(valor)
+    if (!partes) return false
+
+    const dia = Number(partes[1])
+    const mes = Number(partes[2])
+    const ano = Number(partes[3])
+
+    if (ano < 1900 || mes < 1 || mes > 12) return false
+
+    const data = new Date(Date.UTC(ano, mes - 1, dia))
+
+    return data.getUTCFullYear() === ano &&
+        data.getUTCMonth() === mes - 1 &&
+        data.getUTCDate() === dia
+}
+
 function Campo({
     label,
     value,
@@ -68,6 +93,63 @@ function Campo({
     )
 }
 
+function CampoDataNascimento({ value, onChange }) {
+    const [texto, setTexto] = useState(() => dataParaBR(value))
+    const [erro, setErro] = useState('')
+
+    useEffect(() => {
+        if (!value) {
+            setTexto('')
+            setErro('')
+        } else if (dataValidaBR(dataParaBR(value))) {
+            setTexto(dataParaBR(value))
+            setErro('')
+        }
+    }, [value])
+
+    function atualizar(valor) {
+        const digitos = valor.replace(/\D/g, '').slice(0, 8)
+
+        const formatado = [
+            digitos.slice(0, 2),
+            digitos.slice(2, 4),
+            digitos.slice(4, 8)
+        ].filter(Boolean).join('/')
+
+        setTexto(formatado)
+        setErro('')
+
+        if (dataValidaBR(formatado)) {
+            const [dia, mes, ano] = formatado.split('/')
+            onChange(`${ano}-${mes}-${dia}`)
+        } else {
+            onChange('')
+        }
+    }
+
+    return (
+        <div className="admin-campo">
+            <label>Data de nascimento</label>
+            <input
+                type="text"
+                inputMode="numeric"
+                autoComplete="bday"
+                placeholder="DD/MM/AAAA"
+                maxLength={10}
+                value={texto}
+                onChange={e => atualizar(e.target.value)}
+                onBlur={() => {
+                    if (texto && !dataValidaBR(texto)) {
+                        setErro('Informe uma data válida no formato DD/MM/AAAA.')
+                    }
+                }}
+                required
+                aria-invalid={Boolean(erro)}
+            />
+            {erro && <small role="alert">{erro}</small>}
+        </div>
+    )
+}
 
 function BotaoAcao({
     titulo,
@@ -89,6 +171,223 @@ function BotaoAcao({
     )
 }
 
+function Detalhe({ titulo, valor }) {
+    return (
+        <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 5,
+            minWidth: 0
+        }}>
+            <span style={{
+                fontSize: 12,
+                color: '#b9a6d0',
+                fontWeight: 600
+            }}>
+                {titulo}
+            </span>
+            <span style={{
+                fontSize: 14,
+                color: '#fff',
+                fontWeight: 500,
+                overflowWrap: 'anywhere'
+            }}>
+                {valor || 'Não informado'}
+            </span>
+        </div>
+    )
+}
+
+function ModalDetalhes({ registro, onClose }) {
+    useEffect(() => {
+        function fecharComEscape(evento) {
+            if (evento.key === 'Escape') onClose()
+        }
+
+        document.addEventListener('keydown', fecharComEscape)
+        return () => document.removeEventListener('keydown', fecharComEscape)
+    }, [onClose])
+
+    if (!registro) return null
+
+    const ehAluno = registro.perfil === 'Aluno'
+    const dados = registro.original
+
+    return (
+        <div
+            role="presentation"
+            onMouseDown={evento => {
+                if (evento.target === evento.currentTarget) {
+                    onClose()
+                }
+            }}
+            style={{
+                position: 'fixed',
+                inset: 0,
+                background: 'rgba(0, 0, 0, 0.75)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 9999,
+                padding: 20
+            }}
+        >
+            <div
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="titulo-detalhes-cadastro"
+                style={{
+                    background: '#21102f',
+                    border: '1px solid #57316e',
+                    borderRadius: 16,
+                    width: '100%',
+                    maxWidth: 550,
+                    padding: 26,
+                    boxShadow: '0 20px 60px rgba(0,0,0,0.45)'
+                }}
+            >
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    justifyContent: 'space-between',
+                    gap: 16,
+                    marginBottom: 24
+                }}>
+                    <div>
+                        <span style={{
+                            color: '#bc91e9',
+                            fontSize: 11,
+                            fontWeight: 700,
+                            letterSpacing: 1
+                        }}>
+                            DETALHES DO CADASTRO
+                        </span>
+                        <h2
+                            id="titulo-detalhes-cadastro"
+                            style={{
+                                color: '#fff',
+                                fontSize: 22,
+                                margin: '8px 0 0'
+                            }}
+                        >
+                            {registro.nome}
+                        </h2>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        aria-label="Fechar detalhes"
+                        style={{
+                            background: '#432057',
+                            color: '#fff',
+                            border: 0,
+                            borderRadius: 8,
+                            padding: 9,
+                            cursor: 'pointer',
+                            display: 'flex'
+                        }}
+                    >
+                        <X size={19} />
+                    </button>
+                </div>
+
+                <div style={{
+                    display: 'flex',
+                    gap: 10,
+                    marginBottom: 24
+                }}>
+                    <span style={{
+                        padding: '7px 12px',
+                        borderRadius: 8,
+                        background: '#552476',
+                        color: '#fff',
+                        fontSize: 12,
+                        fontWeight: 600
+                    }}>
+                        {registro.perfil}
+                    </span>
+                    <span style={{
+                        padding: '7px 12px',
+                        borderRadius: 8,
+                        background: registro.status === 'Ativo'
+                            ? '#174d36'
+                            : '#5b2532',
+                        color: registro.status === 'Ativo'
+                            ? '#8df0b8'
+                            : '#ffb4c2',
+                        fontSize: 12,
+                        fontWeight: 600
+                    }}>
+                        {registro.status}
+                    </span>
+                </div>
+
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+                    gap: 24,
+                    padding: 20,
+                    borderRadius: 12,
+                    background: '#170b22',
+                    border: '1px solid #3c254d'
+                }}>
+                    <Detalhe titulo="Nome completo" valor={dados.nome} />
+                    <Detalhe titulo="Perfil" valor={registro.perfil} />
+
+                    {ehAluno ? (
+                        <>
+                            <Detalhe
+                                titulo="Matrícula"
+                                valor={dados.matricula}
+                            />
+                            <Detalhe
+                                titulo="Data de nascimento"
+                                valor={dataParaBR(dados.data_nascimento)}
+                            />
+                            <Detalhe
+                                titulo="Turma(s)"
+                                valor={registro.vinculo}
+                            />
+                            <Detalhe
+                                titulo="Status"
+                                valor={registro.status}
+                            />
+                        </>
+                    ) : (
+                        <>
+                            <Detalhe
+                                titulo="E-mail"
+                                valor={dados.email}
+                            />
+                            <Detalhe
+                                titulo="Vínculos"
+                                valor={registro.vinculo}
+                            />
+                            <Detalhe
+                                titulo="Status"
+                                valor={registro.status}
+                            />
+                        </>
+                    )}
+                </div>
+
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    marginTop: 24
+                }}>
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="admin-botao-principal"
+                    >
+                        Fechar
+                    </button>
+                </div>
+            </div>
+        </div>
+    )
+}
 
 export default function Cadastros() {
     const {
@@ -117,6 +416,7 @@ export default function Cadastros() {
         carregarCadastros
     } = useAdmin()
 
+    const [visualizando, setVisualizando] = useState(null)
     const [editando, setEditando] = useState(null)
     const [editandoTurma, setEditandoTurma] = useState(null)
     const [processando, setProcessando] = useState(false)
@@ -228,6 +528,11 @@ export default function Cadastros() {
         evento.preventDefault()
         if (!editando) return
 
+        if (editando.tipo === 'aluno' && !formEdicao.data_nascimento) {
+            setErroLocal('Informe uma data de nascimento válida.')
+            return
+        }
+
         await executar(async () => {
             const ehAluno = editando.tipo === 'aluno'
 
@@ -277,6 +582,8 @@ export default function Cadastros() {
             ) {
                 setEditando(null)
             }
+
+            setVisualizando(null)
         }, 'Cadastro desativado com sucesso!')
     }
 
@@ -524,7 +831,14 @@ export default function Cadastros() {
 
                 <form
                     className="admin-form-grid"
-                    onSubmit={salvarCadastro}
+                    onSubmit={evento => {
+                        if (tipoCadastro === 'aluno' && !cadastroForm.data_nascimento) {
+                            evento.preventDefault()
+                            setErroCadastro('Informe uma data de nascimento válida.')
+                            return
+                        }
+                        salvarCadastro(evento)
+                    }}
                 >
                     <Campo
                         label="Nome completo"
@@ -545,9 +859,7 @@ export default function Cadastros() {
                                 required
                             />
 
-                            <Campo
-                                label="Data de nascimento"
-                                type="date"
+                            <CampoDataNascimento
                                 value={cadastroForm.data_nascimento}
                                 onChange={v =>
                                     alterarCadastro('data_nascimento', v)
@@ -1048,9 +1360,8 @@ export default function Cadastros() {
                                         required
                                     />
 
-                                    <Campo
-                                        label="Data de nascimento"
-                                        type="date"
+                                    <CampoDataNascimento
+                                        key={`aluno-${editando.id}`}
                                         value={formEdicao.data_nascimento}
                                         onChange={v =>
                                             alterarEdicao(
@@ -1131,6 +1442,15 @@ export default function Cadastros() {
                                     <td>
                                         <div className="admin-tabela-acoes">
                                             <BotaoAcao
+                                                titulo="Visualizar detalhes"
+                                                onClick={() =>
+                                                    setVisualizando(registro)
+                                                }
+                                            >
+                                                <Eye size={16} />
+                                            </BotaoAcao>
+
+                                            <BotaoAcao
                                                 titulo="Editar cadastro"
                                                 onClick={() =>
                                                     iniciarEdicao(
@@ -1199,6 +1519,13 @@ export default function Cadastros() {
                 >
                     {mensagemLocal || mensagemCadastro}
                 </p>
+            )}
+
+            {visualizando && (
+                <ModalDetalhes
+                    registro={visualizando}
+                    onClose={() => setVisualizando(null)}
+                />
             )}
         </>
     )

@@ -1264,3 +1264,114 @@
     min-width: 720px;
   }
 }
+
+
+/* Perfil do administrador */
+
+.admin-usuario {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 13px;
+  background: var(--campo);
+  border: 1px solid var(--borda);
+  border-radius: 9px;
+  min-width: 0;
+  max-width: 240px;
+}
+
+.admin-avatar {
+  width: 35px;
+  height: 35px;
+  min-width: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  background: var(--destaque);
+  border-radius: 50%;
+}
+
+.admin-usuario > div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.admin-usuario strong {
+  color: var(--texto);
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-usuario span {
+  color: var(--texto-secundario);
+  font-size: 9px;
+}
+
+@media (max-width: 650px) {
+  .admin-usuario > div:last-child {
+    display: flex;
+  }
+}
+
+
+/* Perfil do administrador - padrão KFKA */
+
+.admin-usuario {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 13px;
+  background: var(--campo);
+  border: 1px solid var(--borda);
+  border-radius: 9px;
+  max-width: 240px;
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.admin-avatar {
+  width: 35px;
+  height: 35px;
+  min-width: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--destaque);
+  color: #ffffff;
+  border-radius: 50%;
+}
+
+.admin-usuario .admin-usuario-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.admin-usuario-info strong {
+  color: var(--texto);
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-usuario-info span {
+  color: var(--texto-secundario);
+  font-size: 9px;
+}
+
+@media (max-width: 650px) {
+  .admin-usuario .admin-usuario-info {
+    display: flex;
+  }
+
+  .admin-usuario {
+    max-width: 100%;
+  }
+}
