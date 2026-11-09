@@ -9,15 +9,19 @@ import {
 } from 'lucide-react'
 import { api } from '../servicos/api'
 import './Responsavel.css'
+import { gerarPdfAcompanhamento } from '../servicos/gerarPdfAcompanhamento'
+import GraficoEvolucao from '../componentes/GraficoEvolucao'
 
+// Lê os dados preenchidos pelo professor
 function lerDescricao(valor) {
   try {
     const dados = JSON.parse(valor)
+
     if (dados?.formato === 'kfka-professor-v1') {
       return dados
     }
   } catch {
-    // Compatibilidade com registros antigos.
+    // Permite ler relatórios antigos
   }
 
   return {
@@ -30,8 +34,10 @@ function lerDescricao(valor) {
   }
 }
 
+// Formata a data para o padrão brasileiro
 function formatarData(valor) {
   if (!valor) return 'Data não informada'
+
   const data = new Date(valor)
 
   return Number.isNaN(data.getTime())
@@ -39,12 +45,25 @@ function formatarData(valor) {
     : data.toLocaleDateString('pt-BR')
 }
 
+// Formata data e horário dos registros
+function formatarDataHora(valor) {
+  if (!valor) return 'Data não informada'
+
+  const data = new Date(valor)
+
+  return Number.isNaN(data.getTime())
+    ? 'Data não informada'
+    : data.toLocaleString('pt-BR')
+}
+
+// Organiza os dados recebidos do backend
 function adaptarAcompanhamento(item) {
   const detalhes = lerDescricao(item.descricao)
 
   return {
     id: item.id,
     alunoId: item.aluno_id,
+    aluno: item.aluno,
     ano: String(item.ano_letivo ?? ''),
     disciplina: item.disciplina,
     professor: item.professor,
@@ -59,6 +78,7 @@ function adaptarAcompanhamento(item) {
 
 export default function Responsavel() {
   const [menuAberto, setMenuAberto] = useState(false)
+
   const [alunos, setAlunos] = useState([])
   const [acompanhamentos, setAcompanhamentos] = useState([])
   const [alunoSelecionado, setAlunoSelecionado] = useState(null)
@@ -68,15 +88,28 @@ export default function Responsavel() {
 
   const [anoSelecionado, setAnoSelecionado] = useState('Todos')
   const [bimestreSelecionado, setBimestreSelecionado] = useState('Todos')
-  const [disciplinaSelecionada, setDisciplinaSelecionada] = useState('Todas')
+  const [disciplinaSelecionada, setDisciplinaSelecionada] =
+    useState('Todas')
 
-  const [acompanhamentoAberto, setAcompanhamentoAberto] = useState(null)
+  const [acompanhamentoAberto, setAcompanhamentoAberto] =
+    useState(null)
+
   const [observacaoAberta, setObservacaoAberta] = useState(null)
   const [textoObservacao, setTextoObservacao] = useState('')
   const [erroObservacao, setErroObservacao] = useState('')
   const [mensagem, setMensagem] = useState('')
+
+  // Registros carregados do MySQL
   const [ciencias, setCiencias] = useState([])
   const [observacoes, setObservacoes] = useState([])
+
+  // Controla as requisições
+  const [salvandoCiencia, setSalvandoCiencia] = useState(null)
+  const [salvandoObservacao, setSalvandoObservacao] =
+    useState(false)
+
+  const [historicoCarregado, setHistoricoCarregado] =
+    useState(false)
 
   const [usuario] = useState(() => {
     try {
@@ -88,11 +121,77 @@ export default function Responsavel() {
     }
   })
 
+  // Busca o histórico de um relatório
+  async function buscarHistorico(id) {
+    const dados = await api(`/acompanhamentos/${id}/familia`)
+
+    return {
+      acompanhamentoId: id,
+      logs: Array.isArray(dados?.logs) ? dados.logs : [],
+      ciencias: Array.isArray(dados?.ciencias)
+        ? dados.ciencias
+        : []
+    }
+  }
+
+  // Carrega os históricos de todos os relatórios
+  async function carregarHistoricos(registros) {
+    const resultados = await Promise.all(
+      registros.map(item => buscarHistorico(item.id))
+    )
+
+    const cienciasEncontradas = []
+    const observacoesEncontradas = []
+
+    for (const resultado of resultados) {
+      const acompanhamento = registros.find(
+        item => String(item.id) ===
+          String(resultado.acompanhamentoId)
+      )
+
+      if (!acompanhamento) continue
+
+      // Recupera as confirmações do banco
+      if (resultado.ciencias.length > 0) {
+        cienciasEncontradas.push(acompanhamento.id)
+      }
+
+      // Recupera as observações do banco
+      for (const log of resultado.logs) {
+        if (log.acao !== 'observacao') continue
+
+        observacoesEncontradas.push({
+          id: log.id,
+          alunoId: acompanhamento.alunoId,
+          acompanhamentoId: acompanhamento.id,
+          disciplina: acompanhamento.disciplina,
+          bimestre: acompanhamento.bimestre,
+          texto: log.descricao || '',
+          data: formatarDataHora(log.criado_em),
+          criadoEm: log.criado_em,
+          responsavel: log.responsavel
+        })
+      }
+    }
+
+    setCiencias(cienciasEncontradas)
+
+    setObservacoes(
+      observacoesEncontradas.sort(
+        (a, b) =>
+          new Date(b.criadoEm).getTime() -
+          new Date(a.criadoEm).getTime()
+      )
+    )
+  }
+
+  // Carrega alunos, relatórios e histórico ao entrar
   useEffect(() => {
     let ativo = true
 
     async function carregar() {
       setCarregando(true)
+      setHistoricoCarregado(false)
 
       try {
         const [filhos, registros] = await Promise.all([
@@ -102,19 +201,30 @@ export default function Responsavel() {
 
         if (!ativo) return
 
-        const listaAlunos = Array.isArray(filhos) ? filhos : []
-        const listaRegistros = Array.isArray(registros) ? registros : []
+        const listaAlunos = Array.isArray(filhos)
+          ? filhos
+          : []
+
+        const listaRegistros = Array.isArray(registros)
+          ? registros.map(adaptarAcompanhamento)
+          : []
 
         setAlunos(listaAlunos)
-        setAcompanhamentos(
-          listaRegistros.map(adaptarAcompanhamento)
-        )
+        setAcompanhamentos(listaRegistros)
         setAlunoSelecionado(listaAlunos[0]?.id ?? null)
+
+        // Busca as confirmações e observações já salvas
+        await carregarHistoricos(listaRegistros)
+
+        if (!ativo) return
+
+        setHistoricoCarregado(true)
         setErroDados('')
       } catch (erro) {
         if (ativo) {
           setErroDados(
-            erro.message || 'Não foi possível carregar os dados.'
+            erro.message ||
+            'Não foi possível carregar os dados.'
           )
         }
       } finally {
@@ -130,13 +240,15 @@ export default function Responsavel() {
   }, [])
 
   const alunoAtual = alunos.find(
-    aluno => String(aluno.id) === String(alunoSelecionado)
+    aluno =>
+      String(aluno.id) === String(alunoSelecionado)
   )
 
   const acompanhamentosPublicados = useMemo(
     () => acompanhamentos.filter(
       item =>
-        String(item.alunoId) === String(alunoSelecionado) &&
+        String(item.alunoId) ===
+        String(alunoSelecionado) &&
         item.status === 'Publicado'
     ),
     [acompanhamentos, alunoSelecionado]
@@ -144,7 +256,9 @@ export default function Responsavel() {
 
   const disciplinasDoAluno = [
     ...new Set(
-      acompanhamentosPublicados.map(item => item.disciplina)
+      acompanhamentosPublicados.map(
+        item => item.disciplina
+      )
     )
   ]
 
@@ -156,21 +270,34 @@ export default function Responsavel() {
 
   const periodosDoAluno = [
     ...new Set(
-      acompanhamentosPublicados.map(item => item.bimestre)
+      acompanhamentosPublicados.map(
+        item => item.bimestre
+      )
     )
   ]
 
-  const acompanhamentosFiltrados = acompanhamentosPublicados.filter(
-    item =>
-      (anoSelecionado === 'Todos' || item.ano === anoSelecionado) &&
-      (bimestreSelecionado === 'Todos' ||
-        item.bimestre === bimestreSelecionado) &&
-      (disciplinaSelecionada === 'Todas' ||
-        item.disciplina === disciplinaSelecionada)
-  )
+  const acompanhamentosFiltrados =
+    acompanhamentosPublicados.filter(
+      item =>
+        (
+          anoSelecionado === 'Todos' ||
+          item.ano === anoSelecionado
+        ) &&
+        (
+          bimestreSelecionado === 'Todos' ||
+          item.bimestre === bimestreSelecionado
+        ) &&
+        (
+          disciplinaSelecionada === 'Todas' ||
+          item.disciplina === disciplinaSelecionada
+        )
+    )
 
+  // Mostra os registros do aluno selecionado
   const observacoesDoAluno = observacoes.filter(
-    item => String(item.alunoId) === String(alunoSelecionado)
+    item =>
+      String(item.alunoId) ===
+      String(alunoSelecionado)
   )
 
   function selecionarAluno(id) {
@@ -183,14 +310,48 @@ export default function Responsavel() {
     setMensagem('')
   }
 
-  function confirmarCiencia(id) {
-    setCiencias(atual =>
-      atual.includes(id) ? atual : [...atual, id]
-    )
+  // Confirma ciência no MySQL
+  async function confirmarCiencia(id) {
+    if (!historicoCarregado) return
+    if (ciencias.includes(id)) return
+    if (salvandoCiencia !== null) return
 
-    setMensagem(
-      'Ciência marcada apenas nesta sessão. O registro definitivo será implementado na próxima etapa.'
-    )
+    setSalvandoCiencia(id)
+    setMensagem('')
+
+    try {
+      const resposta = await api(
+        `/acompanhamentos/${id}/ciencia`,
+        {
+          method: 'POST'
+        }
+      )
+
+      // Só atualiza a tela depois da resposta do backend
+      if (resposta.confirmado) {
+        setCiencias(atual =>
+          atual.includes(id)
+            ? atual
+            : [...atual, id]
+        )
+
+        setMensagem(
+          resposta.mensagem ||
+          'Ciência registrada com sucesso.'
+        )
+      } else {
+        throw new Error(
+          'Não foi possível confirmar a ciência.'
+        )
+      }
+    } catch (erro) {
+      setMensagem(
+        erro.message ||
+        'Erro ao confirmar ciência.'
+      )
+    } finally {
+      setSalvandoCiencia(null)
+    }
   }
 
   function abrirObservacao(acompanhamento) {
@@ -200,47 +361,137 @@ export default function Responsavel() {
     setMensagem('')
   }
 
-  function salvarObservacao(evento) {
+  // Salva a observação no MySQL
+  async function salvarObservacao(evento) {
     evento.preventDefault()
 
-    if (!textoObservacao.trim()) {
-      setErroObservacao('Digite uma observação antes de salvar.')
+    if (salvandoObservacao) return
+
+    const texto = textoObservacao.trim()
+
+    if (!texto) {
+      setErroObservacao(
+        'Digite uma observação antes de salvar.'
+      )
       return
     }
 
-    const novaObservacao = {
-      id: Date.now(),
-      alunoId: observacaoAberta.alunoId,
-      acompanhamentoId: observacaoAberta.id,
-      disciplina: observacaoAberta.disciplina,
-      bimestre: observacaoAberta.bimestre,
-      texto: textoObservacao.trim(),
-      data: new Date().toLocaleDateString('pt-BR')
+    if (texto.length > 5000) {
+      setErroObservacao(
+        'A observação deve ter no máximo 5000 caracteres.'
+      )
+      return
     }
 
-    setObservacoes(atual => [...atual, novaObservacao])
-    setTextoObservacao('')
-    setErroObservacao('')
-    setObservacaoAberta(null)
+    if (!observacaoAberta) return
 
-    setMensagem(
-      'Observação salva apenas nesta sessão. A persistência no banco será implementada depois.'
-    )
+    setSalvandoObservacao(true)
+    setErroObservacao('')
+
+    try {
+      const acompanhamento = observacaoAberta
+
+      await api(
+        `/acompanhamentos/${acompanhamento.id}/observacoes`,
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            descricao: texto
+          })
+        }
+      )
+
+      // Busca novamente os registros salvos
+      const historico = await buscarHistorico(
+        acompanhamento.id
+      )
+
+      const observacoesAtualizadas =
+        historico.logs
+          .filter(log => log.acao === 'observacao')
+          .map(log => ({
+            id: log.id,
+            alunoId: acompanhamento.alunoId,
+            acompanhamentoId: acompanhamento.id,
+            disciplina: acompanhamento.disciplina,
+            bimestre: acompanhamento.bimestre,
+            texto: log.descricao || '',
+            data: formatarDataHora(log.criado_em),
+            criadoEm: log.criado_em,
+            responsavel: log.responsavel
+          }))
+
+      setObservacoes(atual => {
+        const outrosRegistros = atual.filter(
+          item =>
+            String(item.acompanhamentoId) !==
+            String(acompanhamento.id)
+        )
+
+        return [
+          ...outrosRegistros,
+          ...observacoesAtualizadas
+        ].sort(
+          (a, b) =>
+            new Date(b.criadoEm).getTime() -
+            new Date(a.criadoEm).getTime()
+        )
+      })
+
+      setTextoObservacao('')
+      setObservacaoAberta(null)
+      setMensagem(
+        'Observação salva no histórico com sucesso.'
+      )
+    } catch (erro) {
+      setErroObservacao(
+        erro.message ||
+        'Erro ao salvar observação.'
+      )
+    } finally {
+      setSalvandoObservacao(false)
+    }
   }
 
+  // Gerar o PDF do acompanhamento
   function gerarPdf() {
-    setMensagem(
-      'A geração do PDF será conectada ao backend na próxima etapa.'
-    )
+    if (!acompanhamentoAberto || !alunoAtual) {
+      setMensagem('Selecione um acompanhamento para gerar o PDF.')
+      return
+    }
+
+    try {
+      gerarPdfAcompanhamento(acompanhamentoAberto, alunoAtual)
+      setMensagem('PDF gerado com sucesso.')
+    } catch (erro) {
+      setMensagem(
+        erro.message || 'Não foi possível gerar o PDF.'
+      )
+    }
   }
 
   const detalhes = acompanhamentoAberto
     ? [
-      ['Descrição geral', acompanhamentoAberto.descricao],
-      ['Pontos positivos', acompanhamentoAberto.pontosPositivos],
-      ['Dificuldades identificadas', acompanhamentoAberto.dificuldades],
-      ['Evolução no período', acompanhamentoAberto.evolucao],
-      ['Orientação à família', acompanhamentoAberto.orientacao]
+      [
+        'Descrição geral',
+        acompanhamentoAberto.descricao
+      ],
+      [
+        'Pontos positivos',
+        acompanhamentoAberto.pontosPositivos
+      ],
+      [
+        'Dificuldades identificadas',
+        acompanhamentoAberto.dificuldades
+      ],
+      [
+        'Evolução no período',
+        acompanhamentoAberto.evolucao
+      ],
+      [
+        'Orientação à família',
+        acompanhamentoAberto.orientacao
+      ]
     ]
     : []
 
@@ -255,12 +506,16 @@ export default function Responsavel() {
           <button
             type="button"
             className="responsavel-menu-botao"
-            aria-label={menuAberto ? 'Fechar menu' : 'Abrir menu'}
+            aria-label={
+              menuAberto ? 'Fechar menu' : 'Abrir menu'
+            }
             aria-expanded={menuAberto}
             aria-controls="responsavel-navegacao"
             onClick={() => setMenuAberto(!menuAberto)}
           >
-            {menuAberto ? <X size={22} /> : <Menu size={22} />}
+            {menuAberto
+              ? <X size={22} />
+              : <Menu size={22} />}
           </button>
         </div>
 
@@ -290,12 +545,18 @@ export default function Responsavel() {
             Acompanhamentos
           </a>
 
-          <a href="#evolucao" onClick={() => setMenuAberto(false)}>
+          <a
+            href="#evolucao"
+            onClick={() => setMenuAberto(false)}
+          >
             <TrendingUp size={19} />
             Evolução do aluno
           </a>
 
-          <a href="#historico" onClick={() => setMenuAberto(false)}>
+          <a
+            href="#historico"
+            onClick={() => setMenuAberto(false)}
+          >
             <Clock3 size={19} />
             Histórico
           </a>
@@ -308,7 +569,10 @@ export default function Responsavel() {
           Voltar ao início
         </Link>
 
-        <header className="responsavel-topo" id="dashboard">
+        <header
+          className="responsavel-topo"
+          id="dashboard"
+        >
           <div>
             <span className="responsavel-subtitulo">
               ÁREA DO RESPONSÁVEL
@@ -317,8 +581,8 @@ export default function Responsavel() {
             <h2>Acompanhamento escolar</h2>
 
             <p>
-              Acompanhe o desenvolvimento escolar dos alunos
-              vinculados ao seu cadastro.
+              Acompanhe o desenvolvimento escolar dos
+              alunos vinculados ao seu cadastro.
             </p>
           </div>
 
@@ -328,32 +592,42 @@ export default function Responsavel() {
             </div>
 
             <div>
-              <strong>{usuario.nome || 'Responsável'}</strong>
+              <strong>
+                {usuario.nome || 'Responsável'}
+              </strong>
               <span>Área da família</span>
             </div>
           </div>
         </header>
 
         {carregando && (
-          <p>Carregando alunos e acompanhamentos...</p>
+          <p>
+            Carregando alunos, acompanhamentos
+            e histórico...
+          </p>
         )}
 
         {erroDados && (
-          <p className="responsavel-erro" role="alert">
+          <p
+            className="responsavel-erro"
+            role="alert"
+          >
             {erroDados}
           </p>
         )}
 
-        {!carregando && !erroDados && alunos.length === 0 && (
-          <div className="responsavel-vazio">
-            <BookOpen size={28} />
-            <h4>Nenhum aluno vinculado</h4>
-            <p>
-              Peça ao administrador para vincular um aluno
-              à sua conta.
-            </p>
-          </div>
-        )}
+        {!carregando &&
+          !erroDados &&
+          alunos.length === 0 && (
+            <div className="responsavel-vazio">
+              <BookOpen size={28} />
+              <h4>Nenhum aluno vinculado</h4>
+              <p>
+                Peça ao administrador para vincular
+                um aluno à sua conta.
+              </p>
+            </div>
+          )}
 
         {alunoAtual && (
           <>
@@ -369,15 +643,21 @@ export default function Responsavel() {
                     type="button"
                     key={aluno.id}
                     className={
-                      String(alunoSelecionado) === String(aluno.id)
+                      String(alunoSelecionado) ===
+                        String(aluno.id)
                         ? 'responsavel-aluno responsavel-aluno-ativo'
                         : 'responsavel-aluno'
                     }
-                    onClick={() => selecionarAluno(aluno.id)}
+                    onClick={() =>
+                      selecionarAluno(aluno.id)
+                    }
                   >
                     <div>
                       <strong>{aluno.nome}</strong>
-                      <span>{aluno.turma || 'Turma não informada'}</span>
+                      <span>
+                        {aluno.turma ||
+                          'Turma não informada'}
+                      </span>
                     </div>
 
                     <ChevronRight size={18} />
@@ -394,22 +674,32 @@ export default function Responsavel() {
 
               <div>
                 <span>Turma</span>
-                <strong>{alunoAtual.turma || 'Não informada'}</strong>
+                <strong>
+                  {alunoAtual.turma || 'Não informada'}
+                </strong>
               </div>
 
               <div>
                 <span>Ano letivo</span>
-                <strong>{alunoAtual.ano_letivo || 'Não informado'}</strong>
+                <strong>
+                  {alunoAtual.ano_letivo ||
+                    'Não informado'}
+                </strong>
               </div>
 
               <div>
                 <span>Relatórios publicados</span>
-                <strong>{acompanhamentosPublicados.length}</strong>
+                <strong>
+                  {acompanhamentosPublicados.length}
+                </strong>
               </div>
             </section>
 
             {mensagem && (
-              <div className="responsavel-mensagem">
+              <div
+                className="responsavel-mensagem"
+                role="status"
+              >
                 <CheckCircle2 size={18} />
                 {mensagem}
               </div>
@@ -428,7 +718,8 @@ export default function Responsavel() {
                   <h3>{alunoAtual.nome}</h3>
 
                   <p>
-                    Consulte os registros publicados pela escola.
+                    Consulte os registros publicados
+                    pela escola.
                   </p>
                 </div>
 
@@ -437,46 +728,74 @@ export default function Responsavel() {
                   <select
                     id="ano"
                     value={anoSelecionado}
-                    onChange={e => setAnoSelecionado(e.target.value)}
+                    onChange={e =>
+                      setAnoSelecionado(e.target.value)
+                    }
                   >
                     <option value="Todos">Todos</option>
+
                     {anosDoAluno.map(ano => (
-                      <option key={ano} value={ano}>
+                      <option
+                        key={ano}
+                        value={ano}
+                      >
                         {ano}
                       </option>
                     ))}
                   </select>
 
-                  <label htmlFor="bimestre">Período</label>
+                  <label htmlFor="bimestre">
+                    Período
+                  </label>
+
                   <select
                     id="bimestre"
                     value={bimestreSelecionado}
                     onChange={e =>
-                      setBimestreSelecionado(e.target.value)
+                      setBimestreSelecionado(
+                        e.target.value
+                      )
                     }
                   >
                     <option value="Todos">Todos</option>
+
                     {periodosDoAluno.map(periodo => (
-                      <option key={periodo} value={periodo}>
+                      <option
+                        key={periodo}
+                        value={periodo}
+                      >
                         {periodo}
                       </option>
                     ))}
                   </select>
 
-                  <label htmlFor="disciplina">Disciplina</label>
+                  <label htmlFor="disciplina">
+                    Disciplina
+                  </label>
+
                   <select
                     id="disciplina"
                     value={disciplinaSelecionada}
                     onChange={e =>
-                      setDisciplinaSelecionada(e.target.value)
+                      setDisciplinaSelecionada(
+                        e.target.value
+                      )
                     }
                   >
-                    <option value="Todas">Todas</option>
-                    {disciplinasDoAluno.map(disciplina => (
-                      <option key={disciplina} value={disciplina}>
-                        {disciplina}
-                      </option>
-                    ))}
+                    <option value="Todas">
+                      Todas
+                    </option>
+
+                    {disciplinasDoAluno.map(
+                      disciplina => (
+                        <option
+                          key={disciplina}
+                          value={disciplina}
+                        >
+                          {disciplina}
+                        </option>
+                      )
+                    )}
                   </select>
                 </div>
               </div>
@@ -485,108 +804,137 @@ export default function Responsavel() {
                 <div className="responsavel-vazio">
                   <BookOpen size={28} />
 
-                  <h4>Nenhum acompanhamento publicado</h4>
+                  <h4>
+                    Nenhum acompanhamento publicado
+                  </h4>
 
                   <p>
-                    Ainda não há registros publicados para
-                    os filtros selecionados.
+                    Ainda não há registros publicados
+                    para os filtros selecionados.
                   </p>
                 </div>
               ) : (
                 <div className="responsavel-grid">
-                  {acompanhamentosFiltrados.map(acompanhamento => {
-                    const cienciaRegistrada = ciencias.includes(
-                      acompanhamento.id
-                    )
+                  {acompanhamentosFiltrados.map(
+                    acompanhamento => {
+                      const cienciaRegistrada =
+                        ciencias.includes(
+                          acompanhamento.id
+                        )
 
-                    return (
-                      <article
-                        className="responsavel-card"
-                        key={acompanhamento.id}
-                      >
-                        <div className="responsavel-card-topo">
-                          <div>
-                            <span className="responsavel-disciplina-label">
-                              {acompanhamento.disciplina}
+                      const salvando =
+                        salvandoCiencia ===
+                        acompanhamento.id
+
+                      return (
+                        <article
+                          className="responsavel-card"
+                          key={acompanhamento.id}
+                        >
+                          <div className="responsavel-card-topo">
+                            <div>
+                              <span className="responsavel-disciplina-label">
+                                {acompanhamento.disciplina}
+                              </span>
+
+                              <h4>
+                                {acompanhamento.bimestre}
+                              </h4>
+
+                              <p>
+                                Prof.{' '}
+                                {acompanhamento.professor}
+                              </p>
+                            </div>
+
+                            <span className="responsavel-publicado">
+                              Publicado
                             </span>
-
-                            <h4>{acompanhamento.bimestre}</h4>
-
-                            <p>
-                              Prof. {acompanhamento.professor}
-                            </p>
                           </div>
 
-                          <span className="responsavel-publicado">
-                            Publicado
-                          </span>
-                        </div>
-
-                        <div className="responsavel-situacao">
-                          <span>Situação no período</span>
-                          <strong>
-                            {acompanhamento.situacao ||
-                              'Não informada'}
-                          </strong>
-                        </div>
-
-                        <div className="responsavel-tags">
-                          {acompanhamento.tags.map(tag => (
-                            <span key={tag}>
-                              <Tag size={12} />
-                              {tag}
+                          <div className="responsavel-situacao">
+                            <span>
+                              Situação no período
                             </span>
-                          ))}
-                        </div>
 
-                        <p className="responsavel-descricao">
-                          {acompanhamento.evolucao ||
-                            acompanhamento.descricao ||
-                            'Nenhuma descrição informada.'}
-                        </p>
+                            <strong>
+                              {acompanhamento.situacao ||
+                                'Não informada'}
+                            </strong>
+                          </div>
 
-                        <div className="responsavel-data">
-                          <CalendarDays size={15} />
-                          Publicado em{' '}
-                          {acompanhamento.dataPublicacao}
-                        </div>
+                          <div className="responsavel-tags">
+                            {acompanhamento.tags.map(
+                              tag => (
+                                <span key={tag}>
+                                  <Tag size={12} />
+                                  {tag}
+                                </span>
+                              )
+                            )}
+                          </div>
 
-                        <div className="responsavel-acoes">
-                          <button
-                            type="button"
-                            className="responsavel-detalhes"
-                            onClick={() =>
-                              setAcompanhamentoAberto(acompanhamento)
-                            }
-                          >
-                            <Eye size={16} />
-                            Ver detalhes
-                          </button>
+                          <p className="responsavel-descricao">
+                            {acompanhamento.evolucao ||
+                              acompanhamento.descricao ||
+                              'Nenhuma descrição informada.'}
+                          </p>
 
-                          <button
-                            type="button"
-                            className={
-                              cienciaRegistrada
-                                ? 'responsavel-ciencia ciencia-confirmada'
-                                : 'responsavel-ciencia'
-                            }
-                            onClick={() =>
-                              confirmarCiencia(acompanhamento.id)
-                            }
-                            disabled={cienciaRegistrada}
-                          >
-                            <CheckCircle2 size={16} />
-                            {cienciaRegistrada
-                              ? 'Ciência registrada'
-                              : 'Confirmar ciência'}
-                          </button>
-                        </div>
-                      </article>
-                    )
-                  })}
+                          <div className="responsavel-data">
+                            <CalendarDays size={15} />
+                            Publicado em{' '}
+                            {acompanhamento.dataPublicacao}
+                          </div>
+
+                          <div className="responsavel-acoes">
+                            <button
+                              type="button"
+                              className="responsavel-detalhes"
+                              onClick={() =>
+                                setAcompanhamentoAberto(
+                                  acompanhamento
+                                )
+                              }
+                            >
+                              <Eye size={16} />
+                              Ver detalhes
+                            </button>
+
+                            <button
+                              type="button"
+                              className={
+                                cienciaRegistrada
+                                  ? 'responsavel-ciencia ciencia-confirmada'
+                                  : 'responsavel-ciencia'
+                              }
+                              onClick={() =>
+                                confirmarCiencia(
+                                  acompanhamento.id
+                                )
+                              }
+                              disabled={
+                                cienciaRegistrada ||
+                                !historicoCarregado ||
+                                salvandoCiencia !== null
+                              }
+                            >
+                              <CheckCircle2 size={16} />
+
+                              {salvando
+                                ? 'Registrando...'
+                                : cienciaRegistrada
+                                  ? 'Ciência registrada'
+                                  : 'Confirmar ciência'}
+                            </button>
+                          </div>
+                        </article>
+                      )
+                    }
+                  )}
                 </div>
               )}
             </section>
+
 
             <section
               className="responsavel-evolucao"
@@ -594,26 +942,21 @@ export default function Responsavel() {
             >
               <div className="responsavel-secao-cabecalho">
                 <span>EVOLUÇÃO DO ALUNO</span>
+
                 <h3>Desenvolvimento ao longo do ano</h3>
 
                 <p>
-                  Esta área será utilizada para visualizar
-                  a evolução do aluno entre os períodos.
+                  Acompanhe a evolução das médias escolares de{' '}
+                  {alunoAtual.nome} em cada disciplina.
                 </p>
               </div>
 
-              <div className="responsavel-grafico-futuro">
-                <TrendingUp size={31} />
-
-                <div>
-                  <strong>Gráfico de evolução</strong>
-                  <p>
-                    O gráfico será conectado às médias
-                    publicadas na próxima etapa.
-                  </p>
-                </div>
-              </div>
+              <GraficoEvolucao
+                key={alunoSelecionado}
+                acompanhamentos={acompanhamentosPublicados}
+              />
             </section>
+
 
             <section
               className="responsavel-historico"
@@ -624,39 +967,73 @@ export default function Responsavel() {
                 <h3>Registros da família</h3>
 
                 <p>
-                  Observações registradas nos acompanhamentos
-                  de {alunoAtual.nome}.
+                  Observações registradas nos
+                  acompanhamentos de{' '}
+                  {alunoAtual.nome}.
                 </p>
               </div>
 
               {observacoesDoAluno.length === 0 ? (
                 <div className="responsavel-vazio pequeno">
                   <MessageSquare size={24} />
+
                   <p>
-                    Nenhuma observação registrada até o momento.
+                    Nenhuma observação registrada
+                    até o momento.
                   </p>
                 </div>
               ) : (
                 <div className="responsavel-observacoes">
-                  {observacoesDoAluno.map(observacao => (
-                    <div
-                      className="responsavel-observacao-item"
-                      key={observacao.id}
-                    >
-                      <div>
-                        <strong>{observacao.disciplina}</strong>
-                        <span>
-                          {observacao.bimestre}
-                          {' • '}
-                          {observacao.data}
-                        </span>
-                      </div>
+                  {observacoesDoAluno.map(
+                    observacao => (
+                      <div
+                        className="responsavel-observacao-item"
+                        key={
+                          `${observacao.acompanhamentoId}-${observacao.id}`
+                        }
+                      >
+                        <div>
+                          <strong>
+                            {observacao.disciplina}
+                          </strong>
 
-                      <p>{observacao.texto}</p>
-                    </div>
-                  ))}
+                          <span>
+                            {observacao.bimestre}
+                            {' • '}
+                            {observacao.data}
+                          </span>
+                        </div>
+
+                        <p>{observacao.texto}</p>
+                      </div>
+                    )
+                  )}
                 </div>
               )}
+
+              {ciencias.filter(id =>
+                acompanhamentosPublicados.some(
+                  item =>
+                    String(item.id) === String(id)
+                )
+              ).length > 0 && (
+                  <div
+                    className="responsavel-mensagem"
+                    style={{ marginTop: 16 }}
+                  >
+                    <CheckCircle2 size={18} />
+
+                    Confirmações de ciência registradas:{' '}
+                    {
+                      ciencias.filter(id =>
+                        acompanhamentosPublicados.some(
+                          item =>
+                            String(item.id) === String(id)
+                        )
+                      ).length
+                    }
+                  </div>
+                )}
             </section>
           </>
         )}
@@ -665,7 +1042,9 @@ export default function Responsavel() {
       {acompanhamentoAberto && (
         <div
           className="responsavel-modal-fundo"
-          onClick={() => setAcompanhamentoAberto(null)}
+          onClick={() =>
+            setAcompanhamentoAberto(null)
+          }
         >
           <section
             className="responsavel-modal"
@@ -675,20 +1054,28 @@ export default function Responsavel() {
           >
             <header className="responsavel-modal-topo">
               <div>
-                <span>ACOMPANHAMENTO ESCOLAR</span>
-                <h3>{acompanhamentoAberto.disciplina}</h3>
+                <span>
+                  ACOMPANHAMENTO ESCOLAR
+                </span>
+
+                <h3>
+                  {acompanhamentoAberto.disciplina}
+                </h3>
 
                 <p>
                   {acompanhamentoAberto.bimestre}
                   {' • '}
-                  Prof. {acompanhamentoAberto.professor}
+                  Prof.{' '}
+                  {acompanhamentoAberto.professor}
                 </p>
               </div>
 
               <button
                 type="button"
                 className="responsavel-fechar"
-                onClick={() => setAcompanhamentoAberto(null)}
+                onClick={() =>
+                  setAcompanhamentoAberto(null)
+                }
                 aria-label="Fechar acompanhamento"
               >
                 <X size={20} />
@@ -696,7 +1083,10 @@ export default function Responsavel() {
             </header>
 
             <div className="responsavel-modal-situacao">
-              <span>Situação no período</span>
+              <span>
+                Situação no período
+              </span>
+
               <strong>
                 {acompanhamentoAberto.situacao ||
                   'Não informada'}
@@ -706,6 +1096,7 @@ export default function Responsavel() {
             <div className="responsavel-modal-resumo">
               <div>
                 <span>Média do período</span>
+
                 <strong>
                   {acompanhamentoAberto.media ??
                     'Não informada'}
@@ -714,6 +1105,7 @@ export default function Responsavel() {
 
               <div>
                 <span>Ano letivo</span>
+
                 <strong>
                   {acompanhamentoAberto.ano ||
                     'Não informado'}
@@ -722,15 +1114,19 @@ export default function Responsavel() {
             </div>
 
             <div className="responsavel-detalhe">
-              <h4>Tags de acompanhamento</h4>
+              <h4>
+                Tags de acompanhamento
+              </h4>
 
               <div className="responsavel-tags">
-                {acompanhamentoAberto.tags.map(tag => (
-                  <span key={tag}>
-                    <Tag size={12} />
-                    {tag}
-                  </span>
-                ))}
+                {acompanhamentoAberto.tags.map(
+                  tag => (
+                    <span key={tag}>
+                      <Tag size={12} />
+                      {tag}
+                    </span>
+                  )
+                )}
               </div>
             </div>
 
@@ -740,7 +1136,10 @@ export default function Responsavel() {
                 key={titulo}
               >
                 <h4>{titulo}</h4>
-                <p>{texto || 'Não informado.'}</p>
+
+                <p>
+                  {texto || 'Não informado.'}
+                </p>
               </div>
             ))}
 
@@ -758,7 +1157,10 @@ export default function Responsavel() {
                 type="button"
                 className="responsavel-observacao-botao"
                 onClick={() => {
-                  abrirObservacao(acompanhamentoAberto)
+                  abrirObservacao(
+                    acompanhamentoAberto
+                  )
+
                   setAcompanhamentoAberto(null)
                 }}
               >
@@ -770,17 +1172,28 @@ export default function Responsavel() {
                 type="button"
                 className="responsavel-ciencia"
                 onClick={() =>
-                  confirmarCiencia(acompanhamentoAberto.id)
+                  confirmarCiencia(
+                    acompanhamentoAberto.id
+                  )
                 }
-                disabled={ciencias.includes(
-                  acompanhamentoAberto.id
-                )}
+                disabled={
+                  ciencias.includes(
+                    acompanhamentoAberto.id
+                  ) ||
+                  !historicoCarregado ||
+                  salvandoCiencia !== null
+                }
               >
                 <CheckCircle2 size={16} />
 
-                {ciencias.includes(acompanhamentoAberto.id)
-                  ? 'Ciência registrada'
-                  : 'Confirmar ciência'}
+                {salvandoCiencia ===
+                  acompanhamentoAberto.id
+                  ? 'Registrando...'
+                  : ciencias.includes(
+                    acompanhamentoAberto.id
+                  )
+                    ? 'Ciência registrada'
+                    : 'Confirmar ciência'}
               </button>
             </footer>
           </section>
@@ -790,7 +1203,11 @@ export default function Responsavel() {
       {observacaoAberta && (
         <div
           className="responsavel-modal-fundo"
-          onClick={() => setObservacaoAberta(null)}
+          onClick={() => {
+            if (!salvandoObservacao) {
+              setObservacaoAberta(null)
+            }
+          }}
         >
           <form
             className="responsavel-modal responsavel-form-observacao"
@@ -799,8 +1216,13 @@ export default function Responsavel() {
           >
             <header className="responsavel-modal-topo">
               <div>
-                <span>REGISTRO DA FAMÍLIA</span>
-                <h3>Registrar observação</h3>
+                <span>
+                  REGISTRO DA FAMÍLIA
+                </span>
+
+                <h3>
+                  Registrar observação
+                </h3>
 
                 <p>
                   {observacaoAberta.disciplina}
@@ -812,7 +1234,10 @@ export default function Responsavel() {
               <button
                 type="button"
                 className="responsavel-fechar"
-                onClick={() => setObservacaoAberta(null)}
+                disabled={salvandoObservacao}
+                onClick={() =>
+                  setObservacaoAberta(null)
+                }
                 aria-label="Fechar"
               >
                 <X size={20} />
@@ -821,9 +1246,13 @@ export default function Responsavel() {
 
             <div className="responsavel-aviso-observacao">
               <MessageSquare size={18} />
+
               <p>
-                Esta observação ficará disponível no histórico
-                durante a sessão atual.
+                Sua observação será salva no
+                histórico da família e poderá
+                ser consultada pela escola.
+                Não será enviada uma notificação
+                automática.
               </p>
             </div>
 
@@ -834,15 +1263,23 @@ export default function Responsavel() {
             <textarea
               id="observacao"
               value={textoObservacao}
+              maxLength={5000}
+              disabled={salvandoObservacao}
               onChange={e => {
-                setTextoObservacao(e.target.value)
+                setTextoObservacao(
+                  e.target.value
+                )
+
                 setErroObservacao('')
               }}
               placeholder="Digite uma observação sobre este acompanhamento..."
             />
 
             {erroObservacao && (
-              <p className="responsavel-erro">
+              <p
+                className="responsavel-erro"
+                role="alert"
+              >
                 {erroObservacao}
               </p>
             )}
@@ -851,7 +1288,10 @@ export default function Responsavel() {
               <button
                 type="button"
                 className="responsavel-cancelar"
-                onClick={() => setObservacaoAberta(null)}
+                disabled={salvandoObservacao}
+                onClick={() =>
+                  setObservacaoAberta(null)
+                }
               >
                 Cancelar
               </button>
@@ -859,9 +1299,13 @@ export default function Responsavel() {
               <button
                 type="submit"
                 className="responsavel-enviar"
+                disabled={salvandoObservacao}
               >
                 <Save size={16} />
-                Salvar observação
+
+                {salvandoObservacao
+                  ? 'Salvando...'
+                  : 'Salvar observação'}
               </button>
             </div>
           </form>

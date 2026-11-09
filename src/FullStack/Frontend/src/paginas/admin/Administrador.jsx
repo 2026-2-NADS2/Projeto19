@@ -2,15 +2,9 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import {
-  LayoutDashboard,
-  Users,
-  Tags as TagsIcon,
-  CalendarDays,
-  FileBarChart,
-  BookOpen,
-  Menu,
-  X,
-  ArrowLeft
+  LayoutDashboard, Users, Tags as TagsIcon,
+  CalendarDays, FileBarChart, BookOpen, Menu, X,
+  ArrowLeft, History, CheckCircle2, MessageSquare, RefreshCw
 } from 'lucide-react'
 import './Administrador.css'
 import { api, verificarSessao } from '../../servicos/api'
@@ -25,14 +19,9 @@ import Disciplinas from './Disciplinas'
 const ANO_ATUAL = String(new Date().getFullYear())
 
 const cadastroInicial = {
-  nome: '',
-  matricula: '',
-  data_nascimento: '',
-  email: '',
-  senha: '',
-  turma_id: '',
-  disciplina_id: '',
-  aluno_id: ''
+  nome: '', matricula: '', data_nascimento: '',
+  email: '', senha: '', turma_id: '',
+  disciplina_id: '', aluno_id: ''
 }
 
 const statusNomes = {
@@ -61,16 +50,14 @@ function normalizarAcompanhamento(item) {
 function lerDescricaoAcompanhamento(valor) {
   if (!valor) return { descricao: '' }
   if (typeof valor !== 'string') return valor
-
   try {
     const dados = JSON.parse(valor)
     if (dados && typeof dados === 'object' && !Array.isArray(dados)) {
       return dados
     }
   } catch {
-    // Registros antigos podem conter apenas texto.
+    // Permite ler registros antigos
   }
-
   return { descricao: valor }
 }
 
@@ -88,37 +75,211 @@ function CampoDetalhe({ titulo, valor }) {
 }
 
 const itensMenu = [
-  {
-    caminho: '/administrador',
-    nome: 'Dashboard',
-    icone: LayoutDashboard
-  },
-  {
-    caminho: '/administrador/cadastros',
-    nome: 'Cadastros',
-    icone: Users
-  },
-  {
-    caminho: '/administrador/tags',
-    nome: 'Tags',
-    icone: TagsIcon
-  },
-  {
-    caminho: '/administrador/periodos',
-    nome: 'Períodos',
-    icone: CalendarDays
-  },
-  {
-    caminho: '/administrador/relatorios',
-    nome: 'Relatórios',
-    icone: FileBarChart
-  },
-  {
-    caminho: '/administrador/disciplinas',
-    nome: 'Disciplinas',
-    icone: BookOpen
-  }
+  { caminho: '/administrador', nome: 'Dashboard', icone: LayoutDashboard },
+  { caminho: '/administrador/cadastros', nome: 'Cadastros', icone: Users },
+  { caminho: '/administrador/tags', nome: 'Tags', icone: TagsIcon },
+  { caminho: '/administrador/periodos', nome: 'Períodos', icone: CalendarDays },
+  { caminho: '/administrador/relatorios', nome: 'Relatórios', icone: FileBarChart },
+  { caminho: '/administrador/disciplinas', nome: 'Disciplinas', icone: BookOpen },
+  { caminho: '/administrador/historico-familiar', nome: 'Histórico familiar', icone: History }
 ]
+
+// Consulta os registros familiares no banco
+function HistoricoFamiliar() {
+  const [logs, setLogs] = useState([])
+  const [carregando, setCarregando] = useState(true)
+  const [erro, setErro] = useState('')
+  const [busca, setBusca] = useState('')
+  const [acao, setAcao] = useState('todas')
+
+  async function carregarLogs() {
+    setCarregando(true)
+    setErro('')
+    try {
+      const dados = await api('/acompanhamentos/admin/logs-familia')
+      setLogs(Array.isArray(dados) ? dados : [])
+    } catch (error) {
+      setErro(error.message || 'Erro ao carregar o histórico familiar.')
+    } finally {
+      setCarregando(false)
+    }
+  }
+
+  useEffect(() => {
+    carregarLogs()
+  }, [])
+
+  const filtrados = logs.filter(log => {
+    const termo = busca.toLocaleLowerCase('pt-BR').trim()
+    const texto = [
+      log.aluno, log.responsavel, log.disciplina, log.periodo
+    ].join(' ').toLocaleLowerCase('pt-BR')
+
+    return (!termo || texto.includes(termo)) &&
+      (acao === 'todas' || log.acao === acao)
+  })
+
+  function dataHora(valor) {
+    if (!valor) return 'Data não informada'
+    const data = new Date(valor)
+    return Number.isNaN(data.getTime())
+      ? 'Data não informada'
+      : data.toLocaleString('pt-BR')
+  }
+
+  const estiloCampo = {
+    background: '#180d23',
+    color: '#fff',
+    border: '1px solid #67477d',
+    borderRadius: 8,
+    padding: '10px 12px',
+    minHeight: 42,
+    boxSizing: 'border-box'
+  }
+
+  return (
+    <section style={{ padding: '24px 0', color: '#fff' }}>
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        gap: 16,
+        flexWrap: 'wrap',
+        marginBottom: 20
+      }}>
+        <div>
+          <span style={{ color: '#c4a3e7', fontSize: 12, fontWeight: 700 }}>
+            ACOMPANHAMENTO DA FAMÍLIA
+          </span>
+          <h2 style={{ margin: '6px 0' }}>Histórico familiar</h2>
+          <p style={{ color: '#cbb8d7', margin: 0 }}>
+            Consulte as ações registradas pelos responsáveis, sem notificações.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={carregarLogs}
+          disabled={carregando}
+          className="admin-botao-secundario"
+          style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+        >
+          <RefreshCw size={16} />
+          {carregando ? 'Carregando...' : 'Atualizar'}
+        </button>
+      </div>
+
+      <div style={{
+        display: 'flex',
+        gap: 12,
+        flexWrap: 'wrap',
+        marginBottom: 20
+      }}>
+        <input
+          type="search"
+          aria-label="Buscar aluno ou responsável"
+          placeholder="Buscar aluno, responsável ou disciplina"
+          value={busca}
+          onChange={e => setBusca(e.target.value)}
+          style={{ ...estiloCampo, flex: '1 1 280px' }}
+        />
+        <select
+          aria-label="Filtrar tipo de registro"
+          value={acao}
+          onChange={e => setAcao(e.target.value)}
+          style={estiloCampo}
+        >
+          <option value="todas">Todas as ações</option>
+          <option value="ciencia">Ciência confirmada</option>
+          <option value="observacao">Observações</option>
+        </select>
+      </div>
+
+      {erro && (
+        <p role="alert" style={{ color: '#ff9baa' }}>{erro}</p>
+      )}
+      {carregando && <p>Carregando registros...</p>}
+
+      {!carregando && !erro && filtrados.length === 0 && (
+        <div style={{
+          padding: 24,
+          border: '1px solid #56366a',
+          borderRadius: 12
+        }}>
+          Nenhum registro encontrado.
+        </div>
+      )}
+
+      {!carregando && !erro && (
+        <div style={{ display: 'grid', gap: 12 }}>
+          {filtrados.map(log => (
+            <article
+              key={log.id}
+              style={{
+                padding: 18,
+                borderRadius: 12,
+                background: '#21132d',
+                border: '1px solid #56366a'
+              }}
+            >
+              <div style={{
+                display: 'flex',
+                gap: 10,
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap'
+              }}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8
+                }}>
+                  {log.acao === 'ciencia'
+                    ? <CheckCircle2 size={19} color="#5ce0a3" />
+                    : <MessageSquare size={19} color="#c7a2f4" />}
+                  <strong>
+                    {log.acao === 'ciencia'
+                      ? 'Ciência confirmada'
+                      : 'Observação da família'}
+                  </strong>
+                </div>
+                <time style={{ color: '#cbb8d7', fontSize: 13 }}>
+                  {dataHora(log.criado_em)}
+                </time>
+              </div>
+
+              <p style={{ margin: '12px 0 4px' }}>
+                <strong>Aluno:</strong> {log.aluno || 'Não informado'}
+              </p>
+              <p style={{ margin: '4px 0' }}>
+                <strong>Responsável:</strong> {log.responsavel || 'Não informado'}
+              </p>
+              <p style={{ margin: '4px 0', color: '#cbb8d7' }}>
+                {log.disciplina || 'Disciplina não informada'}
+                {' · '}
+                {log.periodo || 'Período não informado'}
+                {log.ano_letivo ? ` · ${log.ano_letivo}` : ''}
+              </p>
+
+              {log.acao === 'observacao' && (
+                <p style={{
+                  whiteSpace: 'pre-wrap',
+                  overflowWrap: 'anywhere',
+                  background: '#160b20',
+                  padding: 12,
+                  borderRadius: 8,
+                  marginBottom: 0
+                }}>
+                  {log.descricao || 'Sem descrição'}
+                </p>
+              )}
+            </article>
+          ))}
+        </div>
+      )}
+    </section>
+  )
+}
 
 export default function Administrador() {
   const location = useLocation()
@@ -185,7 +346,6 @@ export default function Administrador() {
     nome: '',
     area: 'Linguagens'
   })
-
   const [disciplinaEditando, setDisciplinaEditando] = useState(null)
 
   const [filtros, setFiltros] = useState({
@@ -203,12 +363,8 @@ export default function Administrador() {
 
   async function carregarCadastros() {
     const [
-      listaUsuarios,
-      listaAlunos,
-      listaTurmas,
-      listaDisciplinas,
-      listaProfessores,
-      listaResponsaveis
+      listaUsuarios, listaAlunos, listaTurmas,
+      listaDisciplinas, listaProfessores, listaResponsaveis
     ] = await Promise.all([
       api('/usuarios'),
       api('/alunos'),
@@ -218,21 +374,11 @@ export default function Administrador() {
       api('/responsaveis-alunos')
     ])
 
-    const usuariosDados = Array.isArray(listaUsuarios)
-      ? listaUsuarios
-      : []
-
-    const alunosDados = Array.isArray(listaAlunos)
-      ? listaAlunos
-      : []
-
-    const turmasDados = Array.isArray(listaTurmas)
-      ? listaTurmas
-      : []
-
+    const usuariosDados = Array.isArray(listaUsuarios) ? listaUsuarios : []
+    const alunosDados = Array.isArray(listaAlunos) ? listaAlunos : []
+    const turmasDados = Array.isArray(listaTurmas) ? listaTurmas : []
     const disciplinasDados = Array.isArray(listaDisciplinas)
-      ? listaDisciplinas
-      : []
+      ? listaDisciplinas : []
 
     setUsuarios(usuariosDados)
     setAlunos(alunosDados)
@@ -242,7 +388,6 @@ export default function Administrador() {
     setVinculosProfessores(
       Array.isArray(listaProfessores) ? listaProfessores : []
     )
-
     setVinculosResponsaveis(
       Array.isArray(listaResponsaveis) ? listaResponsaveis : []
     )
@@ -251,11 +396,7 @@ export default function Administrador() {
       turmasDados.map(async turma => {
         try {
           const lista = await api(`/turmas/${turma.id}/alunos`)
-
-          return [
-            turma.id,
-            Array.isArray(lista) ? lista : []
-          ]
+          return [turma.id, Array.isArray(lista) ? lista : []]
         } catch {
           return [turma.id, []]
         }
@@ -272,7 +413,6 @@ export default function Administrador() {
 
   async function carregarAcompanhamentos() {
     const dados = await api('/acompanhamentos')
-
     setAcompanhamentos(
       Array.isArray(dados)
         ? dados.map(normalizarAcompanhamento)
@@ -283,7 +423,6 @@ export default function Administrador() {
   async function carregarTudo() {
     setCarregando(true)
     setErro('')
-
     try {
       await Promise.all([
         carregarCadastros(),
@@ -306,7 +445,6 @@ export default function Administrador() {
 
     verificarSessao()
     carregarTudo()
-
     window.addEventListener('focus', conferirSessao)
     document.addEventListener('visibilitychange', conferirSessao)
 
@@ -409,13 +547,11 @@ export default function Administrador() {
       })
 
       setMensagemCadastro('Turma cadastrada com sucesso!')
-
       setTurmaForm({
         nome: '',
         ano_letivo: ANO_ATUAL,
         periodo: 'manha'
       })
-
       await carregarCadastros()
     } catch (error) {
       setErroCadastro(error.message)
@@ -429,9 +565,7 @@ export default function Administrador() {
 
     try {
       if (periodoForm.data_fim < periodoForm.data_inicio) {
-        throw new Error(
-          'A data final não pode ser anterior à inicial.'
-        )
+        throw new Error('A data final não pode ser anterior à inicial.')
       }
 
       await api('/periodos', {
@@ -446,13 +580,11 @@ export default function Administrador() {
 
       setFiltroPeriodoAno(String(periodoForm.ano_letivo))
       setMensagemPeriodo('Bimestre cadastrado com sucesso!')
-
       setPeriodoForm(anterior => ({
         ...anterior,
         data_inicio: '',
         data_fim: ''
       }))
-
       await carregarPeriodos()
     } catch (error) {
       setErroPeriodo(error.message)
@@ -464,7 +596,6 @@ export default function Administrador() {
       await api(`/acompanhamentos/${id}/publicar`, {
         method: 'PATCH'
       })
-
       await carregarAcompanhamentos()
       setAlunoSelecionado(null)
     } catch (error) {
@@ -480,12 +611,10 @@ export default function Administrador() {
 
   async function devolverAcompanhamento(id) {
     const motivo = motivoDevolucao.trim()
-
     if (!motivo) {
       setErroDevolucao('Escreva o motivo da devolução.')
       return
     }
-
     if (processandoRevisao) return
 
     setProcessandoRevisao(true)
@@ -499,7 +628,6 @@ export default function Administrador() {
           observacao: motivo
         })
       })
-
       await carregarAcompanhamentos()
       setModalDevolucao(false)
       setAlunoSelecionado(null)
@@ -526,7 +654,6 @@ export default function Administrador() {
       Devolvido: 'devolvido',
       Publicado: 'publicado'
     }
-
     return classes[status] || ''
   }
 
@@ -543,10 +670,7 @@ export default function Administrador() {
     } else {
       setTags(lista => [
         ...lista,
-        {
-          id: Date.now(),
-          nome: nomeTag.trim()
-        }
+        { id: Date.now(), nome: nomeTag.trim() }
       ])
     }
 
@@ -567,10 +691,7 @@ export default function Administrador() {
     } else {
       setAreas(lista => [
         ...lista,
-        {
-          id: Date.now(),
-          nome: nomeArea.trim()
-        }
+        { id: Date.now(), nome: nomeArea.trim() }
       ])
     }
 
@@ -579,14 +700,11 @@ export default function Administrador() {
   }
 
   function excluirArea(id) {
-    setAreas(lista =>
-      lista.filter(area => area.id !== id)
-    )
+    setAreas(lista => lista.filter(area => area.id !== id))
   }
 
   async function salvarDisciplina(evento) {
     evento.preventDefault()
-
     if (!disciplinaForm.nome.trim()) return
 
     if (disciplinaEditando !== null) {
@@ -620,92 +738,41 @@ export default function Administrador() {
     const alunoOk = item.nome.toLowerCase().includes(
       filtros.aluno.toLowerCase()
     )
-
     const disciplinaOk =
       !filtros.disciplina ||
       item.disciplina === filtros.disciplina
-
     const bimestreOk =
       !filtros.bimestre ||
       item.bimestre === filtros.bimestre
-
     const statusOk =
       !filtros.status ||
       item.status === filtros.status
 
-    return (
-      alunoOk &&
-      disciplinaOk &&
-      bimestreOk &&
-      statusOk
-    )
+    return alunoOk && disciplinaOk && bimestreOk && statusOk
   })
 
   const contexto = {
     carregarCadastros,
-    usuarios,
-    alunos,
-    turmas,
-    disciplinas,
-    setDisciplinas,
-    periodos,
-    acompanhamentos,
-    carregando,
-    erro,
-    vinculosProfessores,
-    vinculosResponsaveis,
-    alunosTurmas,
-    tipoCadastro,
-    setTipoCadastro,
-    cadastroForm,
-    setCadastroForm,
-    turmaForm,
-    setTurmaForm,
-    filtroCadastro,
-    setFiltroCadastro,
-    mensagemCadastro,
-    setMensagemCadastro,
-    erroCadastro,
-    setErroCadastro,
-    salvandoCadastro,
-    salvarCadastro,
-    salvarTurma,
-    periodoForm,
-    setPeriodoForm,
-    filtroPeriodoAno,
-    setFiltroPeriodoAno,
-    mensagemPeriodo,
-    erroPeriodo,
-    salvarPeriodo,
-    tags,
-    setTags,
-    nomeTag,
-    setNomeTag,
-    tagEditando,
-    setTagEditando,
-    salvarTag,
-    areas,
-    nomeArea,
-    setNomeArea,
-    areaEditando,
-    setAreaEditando,
-    salvarArea,
-    excluirArea,
-    disciplinaForm,
-    setDisciplinaForm,
-    disciplinaEditando,
-    setDisciplinaEditando,
-    salvarDisciplina,
-    filtros,
-    setFiltros,
-    alunosFiltrados,
-    alunoSelecionado,
-    setAlunoSelecionado,
-    publicarAcompanhamento,
-    devolverAcompanhamento,
-    abrirDevolucao,
-    contarStatus,
-    classeStatus
+    usuarios, alunos, turmas, disciplinas, setDisciplinas,
+    periodos, acompanhamentos, carregando, erro,
+    vinculosProfessores, vinculosResponsaveis, alunosTurmas,
+    tipoCadastro, setTipoCadastro, cadastroForm, setCadastroForm,
+    turmaForm, setTurmaForm, filtroCadastro, setFiltroCadastro,
+    mensagemCadastro, setMensagemCadastro, erroCadastro,
+    setErroCadastro, salvandoCadastro, salvarCadastro,
+    salvarTurma, periodoForm, setPeriodoForm,
+    filtroPeriodoAno, setFiltroPeriodoAno,
+    mensagemPeriodo, setMensagemPeriodo, erroPeriodo,
+    setErroPeriodo, salvarPeriodo, tags, setTags,
+    nomeTag, setNomeTag, tagEditando, setTagEditando,
+    salvarTag, areas, nomeArea, setNomeArea,
+    areaEditando, setAreaEditando, salvarArea, excluirArea,
+    disciplinaForm, setDisciplinaForm, disciplinaEditando,
+    setDisciplinaEditando, salvarDisciplina, filtros,
+    setFiltros, alunosFiltrados, alunoSelecionado,
+    setAlunoSelecionado, publicarAcompanhamento,
+    devolverAcompanhamento, abrirDevolucao,
+    contarStatus, classeStatus
   }
 
   const pagina = location.pathname.replace(/\/$/, '')
@@ -714,19 +781,16 @@ export default function Administrador() {
     switch (pagina) {
       case '/administrador/cadastros':
         return <Cadastros />
-
       case '/administrador/tags':
         return <Tags />
-
       case '/administrador/periodos':
         return <Periodos />
-
       case '/administrador/relatorios':
         return <Relatorios />
-
       case '/administrador/disciplinas':
         return <Disciplinas />
-
+      case '/administrador/historico-familiar':
+        return <HistoricoFamiliar />
       default:
         return <Dashboard />
     }
@@ -776,7 +840,6 @@ export default function Administrador() {
             <ArrowLeft size={16} />
             Voltar ao início
           </Link>
-
           {renderizarPagina()}
         </main>
 
@@ -784,7 +847,6 @@ export default function Administrador() {
           const detalhes = lerDescricaoAcompanhamento(
             alunoSelecionado.descricao
           )
-
           const pendente =
             alunoSelecionado.status === 'Enviado para revisão'
 
@@ -804,10 +866,7 @@ export default function Administrador() {
                 aria-modal="true"
                 aria-label="Detalhes do acompanhamento"
                 onClick={evento => evento.stopPropagation()}
-                style={{
-                  maxHeight: '88vh',
-                  overflowY: 'auto'
-                }}
+                style={{ maxHeight: '88vh', overflowY: 'auto' }}
               >
                 <div className="admin-modal-topo">
                   <div>
@@ -838,7 +897,6 @@ export default function Administrador() {
                     <span>Período</span>
                     <strong>{alunoSelecionado.bimestre}</strong>
                   </div>
-
                   <div>
                     <span>Status</span>
                     <strong>{alunoSelecionado.status}</strong>
@@ -862,27 +920,22 @@ export default function Administrador() {
                   titulo="Situação atual"
                   valor={detalhes.situacao}
                 />
-
                 <CampoDetalhe
                   titulo="Descrição geral"
                   valor={detalhes.descricao}
                 />
-
                 <CampoDetalhe
                   titulo="Pontos positivos"
                   valor={detalhes.pontosPositivos}
                 />
-
                 <CampoDetalhe
                   titulo="Dificuldades identificadas"
                   valor={detalhes.dificuldades}
                 />
-
                 <CampoDetalhe
                   titulo="Evolução no período"
                   valor={detalhes.evolucao}
                 />
-
                 <CampoDetalhe
                   titulo="Orientação à família"
                   valor={detalhes.orientacao}
@@ -897,7 +950,6 @@ export default function Administrador() {
                     >
                       Devolver
                     </button>
-
                     <button
                       type="button"
                       className="admin-botao-principal"
@@ -924,22 +976,18 @@ export default function Administrador() {
                       border: '1px solid #69418a'
                     }}
                   >
-                    <h4
-                      style={{
-                        color: '#fff',
-                        margin: '0 0 8px'
-                      }}
-                    >
+                    <h4 style={{
+                      color: '#fff',
+                      margin: '0 0 8px'
+                    }}>
                       Devolver ao professor
                     </h4>
 
-                    <p
-                      style={{
-                        color: '#d3c0e1',
-                        fontSize: 13,
-                        marginBottom: 14
-                      }}
-                    >
+                    <p style={{
+                      color: '#d3c0e1',
+                      fontSize: 13,
+                      marginBottom: 14
+                    }}>
                       Explique o que precisa ser corrigido.
                       A justificativa ficará registrada no acompanhamento.
                     </p>

@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Alexandria:wght@400;500;600;700&display=swap');
 
-/* Tema escuro - padrão da KFKA */
+/* TEMA ESCURO - PADRÃO KFKA */
 
 :root {
     --fundo-inicio: #170025;
@@ -29,7 +29,7 @@
     --erro: #e56a6a;
 }
 
-/* Tema claro - acessibilidade */
+/* TEMA CLARO */
 
 .tema-claro {
     --fundo-inicio: #f4f1f6;
@@ -58,7 +58,7 @@
     --erro: #a12d2d;
 }
 
-/* Configurações gerais */
+/* CONFIGURAÇÕES GERAIS */
 
 * {
     margin: 0;
@@ -85,7 +85,6 @@ body {
     font-family: 'Alexandria', sans-serif;
 
     background: var(--fundo-inicio);
-
     color: var(--texto);
 
     overflow-x: hidden;
@@ -104,7 +103,7 @@ a {
     -webkit-tap-highlight-color: transparent;
 }
 
-/* Formulários */
+/* FORMULÁRIOS */
 
 input,
 select,
@@ -112,7 +111,7 @@ textarea {
     font-size: inherit;
 }
 
-/* Acessibilidade - navegação por teclado */
+/* ACESSIBILIDADE - TECLADO */
 
 a:focus-visible,
 button:focus-visible,
@@ -123,63 +122,67 @@ textarea:focus-visible {
     outline-offset: 3px;
 }
 
-/* Seleção de texto */
+/* SELEÇÃO DE TEXTO */
 
 ::selection {
     background: var(--destaque);
     color: #ffffff;
 }
 
-
-/* Acessibilidade -fonte-grande */
+/* ACESSIBILIDADE - FONTE GRANDE */
 
 html.acessibilidade-fonte-grande {
     font-size: 112.5%;
 }
 
+/* ACESSIBILIDADE - ESCALA DE CINZA */
+
 html.acessibilidade-escala-cinza {
     filter: grayscale(100%);
 }
 
+/* ACESSIBILIDADE - ALTO CONTRASTE */
+
 html.acessibilidade-alto-contraste {
-  --fundo-inicio: #000000;
-  --fundo-meio: #000000;
-  --fundo-fim: #000000;
-  --sidebar: #000000;
-  --painel: #000000;
-  --painel-secundario: #000000;
-  --campo: #111111;
-  --campo-hover: #222222;
-  --borda: #ffffff;
-  --texto: #ffffff;
-  --texto-secundario: #ffffff;
-  --destaque: #ffff00;
-  --destaque-hover: #ffff00;
-  --destaque-claro: #ffff00;
-  --sucesso: #00ff00;
-  --atencao: #ffff00;
-  --erro: #ff5555;
+    --fundo-inicio: #000000;
+    --fundo-meio: #000000;
+    --fundo-fim: #000000;
+
+    --sidebar: #000000;
+    --painel: #000000;
+    --painel-secundario: #000000;
+
+    --campo: #111111;
+    --campo-hover: #222222;
+
+    --borda: #ffffff;
+
+    --texto: #ffffff;
+    --texto-secundario: #ffffff;
+
+    --destaque: #ffff00;
+    --destaque-hover: #ffff00;
+    --destaque-claro: #ffff00;
+
+    --sucesso: #00ff00;
+    --atencao: #ffff00;
+    --erro: #ff5555;
 }
 
-html.acessiblidade-alto-contraste
-    button,
-html.acessibilidade-alto-constraste
-    a {
+html.acessibilidade-alto-contraste button,
+html.acessibilidade-alto-contraste a {
     border-color: #ffffff;
-    }
+}
 
-html.acessibilidade-alto-contraste
-    a:focus-visible,
-html.acessibilidade-alto-contraste
-    button:focus-visible,
-html.acessibilidade-alto-contraste
-    input:focus-visible,
-html.acessibilidade-alto-contraste
-    select:focus-visible,
-html.acessibilidade-alto-contraste
-    textarea:focus-visible {
+html.acessibilidade-alto-contraste a:focus-visible,
+html.acessibilidade-alto-contraste button:focus-visible,
+html.acessibilidade-alto-contraste input:focus-visible,
+html.acessibilidade-alto-contraste select:focus-visible,
+html.acessibilidade-alto-contraste textarea:focus-visible {
     outline-color: #ffff00;
 }
+
+/* ACESSIBILIDADE - SUBLINHAR LINKS */
 
 html.acessibilidade-sublinhar-links a {
     text-decoration: underline;
@@ -187,11 +190,326 @@ html.acessibilidade-sublinhar-links a {
     text-underline-offset: 3px;
 }
 
+/* ACESSIBILIDADE - REDUZIR MOVIMENTO */
+
 html.acessibilidade-reduzir-movimento *,
 html.acessibilidade-reduzir-movimento *::before,
 html.acessibilidade-reduzir-movimento *::after {
-  animation-duration: 0.01ms !important;
-  animation-iteration-count: 1 !important;
-  scroll-behavior: auto !important;
-  transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+}
+
+/* ==========================================
+   PADRONIZAÇÃO DAS PÁGINAS PÚBLICAS
+   Plataforma, Recursos, Sobre Nós e Contato
+   ========================================== */
+
+/* ESTRUTURA PRINCIPAL */
+
+:where(.conteudo-plataforma,
+    .conteudo-sobre,
+    .conteudo-recursos,
+    .conteudo-contato) {
+    width: 100%;
+    max-width: 1450px;
+    min-height: calc(100vh - 72px);
+
+    margin: 0 auto;
+    padding: 150px 7% 70px;
+
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    align-items: start;
+
+    gap: 64px;
+}
+
+/* COLUNAS */
+
+:where(.lado-esquerdo-plataforma,
+    .lado-direito-plataforma,
+    .lado-esquerdo-sobre,
+    .lado-direito-sobre,
+    .recursos-apresentacao,
+    .recursos-listagem,
+    .contato-apresentacao,
+    .contato-canais) {
+    width: 100%;
+    min-width: 0;
+}
+
+/* ETIQUETAS */
+
+:where(.plataforma-etiqueta,
+    .subtitulo-plataforma,
+    .sobre-etiqueta,
+    .subtitulo-metodo,
+    .recursos-etiqueta,
+    .recursos-listagem-etiqueta,
+    .contato-etiqueta,
+    .contato-canais-etiqueta) {
+    margin: 0 0 18px;
+
+    color: var(--destaque-claro);
+
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.4;
+    letter-spacing: 1.5px;
+}
+
+/* TÍTULOS PRINCIPAIS */
+
+:where(.lado-esquerdo-plataforma h1,
+    .lado-esquerdo-sobre h1,
+    .recursos-apresentacao h1,
+    .contato-apresentacao h1) {
+    max-width: 600px;
+    margin: 0;
+
+    color: var(--texto);
+
+    font-size: 48px;
+    font-weight: 600;
+    line-height: 1.12;
+    letter-spacing: -1.8px;
+}
+
+/* TÍTULOS SECUNDÁRIOS */
+
+:where(.lado-direito-plataforma h2,
+    .lado-direito-sobre h2,
+    .recursos-listagem h2,
+    .contato-canais h2) {
+    margin: 0;
+
+    color: var(--texto);
+
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+}
+
+/* DESCRIÇÕES DA ESQUERDA */
+
+:where(.plataforma-descricao,
+    .sobre-descricao,
+    .recursos-descricao,
+    .contato-descricao) {
+    max-width: 560px;
+
+    margin-top: 26px;
+
+    color: var(--texto-secundario);
+
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.7;
+}
+
+/* DESCRIÇÕES DA DIREITA */
+
+:where(.descricao-plataforma,
+    .descricao-metodo,
+    .recursos-listagem-descricao,
+    .contato-canais-descricao) {
+    max-width: 620px;
+
+    margin-top: 16px;
+    margin-bottom: 26px;
+
+    color: var(--texto-secundario);
+
+    font-size: 14px;
+    line-height: 1.65;
+}
+
+/* TÍTULOS DOS CARDS */
+
+:where(.card-plataforma h3,
+    .card-metodo h3,
+    .recurso-card h3) {
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+/* TEXTOS DOS CARDS */
+
+:where(.card-plataforma p,
+    .card-metodo p,
+    .recurso-card p,
+    .contato-item p,
+    .contato-destaque p) {
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+/* RECURSOS */
+
+.recurso-card {
+    min-height: 160px;
+    padding: 18px;
+}
+
+.recurso-card-topo {
+    margin-bottom: 12px;
+}
+
+.recurso-numero {
+    font-size: 11px;
+}
+
+.recursos-fluxo strong {
+    font-size: 12px;
+}
+
+.recursos-fluxo div span {
+    font-size: 11px;
+}
+
+/* CONTATO */
+
+.contato-item {
+    min-height: 120px;
+    padding: 17px;
+}
+
+.contato-item span {
+    font-size: 11px;
+}
+
+.contato-item strong {
+    font-size: 13px;
+}
+
+.contato-empresa strong {
+    font-size: 13px;
+}
+
+.contato-empresa span {
+    font-size: 11px;
+}
+
+/* PLATAFORMA E SOBRE NÓS */
+
+.card-plataforma,
+.card-metodo {
+    min-height: 190px;
+    padding: 20px;
+}
+
+/* ==========================================
+   RESPONSIVIDADE
+   ========================================== */
+
+/* TABLETS */
+
+@media (max-width: 1100px) {
+
+    :where(.conteudo-plataforma,
+        .conteudo-sobre,
+        .conteudo-recursos,
+        .conteudo-contato) {
+        padding: 110px 5% 60px;
+        gap: 40px;
+    }
+
+    :where(.lado-esquerdo-plataforma h1,
+        .lado-esquerdo-sobre h1,
+        .recursos-apresentacao h1,
+        .contato-apresentacao h1) {
+        font-size: 42px;
+    }
+
+    .cards-plataforma,
+    .cards-metodo {
+        grid-template-columns: 1fr;
+    }
+
+    .card-plataforma,
+    .card-metodo {
+        min-height: auto;
+    }
+}
+
+/* CELULARES */
+
+@media (max-width: 768px) {
+
+    :where(.conteudo-plataforma,
+        .conteudo-sobre,
+        .conteudo-recursos,
+        .conteudo-contato) {
+        display: flex;
+        flex-direction: column;
+
+        min-height: auto;
+
+        padding: 50px 30px 60px;
+        gap: 50px;
+    }
+
+    :where(.lado-esquerdo-plataforma h1,
+        .lado-esquerdo-sobre h1,
+        .recursos-apresentacao h1,
+        .contato-apresentacao h1) {
+        font-size: 40px;
+        letter-spacing: -1px;
+    }
+
+    :where(.lado-direito-plataforma h2,
+        .lado-direito-sobre h2,
+        .recursos-listagem h2,
+        .contato-canais h2) {
+        font-size: 30px;
+    }
+
+    .recursos {
+        overflow: visible;
+    }
+
+    .recursos-grid,
+    .contato-lista {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* CELULARES PEQUENOS */
+
+@media (max-width: 520px) {
+
+    :where(.conteudo-plataforma,
+        .conteudo-sobre,
+        .conteudo-recursos,
+        .conteudo-contato) {
+        padding: 42px 20px 50px;
+        gap: 45px;
+    }
+
+    :where(.lado-esquerdo-plataforma h1,
+        .lado-esquerdo-sobre h1,
+        .recursos-apresentacao h1,
+        .contato-apresentacao h1) {
+        font-size: 36px;
+        letter-spacing: -1px;
+    }
+
+    :where(.lado-direito-plataforma h2,
+        .lado-direito-sobre h2,
+        .recursos-listagem h2,
+        .contato-canais h2) {
+        font-size: 27px;
+    }
+
+    .recursos-grid,
+    .contato-lista {
+        grid-template-columns: 1fr;
+    }
+
+    .recurso-card {
+        min-height: auto;
+    }
 }
