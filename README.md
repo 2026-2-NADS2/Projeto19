@@ -427,7 +427,6 @@ node src/criarAdmin.js
 
 O script cria um usuário com perfil `administrador`, armazenando a senha como hash com `bcryptjs`. Se o e-mail já estiver cadastrado, o script informa que o usuário existe e não cria uma conta duplicada. A criação do administrador é necessária apenas na configuração inicial do banco, caso ainda não haja um usuário válido.
 
-**Não coloque a senha do administrador no README ou no repositório.**
 
 ### 5. Iniciar o backend
 
