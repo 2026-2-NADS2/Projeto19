@@ -188,6 +188,10 @@ Projeto19/
 │   │   ├── Backend/
 │   │   │   ├── sql/
 │   │   │   ├── src/
+│   │   │   │   ├── bancoDados.js
+│   │   │   │   ├── criarAdmin.js
+│   │   │   │   ├── middlewares/
+│   │   │   │   └── routes/
 │   │   │   ├── .env.example
 │   │   │   ├── index.js
 │   │   │   ├── package.json
@@ -202,7 +206,6 @@ Projeto19/
 │   │   │   │   ├── servicos/
 │   │   │   │   ├── App.jsx
 │   │   │   │   └── main.jsx
-│   │   │   ├── iniciar.bat
 │   │   │   ├── index.html
 │   │   │   ├── package.json
 │   │   │   └── vite.config.js
@@ -212,6 +215,7 @@ Projeto19/
 │   └── POO/
 │
 ├── .gitignore
+├── iniciar.bat
 ├── package-lock.json
 └── README.md
 ```
@@ -253,7 +257,6 @@ O projeto utiliza tecnologias voltadas ao desenvolvimento de aplicações web Fu
 
 - **Node.js:** ambiente de execução JavaScript no servidor.
 - **Express:** desenvolvimento da API e gerenciamento das rotas.
-- **MySQL2:** comunicação entre a aplicação Node.js e o banco de dados.
 - **JWT (JSON Web Token):** autenticação baseada em tokens.
 - **bcrypt:** geração e verificação de hashes de senhas.
 - **CORS:** configuração de comunicação entre frontend e backend.
@@ -278,9 +281,9 @@ O projeto utiliza tecnologias voltadas ao desenvolvimento de aplicações web Fu
 
 O KFKA utiliza o MySQL para armazenar informações relacionadas aos usuários, estudantes, turmas, disciplinas e acompanhamentos escolares.
 
-O banco de dados possui tabelas relacionadas por chaves primárias e estrangeiras, permitindo manter a integridade das informações.
+O banco de dados possui tabelas relacionadas por chaves primárias e estrangeiras, permitindo manter a integridade das informações. Na configuração verificada no notebook, foram identificadas 13 tabelas.
 
-### Principais tabelas
+### Tabelas principais
 
 | Tabela | Finalidade |
 |---|---|
@@ -297,8 +300,6 @@ O banco de dados possui tabelas relacionadas por chaves primárias e estrangeira
 | acompanhamentos_tags | Relaciona tags aos acompanhamentos. |
 | comentarios | Armazena comentários associados aos registros. |
 | revisoes_acompanhamentos | Registra informações relacionadas às revisões. |
-| logs_acompanhamentos | Armazena registros de ações sobre acompanhamentos. |
-| ciencias_acompanhamentos | Registra informações relacionadas à ciência dos acompanhamentos. |
 
 ### Arquivos SQL
 
@@ -314,7 +315,7 @@ Também existem scripts SQL na pasta:
 src/FullStack/Backend/sql/
 ```
 
-A importação deve ser realizada utilizando um script compatível com a versão atual da aplicação.
+A importação deve ser realizada utilizando um script compatível com a versão atual da aplicação. Antes de importar, confira se o arquivo exportado está atualizado; os dados do banco instalado em um computador não são sincronizados automaticamente com o arquivo SQL do repositório.
 
 ---
 
@@ -332,7 +333,7 @@ Instale as seguintes ferramentas:
 - Git, para clonar o repositório.
 - Visual Studio Code ou outro editor de código.
 
-O GitHub Desktop é opcional.
+O GitHub Desktop é opcional. O arquivo `iniciar.bat` foi preparado para **Windows**; em outros sistemas operacionais, utilize os comandos manuais descritos abaixo.
 
 ### 1. Clonar o repositório
 
@@ -404,9 +405,31 @@ Substitua os valores de exemplo pelas configurações do seu ambiente.
 
 A variável `JWT_SECRET` é obrigatória para iniciar o backend.
 
-**Importante:** o arquivo `.env` contém informações sensíveis e não deve ser enviado ao GitHub.
+Para criar o administrador inicial, acrescente também ao `.env`:
 
-### 4. Iniciar o backend
+```env
+ADMIN_NOME=Administrador KFKA
+ADMIN_EMAIL=admin@kfka.com
+ADMIN_SENHA=ESCOLHA_UMA_SENHA_FORTE
+```
+
+Substitua `ESCOLHA_UMA_SENHA_FORTE` por uma senha de **no mínimo 12 caracteres**. Essas variáveis são utilizadas pelo script de criação do administrador; não são credenciais públicas ou valores que devem ser compartilhados.
+
+**Importante:** o arquivo `.env` contém informações sensíveis e não deve ser enviado ao GitHub. Configure também o MySQL Server localmente e confirme que o banco `kfka` possui as tabelas necessárias.
+
+### 4. Criar o administrador inicial
+
+Com o banco importado e as variáveis `ADMIN_NOME`, `ADMIN_EMAIL` e `ADMIN_SENHA` preenchidas, execute **dentro da pasta `src/FullStack/Backend`**:
+
+```bash
+node src/criarAdmin.js
+```
+
+O script cria um usuário com perfil `administrador`, armazenando a senha como hash com `bcryptjs`. Se o e-mail já estiver cadastrado, o script informa que o usuário existe e não cria uma conta duplicada. A criação do administrador é necessária apenas na configuração inicial do banco, caso ainda não haja um usuário válido.
+
+**Não coloque a senha do administrador no README ou no repositório.**
+
+### 5. Iniciar o backend
 
 Ainda na pasta Backend, execute:
 
@@ -434,7 +457,7 @@ http://localhost:3333/teste-banco
 
 Quando a conexão estiver configurada corretamente, a API retornará uma mensagem de sucesso.
 
-### 5. Configurar o frontend
+### 6. Configurar o frontend
 
 Abra outro terminal, mantendo o backend em execução.
 
@@ -462,7 +485,7 @@ Caso seja necessário utilizar outro endereço, crie um arquivo `.env` na pasta 
 VITE_API_URL=http://localhost:3333
 ```
 
-### 6. Iniciar o frontend
+### 7. Iniciar o frontend
 
 Execute:
 
@@ -478,7 +501,7 @@ http://localhost:5173/
 
 Abra o endereço no navegador para acessar o KFKA.
 
-### 7. Encerrar os servidores
+### 8. Encerrar os servidores
 
 Para interromper os servidores de desenvolvimento, pressione:
 
@@ -490,19 +513,37 @@ Execute esse comando nos terminais do backend e do frontend.
 
 ---
 
-## 🚀 Execução Rápida do Frontend
+## 🚀 Inicialização Automática no Windows
 
-O projeto possui um arquivo de inicialização para Windows localizado em:
+Após configurar o MySQL, importar o banco `kfka` e preparar o `.env` do backend, é possível iniciar a aplicação pelo arquivo localizado na **raiz do repositório**:
 
 ```text
-src/FullStack/Frontend/iniciar.bat
+Projeto19/iniciar.bat
 ```
 
-Esse arquivo verifica a disponibilidade do npm, instala as dependências do frontend quando necessário e inicia o servidor Vite.
+Dê dois cliques no arquivo para executar o inicializador. Ele foi preparado para:
 
-Para utilizá-lo, execute o arquivo `iniciar.bat` dentro da pasta Frontend.
+1. Verificar se o Node.js e o npm estão disponíveis.
+2. Verificar a existência das pastas do frontend e backend e do `.env` do backend.
+3. Instalar as dependências dos dois projetos com `npm ci`, utilizando os respectivos `package-lock.json`.
+4. Abrir o backend e o frontend em janelas de terminal separadas.
+5. Aguardar uma resposta do frontend na porta `5173` e abrir a aplicação no navegador.
 
-**Atenção:** o arquivo atual inicia apenas o frontend. O backend e o MySQL precisam estar configurados e em funcionamento separadamente.
+O frontend utiliza `http://127.0.0.1:5173` e o backend utiliza, por padrão, `http://localhost:3333`.
+
+**Atenção:** o inicializador **não instala o MySQL, não importa o SQL e não cria o administrador**. Essas etapas devem ser realizadas na configuração inicial. O arquivo também não apaga ou recria tabelas do banco. Mantenha as janelas dos servidores abertas durante o uso.
+
+**Observação:** a versão atualizada do `iniciar.bat` ainda deve passar por um teste completo. Como `npm ci` é executado em cada inicialização, o processo pode demorar um pouco mais; ele exige que os arquivos `package-lock.json` estejam sincronizados com os respectivos `package.json`.
+
+### Verificação rápida
+
+Com os servidores em execução, acesse:
+
+- API: `http://localhost:3333/`
+- Conexão com MySQL: `http://localhost:3333/teste-banco`
+- Interface web: `http://127.0.0.1:5173/`
+
+O teste de conexão confirma o acesso ao servidor MySQL, mas **não garante que haja usuários cadastrados**. Se a conexão funcionar e o login não, verifique os registros da tabela `usuarios` e execute o script de criação do administrador quando necessário.
 
 ---
 
@@ -620,7 +661,7 @@ Entre os cenários trabalhados estão:
 - Exportação de dados em CSV.
 - Compilação do frontend com Vite.
 
-Os testes foram realizados durante o desenvolvimento local da aplicação.
+Os testes foram realizados durante o desenvolvimento local da aplicação. No notebook, também foram confirmados o acesso à API, a conexão com o MySQL, a criação do administrador inicial e o login. A versão mais recente do inicializador automático ainda está pendente de validação.
 
 ---
 
@@ -630,7 +671,7 @@ Durante o desenvolvimento do KFKA, ferramentas de inteligência artificial foram
 
 O uso dessas ferramentas foi acompanhado de análise, adaptações e testes realizados durante o desenvolvimento.
 
-A documentação específica sobre a utilização de IA, incluindo exemplos de prompts, objetivos e aplicações no projeto, será apresentada em documento complementar.
+A documentação específica sobre a utilização de IA, incluindo exemplos de prompts, objetivos e aplicações no projeto, está registrada na **Ficha de Declaração de Uso de IA**, preparada como documento complementar da entrega acadêmica.
 
 ---
 
