@@ -1,66 +1,62 @@
+/* PÁGINA SOBRE NÓS */
+
 .sobre-nos {
   min-height: 100vh;
-
   color: var(--texto);
 
-  background: linear-gradient(
-    110deg,
-    var(--fundo-inicio) 0%,
-    var(--fundo-meio) 55%,
-    var(--fundo-fim) 100%
-  );
+  background: linear-gradient(110deg,
+      var(--fundo-inicio) 0%,
+      var(--fundo-meio) 55%,
+      var(--fundo-fim) 100%);
 }
 
-
-/* CONTEÚDO */
+/* CONTEÚDO PRINCIPAL */
 
 .conteudo-sobre {
-  display: flex;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr);
+  align-items: center;
 
+  width: min(100%, 1600px);
   min-height: calc(100vh - 72px);
+  margin: 0 auto;
 
-  padding: 190px 8% 70px;
-
-  gap: 80px;
+  padding: 90px 5%;
+  gap: clamp(40px, 5vw, 90px);
 }
-
 
 /* COLUNAS */
 
 .lado-esquerdo-sobre,
 .lado-direito-sobre {
-  width: 50%;
-
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-}
 
+  width: 100%;
+  min-width: 0;
+}
 
 /* LADO ESQUERDO */
 
-.sobre-etiqueta {
-  margin: 0 0 18px;
+.sobre-etiqueta,
+.subtitulo-metodo {
+  margin: 0 0 20px;
 
   color: var(--destaque-claro);
 
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
-
   letter-spacing: 1.5px;
 }
 
 .lado-esquerdo-sobre h1 {
-  max-width: 600px;
-
+  max-width: 650px;
   margin: 0;
 
   color: var(--texto);
 
-  font-size: clamp(42px, 3.6vw, 55px);
+  font-size: clamp(42px, 3.8vw, 64px);
   font-weight: 600;
-
   line-height: 1.1;
   letter-spacing: -2px;
 }
@@ -70,34 +66,32 @@
 }
 
 .sobre-descricao {
-  max-width: 540px;
-
-  margin-top: 28px;
+  max-width: 620px;
+  margin: 30px 0 0;
 
   color: var(--texto-secundario);
 
-  font-size: 14px;
+  font-size: 17px;
   font-weight: 400;
-
-  line-height: 1.7;
+  line-height: 1.75;
 }
-
 
 /* INFORMAÇÕES DA KFKA */
 
 .informacoes-kfka {
   display: flex;
   align-items: stretch;
+  flex-wrap: wrap;
 
-  gap: 10px;
-
-  margin-top: 28px;
+  gap: 12px;
+  margin-top: 32px;
 }
 
 .informacoes-kfka div {
-  min-width: 120px;
+  flex: 0 1 auto;
+  min-width: 130px;
 
-  padding: 11px 13px;
+  padding: 13px 16px;
 
   display: flex;
   flex-direction: column;
@@ -105,46 +99,34 @@
   background: var(--campo);
 
   border: 1px solid var(--borda);
-  border-radius: 7px;
+  border-radius: 8px;
 }
 
 .informacoes-kfka strong {
   color: var(--texto);
 
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
 }
 
 .informacoes-kfka span {
-  margin-top: 3px;
+  margin-top: 5px;
 
   color: var(--texto-secundario);
 
-  font-size: 10px;
+  font-size: 12px;
+  line-height: 1.5;
 }
-
 
 /* LADO DIREITO */
-
-.subtitulo-metodo {
-  margin: 0 0 18px;
-
-  color: var(--destaque-claro);
-
-  font-size: 12px;
-  font-weight: 700;
-
-  letter-spacing: 1.5px;
-}
 
 .lado-direito-sobre h2 {
   margin: 0;
 
   color: var(--texto);
 
-  font-size: 32px;
+  font-size: clamp(28px, 2.5vw, 38px);
   font-weight: 600;
-
   line-height: 1.2;
 }
 
@@ -153,69 +135,66 @@
 }
 
 .descricao-metodo {
-  max-width: 620px;
-
-  margin-top: 16px;
-  margin-bottom: 28px;
+  max-width: 680px;
+  margin: 20px 0 32px;
 
   color: var(--texto-secundario);
 
-  font-size: 14px;
-
-  line-height: 1.65;
+  font-size: 16px;
+  line-height: 1.7;
 }
-
 
 /* CARDS */
 
 .cards-metodo {
   display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 
-  grid-template-columns: repeat(3, 1fr);
-
-  gap: 14px;
+  gap: 16px;
 }
 
 .card-metodo {
-  min-height: 190px;
+  min-width: 0;
+  min-height: 230px;
 
-  padding: 20px;
+  padding: 24px 20px;
 
   background: rgba(86, 38, 128, 0.42);
 
   border: 1px solid rgba(184, 167, 206, 0.28);
-  border-radius: 10px;
+  border-radius: 12px;
 
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 
-  transition: 0.2s;
+  transition:
+    transform 0.2s,
+    background 0.2s,
+    border-color 0.2s;
 }
 
 .card-metodo:hover {
   transform: translateY(-3px);
 
   background: rgba(100, 47, 148, 0.48);
-
   border-color: var(--destaque-claro);
 }
 
 .numero-card {
   display: block;
-
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 
   color: var(--destaque-claro);
 
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
 }
 
 .card-metodo h3 {
-  margin: 0 0 10px;
+  margin: 0 0 14px;
 
   color: var(--texto);
 
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
 }
 
@@ -224,24 +203,22 @@
 
   color: var(--texto-secundario);
 
-  font-size: 12px;
-
-  line-height: 1.6;
+  font-size: 14px;
+  line-height: 1.65;
 }
 
+/* NOTEBOOKS E TELAS MÉDIAS */
 
-/* RESPONSIVIDADE */
-
-@media (max-width: 1100px) {
-
+@media (max-width: 1200px) {
   .conteudo-sobre {
-    padding: 130px 5% 60px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
 
-    gap: 45px;
+    padding: 75px 5%;
+    gap: 40px;
   }
 
   .lado-esquerdo-sobre h1 {
-    font-size: 46px;
+    font-size: clamp(38px, 4vw, 50px);
   }
 
   .cards-metodo {
@@ -250,79 +227,85 @@
 
   .card-metodo {
     min-height: auto;
+    padding: 20px;
   }
 }
 
+/* TABLETS */
 
-@media (max-width: 768px) {
-
+@media (max-width: 900px) {
   .conteudo-sobre {
-    flex-direction: column;
-
+    grid-template-columns: 1fr;
     min-height: auto;
 
-    padding: 50px 30px 60px;
-
-    gap: 55px;
-  }
-
-  .lado-esquerdo-sobre,
-  .lado-direito-sobre {
-    width: 100%;
+    padding: 80px 6%;
+    gap: 60px;
   }
 
   .lado-esquerdo-sobre h1 {
-    max-width: 550px;
+    max-width: 650px;
+    font-size: clamp(38px, 6vw, 54px);
+  }
 
-    font-size: 42px;
+  .cards-metodo {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
 
+/* CELULARES */
+
+@media (max-width: 600px) {
+  .conteudo-sobre {
+    padding: 55px 22px 65px;
+    gap: 50px;
+  }
+
+  .sobre-etiqueta,
+  .subtitulo-metodo {
+    font-size: 12px;
+  }
+
+  .lado-esquerdo-sobre h1 {
+    font-size: clamp(34px, 9vw, 44px);
     letter-spacing: -1px;
   }
 
   .sobre-descricao {
-    max-width: 600px;
-  }
-
-  .informacoes-kfka {
-    flex-wrap: wrap;
+    margin-top: 24px;
+    font-size: 15px;
   }
 
   .lado-direito-sobre h2 {
-    font-size: 30px;
+    font-size: 29px;
+  }
+
+  .descricao-metodo {
+    font-size: 15px;
+  }
+
+  .informacoes-kfka {
+    gap: 10px;
+  }
+
+  .informacoes-kfka div {
+    flex: 1 1 100%;
+    min-width: 0;
   }
 
   .cards-metodo {
     grid-template-columns: 1fr;
   }
-}
 
-
-@media (max-width: 480px) {
-
-  .conteudo-sobre {
-    padding: 42px 20px 50px;
-
-    gap: 45px;
+  .card-metodo {
+    min-height: auto;
+    padding: 22px;
   }
 
-  .lado-esquerdo-sobre h1 {
-    font-size: 36px;
+  .card-metodo h3 {
+    font-size: 18px;
   }
 
-  .lado-direito-sobre h2 {
-    font-size: 27px;
-  }
-
-  .sobre-etiqueta,
-  .subtitulo-metodo {
-    font-size: 11px;
-  }
-
-  .informacoes-kfka {
-    flex-direction: column;
-  }
-
-  .informacoes-kfka div {
-    width: 100%;
+  .card-metodo p {
+    font-size: 14px;
   }
 }

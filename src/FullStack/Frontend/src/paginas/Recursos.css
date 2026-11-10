@@ -2,7 +2,6 @@
 
 .recursos {
     min-height: 100vh;
-
     color: var(--texto);
 
     background: linear-gradient(110deg,
@@ -11,21 +10,20 @@
             var(--fundo-fim) 100%);
 }
 
-/* CONTEÚDO */
+/* CONTEÚDO PRINCIPAL */
 
 .conteudo-recursos {
-    width: 100%;
-    max-width: 1450px;
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    align-items: center;
+
+    width: min(100%, 1600px);
     min-height: calc(100vh - 72px);
 
     margin: 0 auto;
-    padding: 150px 7% 70px;
+    padding: 80px 5%;
 
-    display: grid;
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-    align-items: start;
-
-    gap: 64px;
+    gap: clamp(40px, 5vw, 85px);
 }
 
 /* APRESENTAÇÃO */
@@ -35,27 +33,28 @@
     min-width: 0;
 }
 
-.recursos-etiqueta {
-    margin: 0 0 18px;
+.recursos-etiqueta,
+.recursos-listagem-etiqueta {
+    margin: 0 0 20px;
 
     color: var(--destaque-claro);
 
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 700;
     line-height: 1.4;
     letter-spacing: 1.5px;
 }
 
 .recursos-apresentacao h1 {
-    max-width: 600px;
+    max-width: 650px;
     margin: 0;
 
     color: var(--texto);
 
-    font-size: 48px;
+    font-size: clamp(42px, 3.8vw, 64px);
     font-weight: 600;
-    line-height: 1.12;
-    letter-spacing: -1.8px;
+    line-height: 1.1;
+    letter-spacing: -2px;
 }
 
 .recursos-apresentacao h1 span {
@@ -63,60 +62,59 @@
 }
 
 .recursos-descricao {
-    max-width: 560px;
-
-    margin-top: 26px;
+    max-width: 620px;
+    margin: 30px 0 0;
 
     color: var(--texto-secundario);
 
-    font-size: 14px;
+    font-size: 17px;
     font-weight: 400;
-    line-height: 1.7;
+    line-height: 1.75;
 }
 
 /* FLUXO */
 
 .recursos-fluxo {
-    max-width: 560px;
-
-    margin-top: 28px;
-
     display: flex;
     align-items: center;
 
-    gap: 9px;
+    width: 100%;
+    max-width: 650px;
+
+    margin-top: 32px;
+    gap: 10px;
 }
 
 .recursos-fluxo>div {
     flex: 1;
     min-width: 0;
-    min-height: 65px;
+    min-height: 85px;
 
-    padding: 11px 12px;
+    padding: 15px;
 
     display: flex;
     flex-direction: column;
     justify-content: center;
 
-    gap: 4px;
+    gap: 6px;
 
     background: var(--campo);
 
     border: 1px solid var(--borda);
-    border-radius: 8px;
+    border-radius: 9px;
 }
 
 .recursos-fluxo strong {
     color: var(--texto);
 
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 600;
 }
 
 .recursos-fluxo div span {
     color: var(--texto-secundario);
 
-    font-size: 11px;
+    font-size: 12px;
     line-height: 1.5;
 }
 
@@ -125,7 +123,7 @@
 
     color: var(--destaque-claro);
 
-    font-size: 15px;
+    font-size: 19px;
 }
 
 /* FUNCIONALIDADES */
@@ -135,23 +133,12 @@
     min-width: 0;
 }
 
-.recursos-listagem-etiqueta {
-    margin: 0 0 18px;
-
-    color: var(--destaque-claro);
-
-    font-size: 12px;
-    font-weight: 700;
-    line-height: 1.4;
-    letter-spacing: 1.5px;
-}
-
 .recursos-listagem h2 {
     margin: 0;
 
     color: var(--texto);
 
-    font-size: 32px;
+    font-size: clamp(28px, 2.5vw, 38px);
     font-weight: 600;
     line-height: 1.2;
     letter-spacing: -0.5px;
@@ -162,15 +149,14 @@
 }
 
 .recursos-listagem-descricao {
-    max-width: 620px;
+    max-width: 680px;
 
-    margin-top: 16px;
-    margin-bottom: 26px;
+    margin: 20px 0 30px;
 
     color: var(--texto-secundario);
 
-    font-size: 14px;
-    line-height: 1.65;
+    font-size: 16px;
+    line-height: 1.7;
 }
 
 /* CARDS */
@@ -179,26 +165,27 @@
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
 
-    gap: 12px;
+    gap: 16px;
 }
 
 .recurso-card {
     min-width: 0;
-    min-height: 160px;
+    min-height: 190px;
 
-    padding: 18px;
+    padding: 22px;
 
     background: var(--painel-secundario);
 
     border: 1px solid var(--borda);
-    border-radius: 10px;
+    border-radius: 12px;
 
-    transition: transform 0.2s, border-color 0.2s;
+    transition:
+        transform 0.2s,
+        border-color 0.2s;
 }
 
 .recurso-card:hover {
-    transform: translateY(-2px);
-
+    transform: translateY(-3px);
     border-color: var(--destaque-claro);
 }
 
@@ -207,12 +194,12 @@
     align-items: center;
     justify-content: space-between;
 
-    margin-bottom: 12px;
+    margin-bottom: 14px;
 }
 
 .recurso-icone {
-    width: 34px;
-    height: 34px;
+    width: 40px;
+    height: 40px;
 
     display: flex;
     align-items: center;
@@ -223,23 +210,23 @@
     background: var(--campo);
 
     border: 1px solid var(--borda);
-    border-radius: 8px;
+    border-radius: 9px;
 }
 
 .recurso-numero {
     color: var(--destaque-claro);
 
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 700;
     letter-spacing: 1px;
 }
 
 .recurso-card h3 {
-    margin: 0 0 8px;
+    margin: 0 0 10px;
 
     color: var(--texto);
 
-    font-size: 14px;
+    font-size: 17px;
     font-weight: 600;
     line-height: 1.4;
 }
@@ -249,68 +236,56 @@
 
     color: var(--texto-secundario);
 
-    font-size: 12px;
+    font-size: 14px;
     line-height: 1.6;
 }
 
-/* TABLET */
+/* NOTEBOOKS E TELAS MÉDIAS */
 
-@media (max-width: 1100px) {
-
+@media (max-width: 1200px) {
     .conteudo-recursos {
-        padding: 110px 5% 60px;
+        padding: 75px 5%;
         gap: 40px;
     }
 
     .recursos-apresentacao h1 {
-        font-size: 42px;
+        font-size: clamp(38px, 4vw, 50px);
     }
 
     .recursos-fluxo {
-        align-items: stretch;
         flex-direction: column;
+        align-items: stretch;
     }
 
     .recursos-fluxo>div {
         flex: none;
+        min-height: 65px;
     }
 
     .recursos-seta {
         display: none;
     }
+
+    .recurso-card {
+        padding: 18px;
+        min-height: 180px;
+    }
 }
 
-/* CELULAR */
+/* TABLETS */
 
-@media (max-width: 768px) {
-
+@media (max-width: 900px) {
     .conteudo-recursos {
-        display: flex;
-        flex-direction: column;
-
+        grid-template-columns: 1fr;
         min-height: auto;
 
-        padding: 50px 30px 60px;
-        gap: 50px;
-    }
-
-    .recursos-apresentacao,
-    .recursos-listagem {
-        width: 100%;
+        padding: 80px 6%;
+        gap: 60px;
     }
 
     .recursos-apresentacao h1 {
-        font-size: 40px;
-        letter-spacing: -1px;
-    }
-
-    .recursos-listagem h2 {
-        font-size: 30px;
-    }
-
-    .recursos-descricao,
-    .recursos-fluxo {
-        max-width: none;
+        max-width: 650px;
+        font-size: clamp(38px, 6vw, 54px);
     }
 
     .recursos-fluxo {
@@ -321,94 +296,129 @@
     .recursos-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+
+    .recurso-card {
+        min-height: 175px;
+    }
 }
 
-/* CELULAR PEQUENO */
+/* CELULARES */
 
-@media (max-width: 520px) {
-
+@media (max-width: 600px) {
     .conteudo-recursos {
-        padding: 42px 20px 50px;
-        gap: 45px;
+        padding: 55px 22px 65px;
+        gap: 50px;
+    }
+
+    .recursos-etiqueta,
+    .recursos-listagem-etiqueta {
+        font-size: 12px;
     }
 
     .recursos-apresentacao h1 {
-        font-size: 36px;
+        font-size: clamp(34px, 9vw, 44px);
+        letter-spacing: -1px;
+    }
+
+    .recursos-descricao {
+        margin-top: 24px;
+        font-size: 15px;
     }
 
     .recursos-listagem h2 {
-        font-size: 27px;
+        font-size: 29px;
     }
 
-    .recursos-grid {
-        grid-template-columns: 1fr;
+    .recursos-listagem-descricao {
+        font-size: 15px;
     }
 
     .recursos-fluxo {
         grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .recursos-fluxo>div {
+        min-height: 65px;
+    }
+
+    .recursos-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
     }
 
     .recurso-card {
         min-height: auto;
+        padding: 22px;
+    }
+
+    .recurso-card h3 {
+        font-size: 17px;
+    }
+
+    .recurso-card p {
+        font-size: 14px;
     }
 }
 
 
-/* AJUSTE PARA CABER EM UMA TELA NO DESKTOP */
+/* AJUSTE COMPACTO PARA NOTEBOOKS E DESKTOPS */
 
-@media (min-width: 1101px) {
-
+@media (min-width: 901px) {
     .conteudo-recursos {
         min-height: calc(100vh - 72px);
-        padding-top: clamp(65px, 10vh, 110px);
-        padding-bottom: 30px;
-        gap: 55px;
+        padding-top: 35px;
+        padding-bottom: 35px;
+        gap: 45px;
     }
 
     .recursos-apresentacao h1 {
-        font-size: clamp(40px, 3vw, 48px);
+        font-size: clamp(38px, 3.2vw, 52px);
     }
 
     .recursos-descricao {
-        margin-top: 20px;
-        font-size: 13px;
-    }
-
-    .recursos-fluxo {
+        font-size: 15px;
         margin-top: 22px;
     }
 
+    .recursos-fluxo {
+        margin-top: 24px;
+    }
+
+    .recursos-listagem h2 {
+        font-size: 30px;
+    }
+
     .recursos-listagem-descricao {
-        margin-top: 10px;
-        margin-bottom: 16px;
-        font-size: 12px;
+        font-size: 14px;
+        margin: 14px 0 20px;
     }
 
     .recursos-grid {
-        gap: 10px;
+        gap: 12px;
     }
 
     .recurso-card {
-        min-height: 125px;
-        padding: 13px;
+        min-height: 145px;
+        padding: 15px;
     }
 
     .recurso-card-topo {
-        margin-bottom: 7px;
+        margin-bottom: 8px;
     }
 
     .recurso-icone {
-        width: 30px;
-        height: 30px;
+        width: 32px;
+        height: 32px;
     }
 
     .recurso-card h3 {
-        margin-bottom: 5px;
-        font-size: 12px;
+        font-size: 15px;
+        margin-bottom: 6px;
     }
 
     .recurso-card p {
-        font-size: 10.5px;
-        line-height: 1.45;
+        font-size: 12.5px;
+        line-height: 1.5;
     }
 }

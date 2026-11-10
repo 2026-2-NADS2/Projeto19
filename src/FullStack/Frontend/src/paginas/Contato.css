@@ -1,64 +1,57 @@
+/* PÁGINA CONTATO */
+
 .contato {
     min-height: 100vh;
-
     color: var(--texto);
 
-    background: linear-gradient(
-        110deg,
-        var(--fundo-inicio) 0%,
-        var(--fundo-meio) 55%,
-        var(--fundo-fim) 100%
-    );
+    background: linear-gradient(110deg,
+            var(--fundo-inicio) 0%,
+            var(--fundo-meio) 55%,
+            var(--fundo-fim) 100%);
 }
 
-
-/* CONTEÚDO */
+/* CONTEÚDO PRINCIPAL */
 
 .conteudo-contato {
-    width: 100%;
-    max-width: 1450px;
-
-    margin: 0 auto;
-
     display: grid;
-    grid-template-columns: 0.9fr 1.1fr;
-    align-items: start;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    align-items: center;
 
+    width: min(100%, 1600px);
     min-height: calc(100vh - 72px);
 
-    padding: 145px 7% 70px;
+    margin: 0 auto;
+    padding: 65px 5%;
 
-    gap: 90px;
+    gap: clamp(40px, 5vw, 85px);
 }
-
 
 /* LADO ESQUERDO */
 
 .contato-apresentacao {
     width: 100%;
+    min-width: 0;
 }
 
-.contato-etiqueta {
-    margin: 0 0 18px;
+.contato-etiqueta,
+.contato-canais-etiqueta {
+    margin: 0 0 20px;
 
     color: var(--destaque-claro);
 
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 700;
-
     letter-spacing: 1.5px;
 }
 
 .contato-apresentacao h1 {
-    max-width: 600px;
-
+    max-width: 650px;
     margin: 0;
 
     color: var(--texto);
 
-    font-size: clamp(42px, 3.6vw, 55px);
+    font-size: clamp(42px, 3.8vw, 64px);
     font-weight: 600;
-
     line-height: 1.1;
     letter-spacing: -2px;
 }
@@ -68,40 +61,34 @@
 }
 
 .contato-descricao {
-    max-width: 560px;
-
-    margin-top: 25px;
+    max-width: 620px;
+    margin: 28px 0 0;
 
     color: var(--texto-secundario);
 
-    font-size: 14px;
-
+    font-size: 16px;
     line-height: 1.7;
 }
 
-
-/* SUPORTE */
+/* DESTAQUE DE SUPORTE */
 
 .contato-destaque {
-    max-width: 560px;
-
-    margin-top: 28px;
-    padding: 18px;
+    max-width: 620px;
+    margin-top: 30px;
+    padding: 20px;
 
     display: flex;
     align-items: flex-start;
-
-    gap: 14px;
+    gap: 16px;
 
     background: var(--campo);
 
     border: 1px solid var(--borda);
-    border-radius: 10px;
+    border-radius: 11px;
 }
 
-.contato-destaque > svg {
+.contato-destaque>svg {
     flex-shrink: 0;
-
     margin-top: 2px;
 
     color: var(--destaque-claro);
@@ -110,14 +97,13 @@
 .contato-destaque div {
     display: flex;
     flex-direction: column;
-
-    gap: 5px;
+    gap: 7px;
 }
 
 .contato-destaque strong {
     color: var(--texto);
 
-    font-size: 12px;
+    font-size: 15px;
     font-weight: 600;
 }
 
@@ -126,27 +112,15 @@
 
     color: var(--texto-secundario);
 
-    font-size: 11px;
-
+    font-size: 13px;
     line-height: 1.6;
 }
-
 
 /* LADO DIREITO */
 
 .contato-canais {
     width: 100%;
-}
-
-.contato-canais-etiqueta {
-    margin: 0 0 18px;
-
-    color: var(--destaque-claro);
-
-    font-size: 12px;
-    font-weight: 700;
-
-    letter-spacing: 1.5px;
+    min-width: 0;
 }
 
 .contato-canais h2 {
@@ -154,9 +128,8 @@
 
     color: var(--texto);
 
-    font-size: 32px;
+    font-size: clamp(28px, 2.5vw, 38px);
     font-weight: 600;
-
     line-height: 1.2;
 }
 
@@ -165,55 +138,49 @@
 }
 
 .contato-canais-descricao {
-    margin-top: 12px;
-    margin-bottom: 22px;
+    margin: 16px 0 26px;
 
     color: var(--texto-secundario);
 
-    font-size: 12px;
-
-    line-height: 1.6;
+    font-size: 15px;
+    line-height: 1.65;
 }
-
 
 /* CARDS DE CONTATO */
 
 .contato-lista {
     display: grid;
-
     grid-template-columns: repeat(2, minmax(0, 1fr));
-
-    gap: 12px;
+    gap: 14px;
 }
 
 .contato-item {
-    min-height: 105px;
-
-    padding: 16px;
+    min-width: 0;
+    min-height: 125px;
+    padding: 18px;
 
     display: flex;
     align-items: flex-start;
-
-    gap: 13px;
+    gap: 14px;
 
     background: var(--painel-secundario);
 
     border: 1px solid var(--borda);
-    border-radius: 10px;
+    border-radius: 11px;
 
-    transition: 0.2s;
+    transition:
+        transform 0.2s,
+        border-color 0.2s;
 }
 
 .contato-item:hover {
     transform: translateY(-2px);
-
     border-color: var(--destaque-claro);
 }
 
 .contato-icone {
-    width: 38px;
-    height: 38px;
-
+    width: 40px;
+    height: 40px;
     flex-shrink: 0;
 
     display: flex;
@@ -225,63 +192,59 @@
     background: var(--campo);
 
     border: 1px solid var(--borda);
-    border-radius: 8px;
+    border-radius: 9px;
 }
 
-.contato-item > div:last-child {
+.contato-item>div:last-child {
     display: flex;
     flex-direction: column;
-
-    gap: 4px;
+    min-width: 0;
+    gap: 5px;
 }
 
 .contato-item span {
     color: var(--destaque-claro);
 
-    font-size: 9px;
+    font-size: 11px;
     font-weight: 700;
-
     letter-spacing: 1px;
 }
 
 .contato-item strong {
     color: var(--texto);
 
-    font-size: 11px;
+    font-size: 14px;
     font-weight: 600;
+    overflow-wrap: anywhere;
 }
 
 .contato-item p {
-    margin: 1px 0 0;
+    margin: 2px 0 0;
 
     color: var(--texto-secundario);
 
-    font-size: 10px;
-
+    font-size: 12px;
     line-height: 1.5;
 }
 
-
-/* EMPRESA */
+/* INFORMAÇÕES DA EMPRESA */
 
 .contato-empresa {
-    margin-top: 12px;
-    padding: 14px 16px;
+    margin-top: 14px;
+    padding: 17px 18px;
 
     display: flex;
     align-items: center;
-
-    gap: 12px;
+    gap: 14px;
 
     background: var(--campo);
 
     border: 1px solid var(--borda);
-    border-radius: 9px;
+    border-radius: 10px;
 }
 
-.contato-empresa > svg {
+.contato-empresa>svg {
     flex-shrink: 0;
-
     color: var(--destaque-claro);
 }
 
@@ -290,95 +253,170 @@
 
     display: flex;
     flex-direction: column;
-
-    gap: 3px;
+    min-width: 0;
+    gap: 5px;
 }
 
 .contato-empresa strong {
     color: var(--texto);
 
-    font-size: 11px;
+    font-size: 14px;
     font-weight: 600;
 }
 
 .contato-empresa span {
     color: var(--texto-secundario);
 
-    font-size: 9px;
-
+    font-size: 12px;
     line-height: 1.5;
 }
 
+/* NOTEBOOKS E TELAS MÉDIAS */
 
-/* TABLET */
-
-@media (max-width: 1050px) {
-
+@media (max-width: 1200px) {
     .conteudo-contato {
-        padding: 110px 5% 60px;
-
-        gap: 50px;
+        padding: 60px 5%;
+        gap: 40px;
     }
 
     .contato-apresentacao h1 {
-        font-size: 46px;
+        font-size: clamp(38px, 4vw, 50px);
     }
 
+    .contato-item {
+        padding: 15px;
+        min-height: 115px;
+    }
+
+    .contato-icone {
+        width: 34px;
+        height: 34px;
+    }
 }
 
+/* AJUSTE PARA TELAS DESKTOP MAIS BAIXAS */
 
-/* CELULAR */
-
-@media (max-width: 768px) {
-
+@media (min-width: 901px) and (max-height: 800px) {
     .conteudo-contato {
-        display: flex;
-        flex-direction: column;
-
-        min-height: auto;
-
-        padding: 50px 30px 60px;
-
-        gap: 50px;
-    }
-
-    .contato-apresentacao,
-    .contato-canais {
-        width: 100%;
+        padding-top: 30px;
+        padding-bottom: 30px;
     }
 
     .contato-apresentacao h1 {
-        font-size: 42px;
+        font-size: clamp(38px, 3.2vw, 52px);
+    }
 
-        letter-spacing: -1px;
+    .contato-descricao {
+        margin-top: 20px;
+        font-size: 15px;
+    }
+
+    .contato-destaque {
+        margin-top: 22px;
+        padding: 16px;
+    }
+
+    .contato-canais h2 {
+        font-size: 30px;
+    }
+
+    .contato-canais-descricao {
+        margin: 12px 0 18px;
+        font-size: 14px;
+    }
+
+    .contato-lista {
+        gap: 12px;
+    }
+
+    .contato-item {
+        min-height: 105px;
+        padding: 14px;
+    }
+
+    .contato-empresa {
+        padding: 13px 16px;
+    }
+}
+
+/* TABLETS */
+
+@media (max-width: 900px) {
+    .conteudo-contato {
+        grid-template-columns: 1fr;
+        min-height: auto;
+
+        padding: 80px 6%;
+        gap: 55px;
+    }
+
+    .contato-apresentacao h1 {
+        max-width: 650px;
+        font-size: clamp(38px, 6vw, 54px);
     }
 
     .contato-descricao,
     .contato-destaque {
-        max-width: none;
+        max-width: 650px;
     }
 
+    .contato-lista {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }
 
+/* CELULARES */
 
-/* CELULAR PEQUENO */
-
-@media (max-width: 520px) {
-
+@media (max-width: 600px) {
     .conteudo-contato {
-        padding: 42px 20px 50px;
+        padding: 55px 22px 65px;
+        gap: 50px;
+    }
+
+    .contato-etiqueta,
+    .contato-canais-etiqueta {
+        font-size: 12px;
     }
 
     .contato-apresentacao h1 {
-        font-size: 36px;
+        font-size: clamp(34px, 9vw, 44px);
+        letter-spacing: -1px;
+    }
+
+    .contato-descricao {
+        font-size: 15px;
+    }
+
+    .contato-destaque {
+        padding: 17px;
     }
 
     .contato-canais h2 {
-        font-size: 27px;
+        font-size: 29px;
+    }
+
+    .contato-canais-descricao {
+        font-size: 14px;
     }
 
     .contato-lista {
         grid-template-columns: 1fr;
     }
 
+    .contato-item {
+        min-height: auto;
+        padding: 18px;
+    }
+
+    .contato-item strong {
+        font-size: 14px;
+    }
+
+    .contato-item p {
+        font-size: 12px;
+    }
+
+    .contato-empresa {
+        padding: 16px;
+    }
 }
