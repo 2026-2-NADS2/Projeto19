@@ -19,29 +19,30 @@ export const texto = (valor, limite) => {
 // A injeção do pool permite testar permissões sem acessar o banco real.
 export function criarContexto(pool = bancoDados) {
     const router = Router();
-    router.use(autenticar);
-    const rota = (metodo, caminho, perfis, executar) => router[metodo](caminho, async (req, res) => {
-        let conexao;
-        try {
-            if (!perfis.includes(req.usuario.perfil)) throw falha(403, 'Acesso não autorizado.');
-            conexao = await pool.getConnection();
-            await conexao.beginTransaction();
-            const [usuarios] = await conexao.query(
-                'SELECT id FROM usuarios WHERE id = ? AND perfil = ? AND ativo = 1',
-                [req.usuario.id, req.usuario.perfil]);
-            if (!usuarios.length) throw falha(401, 'Usuário inativo ou não encontrado.');
-            const resultado = await executar(req, conexao);
-            await conexao.commit();
-            res.status(resultado?.status ?? 200).json(resultado?.dados ?? { mensagem: 'Operação realizada com sucesso.' });
-        } catch (erro) {
-            if (conexao) await conexao.rollback().catch(() => {});
-            const status = erro.status ?? (erro.code === 'ER_DUP_ENTRY' ? 409 : 500);
-            if (status === 500) console.error('Erro nas rotas complementares:', erro.message);
-            res.status(status).json({ mensagem: erro.status ? erro.message : status === 409 ? 'Registro já existente.' : 'Erro interno ao realizar operação.' });
-        } finally {
-            conexao?.release();
-        }
-    });
+
+    const rota = (metodo, caminho, perfis, executar) =>
+        router[metodo](caminho, autenticar, async (req, res) => {
+            let conexao;
+            try {
+                if (!perfis.includes(req.usuario.perfil)) throw falha(403, 'Acesso não autorizado.');
+                conexao = await pool.getConnection();
+                await conexao.beginTransaction();
+                const [usuarios] = await conexao.query(
+                    'SELECT id FROM usuarios WHERE id = ? AND perfil = ? AND ativo = 1',
+                    [req.usuario.id, req.usuario.perfil]);
+                if (!usuarios.length) throw falha(401, 'Usuário inativo ou não encontrado.');
+                const resultado = await executar(req, conexao);
+                await conexao.commit();
+                res.status(resultado?.status ?? 200).json(resultado?.dados ?? { mensagem: 'Operação realizada com sucesso.' });
+            } catch (erro) {
+                if (conexao) await conexao.rollback().catch(() => { });
+                const status = erro.status ?? (erro.code === 'ER_DUP_ENTRY' ? 409 : 500);
+                if (status === 500) console.error('Erro nas rotas complementares:', erro.message);
+                res.status(status).json({ mensagem: erro.status ? erro.message : status === 409 ? 'Registro já existente.' : 'Erro interno ao realizar operação.' });
+            } finally {
+                conexao?.release();
+            }
+        });
     const equipe = ['administrador', 'professor'];
     const todos = [...equipe, 'responsavel'];
     async function acompanhamento(req, db, escrita = false) {
