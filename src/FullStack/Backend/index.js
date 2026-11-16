@@ -66,6 +66,8 @@ if (!process.env.JWT_SECRET) {
     throw new Error('JWT_SECRET não configurado no .env');
 }
 
-app.listen(PORT, () => {
-    console.log(`Servidor KFKA rodando em http://localhost:${PORT}`);
+const HOST = process.env.HOST || '::';
+
+app.listen(PORT, HOST, () => {
+    console.log(`Servidor KFKA rodando na porta ${PORT}`);
 });
