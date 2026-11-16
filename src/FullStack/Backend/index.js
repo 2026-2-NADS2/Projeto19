@@ -19,6 +19,17 @@ import responsavelRoutes from './src/routes/responsavelRoutes.js';
 const app = express();
 const PORT = process.env.PORT || 3333;
 
+// Remove o prefixo /api utilizado na hospedagem
+app.use((req, res, next) => {
+    if (req.url === '/api') {
+        req.url = '/';
+    } else if (req.url.startsWith('/api/')) {
+        req.url = req.url.slice(4);
+    }
+
+    next();
+});
+
 app.use(cors());
 app.use(express.json());
 
