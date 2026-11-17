@@ -9,6 +9,8 @@
 
     --sidebar: rgba(15, 0, 25, 0.62);
 
+    --escala-fonte: 1;
+
     --painel: rgba(20, 9, 30, 0.92);
     --painel-secundario: rgba(86, 38, 128, 0.42);
 
@@ -88,6 +90,8 @@ body {
     color: var(--texto);
 
     overflow-x: hidden;
+
+    zoom: var(--escala-fonte);
 }
 
 button,
@@ -129,11 +133,6 @@ textarea:focus-visible {
     color: #ffffff;
 }
 
-/* ACESSIBILIDADE - FONTE GRANDE */
-
-html.acessibilidade-fonte-grande {
-    font-size: 112.5%;
-}
 
 /* ACESSIBILIDADE - ESCALA DE CINZA */
 
