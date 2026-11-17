@@ -19,7 +19,7 @@ import './WidgetAcessibilidade.css'
 
 const configuracaoInicial = {
   temaClaro: false,
-  fonteGrande: false,
+  tamanhoFonte: 100,
   altoContraste: false,
   escalaCinza: false,
   sublinharLinks: false,
@@ -34,23 +34,32 @@ function WidgetAcessibilidade() {
         'kfka_acessibilidade'
       )
 
-      return configuracaoSalva
-        ? {
-            ...configuracaoInicial,
-            ...JSON.parse(configuracaoSalva)
-          }
-        : configuracaoInicial
+      if (!configuracaoSalva) {
+        return configuracaoInicial
+      }
+
+      const configuracaoConvertida = JSON.parse(configuracaoSalva)
+
+      return {
+        ...configuracaoInicial,
+        ...configuracaoConvertida,
+        tamanhoFonte:
+          typeof configuracaoConvertida.tamanhoFonte === 'number'
+            ? configuracaoConvertida.tamanhoFonte
+            : configuracaoInicial.fonteGrande
+              ? 115
+              : 100
+      }
     } catch {
       return configuracaoInicial
     }
-  })
+      })
 
   useEffect(() => {
     const elementoRaiz = document.documentElement
 
     const classes = [
       'tema-claro',
-      'acessibilidade-fonte-grande',
       'acessibilidade-alto-contraste',
       'acessibilidade-escala-cinza',
       'acessibilidade-sublinhar-links',
@@ -65,9 +74,11 @@ function WidgetAcessibilidade() {
       elementoRaiz.classList.add('tema-claro')
     }
 
-    if (configuracao.fonteGrande) {
-      elementoRaiz.classList.add('acessibilidade-fonte-grande')
-    }
+elementoRaiz.style.setProperty(
+  '--escala-fonte',
+  configuracao.tamanhoFonte / 100
+)
+
 
     if (configuracao.altoContraste) {
       elementoRaiz.classList.add('acessibilidade-alto-contraste')
@@ -101,14 +112,20 @@ function WidgetAcessibilidade() {
   function aumentarFonte() {
     setConfiguracao((estadoAtual) => ({
       ...estadoAtual,
-      fonteGrande: true
+      tamanhoFonte: Math.min(
+        estadoAtual.tamanhoFonte + 10,
+        130
+      )
     }))
   }
 
   function diminuirFonte() {
     setConfiguracao((estadoAtual) => ({
       ...estadoAtual,
-      fonteGrande: false
+      tamanhoFonte: Math.max(
+        estadoAtual.tamanhoFonte - 10,
+        90
+      )
     }))
   }
 
@@ -181,19 +198,33 @@ function WidgetAcessibilidade() {
                 Tamanho da fonte
               </span>
 
-              <div className="controles-fonte">
+              <div
+               className="controles-fonte"
+               aria-label="Controles de tamanho da fonte"
+              >
                 <button
                   type="button"
                   onClick={diminuirFonte}
+                  disabled={configuracao.tamanhoFonte <= 90}
                   aria-label="Diminuir tamanho da fonte"
+                  title="Diminuir fonte"
                 >
                   <Minus size={17} aria-hidden="true" />
                 </button>
 
+                <span
+                  className="indicador-tamanho-fonte"
+                  aria-live="polite"
+                >
+                  {configuracao.tamanhoFonte}%
+                </span>
+
                 <button
                   type="button"
                   onClick={aumentarFonte}
+                  disabled={configuracao.tamanhoFonte >= 130}
                   aria-label="Aumentar tamanho da fonte"
+                  title="Aumentar fonte"
                 >
                   <Plus size={17} aria-hidden="true" />
                 </button>
