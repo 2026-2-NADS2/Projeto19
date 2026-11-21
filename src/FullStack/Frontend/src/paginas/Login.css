@@ -1,4 +1,4 @@
-/* LOGIN KFKA — Identidade visual da Home */
+/* Página de login */
 
 .pagina-login,
 .pagina-login *,
@@ -24,7 +24,7 @@
       var(--fundo-fim) 100%);
 }
 
-/* LADO ESQUERDO */
+/* Lado esquerdo */
 
 .login-esquerda {
   position: relative;
@@ -44,7 +44,7 @@
   border: none;
 }
 
-/* LOGO */
+/* Logo */
 
 .login-logo {
   position: absolute;
@@ -72,7 +72,7 @@
   -webkit-text-fill-color: transparent;
 }
 
-/* APRESENTAÇÃO */
+/* Apresentação */
 
 .conteudo-login-esquerda {
   width: 100%;
@@ -120,7 +120,7 @@
   line-height: 1.65;
 }
 
-/* LADO DIREITO */
+/* Lado direito */
 
 .login-direita {
   flex: 1 1 46%;
@@ -137,7 +137,7 @@
   background: transparent;
 }
 
-/* FORMULÁRIO — FUNDO SUAVIZADO */
+/* Formulário */
 
 .formulario-login {
   width: 100%;
@@ -159,7 +159,7 @@
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.06);
 }
 
-/* VOLTAR */
+/* Botão voltar */
 
 .login-voltar {
   display: inline-flex;
@@ -182,7 +182,7 @@
   transform: translateX(-3px);
 }
 
-/* TÍTULOS */
+/* Títulos */
 
 .login-form-etiqueta {
   margin: 0 0 9px;
@@ -211,7 +211,7 @@
   line-height: 1.6;
 }
 
-/* LABELS */
+/* Labels */
 
 .formulario-login>label {
   display: block;
@@ -222,7 +222,7 @@
   font-weight: 500;
 }
 
-/* CAMPOS */
+/* Campos */
 
 .campo-login {
   width: 100%;
@@ -274,7 +274,7 @@
   opacity: 0.7;
 }
 
-/* VISUALIZAÇÃO DE SENHA */
+/* Mostrar senha */
 
 .mostrar-senha {
   flex: 0 0 auto;
@@ -296,7 +296,7 @@
   color: var(--texto);
 }
 
-/* OPÇÕES */
+/* Opções */
 
 .opcoes-login {
   display: flex;
@@ -318,7 +318,7 @@
   gap: 6px;
 }
 
-/* MENSAGENS */
+/* Mensagens de erro */
 
 .erro-login {
   margin: 0 0 15px;
@@ -329,7 +329,7 @@
   overflow-wrap: anywhere;
 }
 
-/* BOTÃO ENTRAR */
+/* Botão entrar */
 
 .botao-login {
   width: 100%;
@@ -363,7 +363,7 @@
   transform: none;
 }
 
-/* ACESSOS DE DEMONSTRAÇÃO */
+/* Acessos de demonstração */
 
 .login-demonstracao {
   margin-top: 20px;
@@ -433,7 +433,7 @@
   color: var(--texto);
 }
 
-/* TABLET */
+/* Tablets */
 
 @media (max-width: 1000px) {
   .login-esquerda {
@@ -460,7 +460,7 @@
   }
 }
 
-/* TABLET PEQUENO E CELULAR */
+/* Tablets pequenos e celulares */
 
 @media (max-width: 850px) {
   .login-esquerda {
@@ -482,7 +482,7 @@
   }
 }
 
-/* CELULAR */
+/* Celulares */
 
 @media (max-width: 480px) {
   .login-direita {
@@ -527,7 +527,7 @@
   }
 }
 
-/* CELULARES PEQUENOS */
+/* Celulares pequenos */
 
 @media (max-width: 360px) {
   .login-direita {
@@ -543,12 +543,83 @@
   }
 }
 
-/* TELAS BAIXAS */
+/* Celulares com telas baixas */
 
 @media (max-height: 650px) and (max-width: 850px) {
   .login-direita {
     align-items: flex-start;
     padding-top: 20px;
     padding-bottom: 20px;
+  }
+}
+
+/* Notebooks com telas baixas */
+
+@media (min-width: 851px) and (max-height: 800px) {
+  .login-esquerda {
+    padding-top: 85px;
+    padding-bottom: 35px;
+  }
+
+  .login-logo {
+    top: 25px;
+  }
+
+  .conteudo-login-esquerda h1 {
+    font-size: clamp(34px, 3vw, 46px);
+  }
+
+  .login-descricao {
+    margin-top: 18px;
+    font-size: 14px;
+  }
+
+  .login-direita {
+    padding-top: 25px;
+    padding-bottom: 25px;
+  }
+
+  .formulario-login {
+    padding: 25px 30px;
+  }
+
+  .login-voltar {
+    margin-bottom: 18px;
+  }
+
+  .subtitulo-login {
+    margin-bottom: 18px;
+  }
+
+  .campo-login {
+    height: 44px;
+    margin-bottom: 14px;
+  }
+
+  .opcoes-login {
+    margin-bottom: 15px;
+  }
+
+  .login-demonstracao {
+    margin-top: 14px;
+    padding: 12px;
+  }
+}
+
+/* Notebooks com altura muito pequena */
+
+@media (min-width: 851px) and (max-height: 650px) {
+
+  .login-esquerda,
+  .login-direita {
+    align-items: flex-start;
+  }
+
+  .login-esquerda {
+    padding-top: 120px;
+  }
+
+  .login-direita {
+    padding-top: 20px;
   }
 }
