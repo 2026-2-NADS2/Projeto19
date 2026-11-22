@@ -7,6 +7,8 @@
     --fundo-meio: #24003d;
     --fundo-fim: #350078;
 
+    --escala-tipografia: 1.1;
+
     --sidebar: rgba(15, 0, 25, 0.62);
 
     --escala-fonte: 1;
@@ -511,4 +513,60 @@ html.acessibilidade-reduzir-movimento *::after {
     .recurso-card {
         min-height: auto;
     }
+}
+
+/* AJUSTE GLOBAL DE TIPOGRAFIA */
+
+body {
+    font-size: calc(16px * var(--escala-tipografia));
+}
+
+/* Textos pequenos que estavam difíceis de ler */
+:where(
+    .cabecalho a,
+    .menu-lateral a,
+    button,
+    input,
+    select,
+    textarea,
+    label,
+){
+    font-size: calc(1em * var(--escala-tipografia));
+}
+
+/* Textos das páginas públicas */
+:where(
+    .plataforma-etiqueta,
+    .subtitulo-plataforma,
+    .sobre-etiqueta,
+    .subtitulo-metodo,
+    .recursos-etiqueta,
+    .recursos-listagem-etiqueta,
+    .contato-etiqueta,
+    .contato-canais-etiqueta
+) {
+    font-size: 14px;
+}
+
+:where(
+    .plataforma-descricao,
+    .sobre-descricao,
+    .recursos-descricao,
+    .contato-descricao,
+    .descricao-plataforma,
+    .descricao-metodo,
+    .recursos-listagem-descricao,
+    .contato-canais-descricao
+) {
+    font-size: 16px;
+}
+
+:where(
+    .card-plataforma p,
+    .card-metodo p,
+    .recurso-card p,
+    .contato-item p,
+    .contato-destaque p
+) {
+    font-size: 14px;
 }

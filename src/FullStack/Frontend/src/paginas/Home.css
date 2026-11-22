@@ -96,7 +96,7 @@
 
     border-radius: 7px;
 
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 500;
 
     text-decoration: none;
@@ -203,7 +203,7 @@
     }
 
     .texto-home h1 {
-        font-size: 42px;
+        font-size: 46px;
 
         line-height: 1.12;
         letter-spacing: -1px;
@@ -211,7 +211,7 @@
 
     .texto-home p {
         margin-top: 20px;
-        font-size: 15px;
+        font-size: 19px;
     }
 
     .botoes-home {
@@ -248,7 +248,7 @@
     }
 
     .texto-home h1 {
-        font-size: 36px;
+        font-size: 40px;
     }
 
     .botoes-home {
