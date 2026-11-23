@@ -2,6 +2,7 @@
 import 'dotenv/config';
 import bcrypt from 'bcryptjs';
 import bancoDados from './bancoDados.js';
+import { email as emailSchema, senhaNova, textoObrigatorio } from './validacao.js';
 
 async function criarAdmin() {
     try {
@@ -9,8 +10,9 @@ async function criarAdmin() {
         const email = process.env.ADMIN_EMAIL;
         const senha = process.env.ADMIN_SENHA;
 
-        if (!nome || !email || !senha || senha.length < 12) {
-            throw new Error('Configure ADMIN_NOME, ADMIN_EMAIL e ADMIN_SENHA (mínimo de 12 caracteres) no .env.');
+        if (!textoObrigatorio(150).safeParse(nome).success || !emailSchema.safeParse(email).success ||
+            !senhaNova.min(12).safeParse(senha).success) {
+            throw new Error('Configure ADMIN_NOME, ADMIN_EMAIL e ADMIN_SENHA (mínimo de 12 caracteres e máximo de 72 bytes) no .env.');
         }
 
         const [existentes] = await bancoDados.query(

@@ -1,3 +1,4 @@
+import { idPositivo } from '../validacao.js';
 
 import { Router } from 'express';
 import bancoDados from '../bancoDados.js';
@@ -19,30 +20,23 @@ router.use((req, res, next) => {
 
 // GET - Listar vínculos de professores
 router.get('/', async (req, res) => {
-    try {
-        const [vinculos] = await bancoDados.query(
-            `SELECT
-                ptd.id,
-                ptd.professor_id,
-                u.nome AS professor,
-                ptd.turma_id,
-                t.nome AS turma,
-                ptd.disciplina_id,
-                d.nome AS disciplina
-             FROM professores_turmas_disciplinas ptd
-             INNER JOIN usuarios u ON u.id = ptd.professor_id
-             INNER JOIN turmas t ON t.id = ptd.turma_id
-             INNER JOIN disciplinas d ON d.id = ptd.disciplina_id
-             ORDER BY u.nome, t.nome, d.nome`
-        );
+    const [vinculos] = await bancoDados.query(
+        `SELECT
+            ptd.id,
+            ptd.professor_id,
+            u.nome AS professor,
+            ptd.turma_id,
+            t.nome AS turma,
+            ptd.disciplina_id,
+            d.nome AS disciplina
+         FROM professores_turmas_disciplinas ptd
+         INNER JOIN usuarios u ON u.id = ptd.professor_id
+         INNER JOIN turmas t ON t.id = ptd.turma_id
+         INNER JOIN disciplinas d ON d.id = ptd.disciplina_id
+         ORDER BY u.nome, t.nome, d.nome`
+    );
 
-        res.json(vinculos);
-    } catch (erro) {
-        console.error('Erro ao listar vínculos:', erro.message);
-        res.status(500).json({
-            mensagem: 'Erro ao listar vínculos dos professores.'
-        });
-    }
+    res.json(vinculos);
 });
 
 // POST - Vincular professor, turma e disciplina
@@ -55,9 +49,7 @@ router.post('/', async (req, res) => {
         const disciplinaId = Number(disciplina_id);
 
         if (
-            !Number.isInteger(professorId) || professorId <= 0 ||
-            !Number.isInteger(turmaId) || turmaId <= 0 ||
-            !Number.isInteger(disciplinaId) || disciplinaId <= 0
+            [professor_id, turma_id, disciplina_id].some(valor => !idPositivo.safeParse(valor).success)
         ) {
             return res.status(400).json({
                 mensagem: 'Informe IDs válidos de professor, turma e disciplina.'
@@ -133,10 +125,7 @@ router.post('/', async (req, res) => {
             });
         }
 
-        console.error('Erro ao vincular professor:', erro.message);
-        res.status(500).json({
-            mensagem: 'Erro interno ao vincular professor.'
-        });
+        throw erro;
     }
 });
 

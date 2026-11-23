@@ -1,10 +1,23 @@
 import autenticar from './autenticar.js';
+import bancoDados from '../bancoDados.js';
+import { falha } from './erros.js';
 import { cienciaAtiva, consultarCiencia } from '../cienciaDocumentos.js';
 
 export default function autenticarComCiencia(req, res, next) {
-    if (!cienciaAtiva()) return autenticar(req, res, next);
-
     return autenticar(req, res, async () => {
+        if (!cienciaAtiva()) {
+            try {
+                const [usuarios] = await bancoDados.execute(
+                    'SELECT id FROM usuarios WHERE id = ? AND perfil = ? AND ativo = 1',
+                    [req.usuario.id, req.usuario.perfil]
+                );
+                if (!usuarios.length) return res.status(401).json({ mensagem: 'Sessão inválida para esta conta.' });
+                return next();
+            } catch (erro) {
+                return next(erro);
+            }
+        }
+
         try {
             const confirmado = await consultarCiencia(req.usuario);
 
@@ -20,9 +33,8 @@ export default function autenticarComCiencia(req, res, next) {
             }
 
             next();
-        } catch (erro) {
-            console.error('Erro ao verificar a ciência dos documentos:', erro.message);
-            res.status(503).json({ mensagem: 'Não foi possível verificar a ciência dos documentos.' });
+        } catch {
+            next(falha(503, 'Não foi possível verificar a ciência dos documentos.'));
         }
     });
 }

@@ -1,4 +1,7 @@
 import 'dotenv/config';
+import { pathToFileURL } from 'node:url';
+import criarRotasRecuperacao from './src/routes/recuperacaoRoutes.js';
+import { falha, tratarErro } from './src/middlewares/erros.js';
 import express from 'express';
 import cors from 'cors';
 import bancoDados from './src/bancoDados.js';
@@ -17,7 +20,7 @@ import comentarioRoutes from './src/routes/comentarioRoutes.js';
 import revisaoRoutes from './src/routes/revisaoRoutes.js';
 import responsavelRoutes from './src/routes/responsavelRoutes.js';
 
-const app = express();
+export const app = express();
 const PORT = process.env.PORT || 3333;
 
 // Remove o prefixo /api utilizado na hospedagem
@@ -39,22 +42,12 @@ app.get('/', (req, res) => {
 });
 
 app.get('/teste-banco', async (req, res) => {
-    try {
-        await bancoDados.query('SELECT 1');
-
-        res.json({
-            mensagem: 'Conexão com MySQL funcionando!'
-        });
-    } catch (erro) {
-        console.error('Erro de conexão:', erro.message);
-
-        res.status(500).json({
-            mensagem: 'Erro ao conectar com MySQL.'
-        });
-    }
+    await bancoDados.query('SELECT 1');
+    res.json({ mensagem: 'Conexão com MySQL funcionando!' });
 });
 
-app.use(authRoutes);
+app.use(authRoutes());
+app.use(criarRotasRecuperacao());
 app.use(cienciaDocumentosRoutes);
 app.use('/usuarios', usuarioRoutes);
 app.use('/alunos', alunoRoutes);
@@ -69,18 +62,13 @@ app.use(comentarioRoutes);
 app.use(revisaoRoutes);
 app.use(responsavelRoutes);
 
-app.use((req, res) => {
-    res.status(404).json({
-        mensagem: 'Rota não encontrada.'
+app.use((req, res, next) => next(falha(404, 'Rota não encontrada.')));
+app.use(tratarErro);
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+    if (!process.env.JWT_SECRET?.trim()) throw new Error('Configure JWT_SECRET no ambiente.');
+    const HOST = process.env.HOST || process.env.IP || '::';
+    app.listen(PORT, HOST, () => {
+        console.log(`Servidor KFKA rodando na porta ${PORT}`);
     });
-});
-
-if (!process.env.JWT_SECRET) {
-    throw new Error('JWT_SECRET não configurado no .env');
 }
-
-const HOST = process.env.HOST || '::';
-
-app.listen(PORT, HOST, () => {
-    console.log(`Servidor KFKA rodando na porta ${PORT}`);
-});

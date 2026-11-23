@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { criarContexto, falha, id, texto } from './apoioRotas.js';
 
 export function criarRevisaoRoutes(pool) {
@@ -12,7 +13,7 @@ export function criarRevisaoRoutes(pool) {
     }
     rota('patch', '/acompanhamentos/:id/publicar', ['administrador'], (req, db) => revisar(req, db, 'aprovado'));
     rota('post', '/acompanhamentos/:id/revisoes', ['administrador'], (req, db) => {
-        if (!['aprovado', 'devolvido'].includes(req.body?.acao)) throw falha(400, 'Ação de revisão inválida.');
+        if (!acaoRevisao.safeParse(req.body?.acao).success) throw falha(400, 'Ação de revisão inválida.');
         return revisar(req, db, req.body.acao);
     });
     rota('get', '/acompanhamentos/:id/revisoes', equipe, async (req, db) => {
@@ -22,5 +23,7 @@ export function criarRevisaoRoutes(pool) {
     });
     return router;
 }
+
+const acaoRevisao = z.enum(['aprovado', 'devolvido']);
 
 export default criarRevisaoRoutes();

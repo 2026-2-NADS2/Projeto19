@@ -1,3 +1,4 @@
+import { idPositivo, textoObrigatorio } from '../validacao.js';
 
 import { Router } from 'express';
 import bancoDados from '../bancoDados.js';
@@ -21,53 +22,37 @@ router.use((req, res, next) => {
 
 // Listar disciplinas
 router.get('/', async (req, res) => {
-    try {
-        const [disciplinas] = await bancoDados.query(
-            'SELECT id, nome, ativo FROM disciplinas ORDER BY nome'
-        );
+    const [disciplinas] = await bancoDados.query(
+        'SELECT id, nome, ativo FROM disciplinas ORDER BY nome'
+    );
 
-        res.json(disciplinas);
-    } catch (erro) {
-        console.error('Erro ao listar disciplinas:', erro.message);
-
-        res.status(500).json({
-            mensagem: 'Erro ao listar disciplinas.'
-        });
-    }
+    res.json(disciplinas);
 });
 
 // Buscar disciplina por ID
 router.get('/:id', async (req, res) => {
-    try {
-        const disciplinaId = Number(req.params.id);
+    const disciplinaId = Number(req.params.id);
 
-        if (!Number.isSafeInteger(disciplinaId) || disciplinaId <= 0) {
-            return res.status(400).json({
-                mensagem: 'ID da disciplina inválido.'
-            });
-        }
-
-        const [disciplinas] = await bancoDados.query(
-            `SELECT id, nome, ativo
-             FROM disciplinas
-             WHERE id = ?`,
-            [disciplinaId]
-        );
-
-        if (disciplinas.length === 0) {
-            return res.status(404).json({
-                mensagem: 'Disciplina não encontrada.'
-            });
-        }
-
-        res.json(disciplinas[0]);
-    } catch (erro) {
-        console.error('Erro ao buscar disciplina:', erro.message);
-
-        res.status(500).json({
-            mensagem: 'Erro interno ao buscar disciplina.'
+    if (!idPositivo.safeParse(req.params.id).success) {
+        return res.status(400).json({
+            mensagem: 'ID da disciplina inválido.'
         });
     }
+
+    const [disciplinas] = await bancoDados.query(
+        `SELECT id, nome, ativo
+         FROM disciplinas
+         WHERE id = ?`,
+        [disciplinaId]
+    );
+
+    if (disciplinas.length === 0) {
+        return res.status(404).json({
+            mensagem: 'Disciplina não encontrada.'
+        });
+    }
+
+    res.json(disciplinas[0]);
 });
 
 // Cadastrar disciplina
@@ -75,7 +60,7 @@ router.post('/', async (req, res) => {
     try {
         const { nome } = req.body ?? {};
 
-        if (typeof nome !== 'string' || !nome.trim()) {
+        if (!textoObrigatorio(100).safeParse(nome).success) {
             return res.status(400).json({
                 mensagem: 'Informe o nome da disciplina.'
             });
@@ -114,11 +99,7 @@ router.post('/', async (req, res) => {
             });
         }
 
-        console.error('Erro ao cadastrar disciplina:', erro.message);
-
-        res.status(500).json({
-            mensagem: 'Erro interno ao cadastrar disciplina.'
-        });
+        throw erro;
     }
 });
 

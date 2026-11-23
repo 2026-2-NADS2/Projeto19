@@ -2,19 +2,13 @@ import { Router } from 'express';
 import bancoDados from '../bancoDados.js';
 import autenticarComCiencia from '../middlewares/autenticarComCiencia.js';
 
-export const falha = (status, mensagem) => Object.assign(new Error(mensagem), { status });
-export const id = valor => {
-    if (!/^[1-9]\d*$/.test(String(valor)) || !Number.isSafeInteger(Number(valor))) {
-        throw falha(400, 'ID inválido.');
-    }
-    return Number(valor);
-};
-export const texto = (valor, limite) => {
-    if (typeof valor !== 'string' || !valor.trim() || valor.trim().length > limite) {
-        throw falha(400, 'Texto ausente ou acima do limite permitido.');
-    }
-    return valor.trim();
-};
+import { falha } from '../middlewares/erros.js';
+import { idPositivo, textoObrigatorio, validar } from '../validacao.js';
+
+export { falha };
+export const id = valor => validar(idPositivo, valor, 'ID inválido.');
+export const texto = (valor, limite) => validar(textoObrigatorio(limite), valor,
+    'Texto ausente ou acima do limite permitido.');
 
 // A injeção do pool permite testar permissões sem acessar o banco real.
 export function criarContexto(pool = bancoDados) {
@@ -36,9 +30,7 @@ export function criarContexto(pool = bancoDados) {
                 res.status(resultado?.status ?? 200).json(resultado?.dados ?? { mensagem: 'Operação realizada com sucesso.' });
             } catch (erro) {
                 if (conexao) await conexao.rollback().catch(() => { });
-                const status = erro.status ?? (erro.code === 'ER_DUP_ENTRY' ? 409 : 500);
-                if (status === 500) console.error('Erro nas rotas complementares:', erro.message);
-                res.status(status).json({ mensagem: erro.status ? erro.message : status === 409 ? 'Registro já existente.' : 'Erro interno ao realizar operação.' });
+                throw erro;
             } finally {
                 conexao?.release();
             }

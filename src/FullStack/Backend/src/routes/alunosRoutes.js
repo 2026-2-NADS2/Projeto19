@@ -1,9 +1,12 @@
+import { dataISO, idPositivo, textoObrigatorio } from '../validacao.js';
 
 import { Router } from 'express';
 import bancoDados from '../bancoDados.js';
 import autenticarComCiencia from '../middlewares/autenticarComCiencia.js';
 
 const router = Router();
+const nomeValido = textoObrigatorio(150);
+const matriculaValida = textoObrigatorio(30);
 
 // Exigir login
 router.use(autenticarComCiencia);
@@ -20,90 +23,50 @@ router.use((req, res, next) => {
 });
 
 // Validar ID
-function validarId(id) {
-    const numero = Number(id);
-
-    return Number.isSafeInteger(numero) && numero > 0;
+function validarId(valor) {
+    return idPositivo.safeParse(valor).success;
 }
 
 // Validar data
 function validarData(data) {
-    if (data == null) {
-        return true;
-    }
-
-    if (
-        typeof data !== 'string' ||
-        !/^\d{4}-\d{2}-\d{2}$/.test(data)
-    ) {
-        return false;
-    }
-
-    const dataInformada = new Date(`${data}T00:00:00Z`);
-
-    if (
-        Number.isNaN(dataInformada.getTime()) ||
-        dataInformada.toISOString().slice(0, 10) !== data
-    ) {
-        return false;
-    }
-
-    const hoje = new Date().toISOString().slice(0, 10);
-
-    return data <= hoje;
+    return dataISO.safeParse(data).success && data <= new Date().toISOString().slice(0, 10);
 }
 
 // Listar alunos
 router.get('/', async (req, res) => {
-    try {
-        const [alunos] = await bancoDados.query(
-            `SELECT id, nome, data_nascimento, matricula, ativo, criado_em
-             FROM alunos
-             ORDER BY id`
-        );
+    const [alunos] = await bancoDados.query(
+        `SELECT id, nome, data_nascimento, matricula, ativo, criado_em
+         FROM alunos
+         ORDER BY id`
+    );
 
-        res.json(alunos);
-    } catch (erro) {
-        console.error('Erro ao listar alunos:', erro.message);
-
-        res.status(500).json({
-            mensagem: 'Erro ao listar alunos.'
-        });
-    }
+    res.json(alunos);
 });
 
 // Detalhar aluno
 router.get('/:id', async (req, res) => {
-    try {
-        if (!validarId(req.params.id)) {
-            return res.status(400).json({
-                mensagem: 'ID inválido.'
-            });
-        }
-
-        const alunoId = Number(req.params.id);
-
-        const [alunos] = await bancoDados.query(
-            `SELECT id, nome, data_nascimento, matricula, ativo, criado_em
-             FROM alunos
-             WHERE id = ?`,
-            [alunoId]
-        );
-
-        if (alunos.length === 0) {
-            return res.status(404).json({
-                mensagem: 'Aluno não encontrado.'
-            });
-        }
-
-        res.json(alunos[0]);
-    } catch (erro) {
-        console.error('Erro ao buscar aluno:', erro.message);
-
-        res.status(500).json({
-            mensagem: 'Erro interno ao buscar aluno.'
+    if (!validarId(req.params.id)) {
+        return res.status(400).json({
+            mensagem: 'ID inválido.'
         });
     }
+
+    const alunoId = Number(req.params.id);
+
+    const [alunos] = await bancoDados.query(
+        `SELECT id, nome, data_nascimento, matricula, ativo, criado_em
+         FROM alunos
+         WHERE id = ?`,
+        [alunoId]
+    );
+
+    if (alunos.length === 0) {
+        return res.status(404).json({
+            mensagem: 'Aluno não encontrado.'
+        });
+    }
+
+    res.json(alunos[0]);
 });
 
 // Cadastrar aluno
@@ -112,13 +75,10 @@ router.post('/', async (req, res) => {
         const { nome, data_nascimento, matricula } = req.body ?? {};
 
         if (
-            typeof nome !== 'string' ||
-            !nome.trim() ||
-            typeof matricula !== 'string' ||
-            !matricula.trim()
+            !nomeValido.safeParse(nome).success || !matriculaValida.safeParse(matricula).success
         ) {
             return res.status(400).json({
-                mensagem: 'Informe o nome e a matrícula do aluno.'
+                mensagem: 'Informe nome de até 150 caracteres e matrícula de até 30 caracteres.'
             });
         }
 
@@ -169,11 +129,7 @@ router.post('/', async (req, res) => {
             });
         }
 
-        console.error('Erro ao cadastrar aluno:', erro.message);
-
-        res.status(500).json({
-            mensagem: 'Erro interno ao cadastrar aluno.'
-        });
+        throw erro;
     }
 });
 
@@ -191,13 +147,10 @@ router.put('/:id', async (req, res) => {
         const { nome, matricula, data_nascimento } = req.body ?? {};
 
         if (
-            typeof nome !== 'string' ||
-            !nome.trim() ||
-            typeof matricula !== 'string' ||
-            !matricula.trim()
+            !nomeValido.safeParse(nome).success || !matriculaValida.safeParse(matricula).success
         ) {
             return res.status(400).json({
-                mensagem: 'Nome e matrícula são obrigatórios.'
+                mensagem: 'Informe nome de até 150 caracteres e matrícula de até 30 caracteres.'
             });
         }
 
@@ -235,80 +188,60 @@ router.put('/:id', async (req, res) => {
             });
         }
 
-        console.error('Erro ao editar aluno:', erro.message);
-
-        res.status(500).json({
-            mensagem: 'Erro ao editar aluno.'
-        });
+        throw erro;
     }
 });
 
 // Desativar aluno
 router.delete('/:id', async (req, res) => {
-    try {
-        if (!validarId(req.params.id)) {
-            return res.status(400).json({
-                mensagem: 'ID inválido.'
-            });
-        }
-
-        const alunoId = Number(req.params.id);
-
-        const [resultado] = await bancoDados.query(
-            'UPDATE alunos SET ativo = 0 WHERE id = ? AND ativo = 1',
-            [alunoId]
-        );
-
-        if (!resultado.affectedRows) {
-            return res.status(404).json({
-                mensagem: 'Aluno ativo não encontrado.'
-            });
-        }
-
-        res.json({
-            mensagem: 'Aluno desativado com sucesso!'
-        });
-    } catch (erro) {
-        console.error('Erro ao desativar aluno:', erro.message);
-
-        res.status(500).json({
-            mensagem: 'Erro ao desativar aluno.'
+    if (!validarId(req.params.id)) {
+        return res.status(400).json({
+            mensagem: 'ID inválido.'
         });
     }
+
+    const alunoId = Number(req.params.id);
+
+    const [resultado] = await bancoDados.query(
+        'UPDATE alunos SET ativo = 0 WHERE id = ? AND ativo = 1',
+        [alunoId]
+    );
+
+    if (!resultado.affectedRows) {
+        return res.status(404).json({
+            mensagem: 'Aluno ativo não encontrado.'
+        });
+    }
+
+    res.json({
+        mensagem: 'Aluno desativado com sucesso!'
+    });
 });
 
 // Reativar aluno
 router.patch('/:id/reativar', async (req, res) => {
-    try {
-        if (!validarId(req.params.id)) {
-            return res.status(400).json({
-                mensagem: 'ID inválido.'
-            });
-        }
-
-        const alunoId = Number(req.params.id);
-
-        const [resultado] = await bancoDados.query(
-            'UPDATE alunos SET ativo = 1 WHERE id = ? AND ativo = 0',
-            [alunoId]
-        );
-
-        if (!resultado.affectedRows) {
-            return res.status(404).json({
-                mensagem: 'Aluno inativo não encontrado.'
-            });
-        }
-
-        res.json({
-            mensagem: 'Aluno reativado com sucesso!'
-        });
-    } catch (erro) {
-        console.error('Erro ao reativar aluno:', erro.message);
-
-        res.status(500).json({
-            mensagem: 'Erro ao reativar aluno.'
+    if (!validarId(req.params.id)) {
+        return res.status(400).json({
+            mensagem: 'ID inválido.'
         });
     }
+
+    const alunoId = Number(req.params.id);
+
+    const [resultado] = await bancoDados.query(
+        'UPDATE alunos SET ativo = 1 WHERE id = ? AND ativo = 0',
+        [alunoId]
+    );
+
+    if (!resultado.affectedRows) {
+        return res.status(404).json({
+            mensagem: 'Aluno inativo não encontrado.'
+        });
+    }
+
+    res.json({
+        mensagem: 'Aluno reativado com sucesso!'
+    });
 });
 
 export default router;

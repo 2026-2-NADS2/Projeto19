@@ -18,6 +18,7 @@ import Recursos from './paginas/Recursos.jsx'
 import SobrePlataforma from './paginas/SobrePlataforma.jsx'
 import Home from './paginas/Home.jsx'
 import Login from './paginas/Login.jsx'
+import RecuperacaoSenha from './paginas/RecuperacaoSenha.jsx'
 import PoliticaPrivacidade from './paginas/PoliticaPrivacidade.jsx'
 import TermosUso from './paginas/TermosUso.jsx'
 
@@ -33,6 +34,8 @@ function TituloPagina() {
     const titulos = {
       '/': 'Início',
       '/login': 'Login',
+      '/recuperar-senha': 'Recuperar senha',
+      '/redefinir-senha': 'Redefinir senha',
       '/politica-de-privacidade': 'Política de Privacidade',
       '/termos-de-uso': 'Termos de Uso',
       '/sobre-plataforma': 'Sobre a Plataforma',
@@ -118,6 +121,8 @@ function App() {
         {/* Páginas públicas */}
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/recuperar-senha" element={<RecuperacaoSenha key="pedido" />} />
+        <Route path="/redefinir-senha" element={<RecuperacaoSenha key="redefinicao" redefinir />} />
         <Route path="/politica-de-privacidade" element={<PoliticaPrivacidade />} />
         <Route path="/termos-de-uso" element={<TermosUso />} />
 
