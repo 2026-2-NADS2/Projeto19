@@ -1,0 +1,65 @@
+.pagina-legal {
+  min-height: 100vh;
+  background: linear-gradient(145deg, var(--fundo-inicio), var(--fundo-meio), var(--fundo-fim));
+  color: var(--texto);
+}
+
+.pagina-legal-conteudo {
+  max-width: 52rem;
+  margin: 0 auto;
+  padding: clamp(1rem, 5vw, 4rem);
+  line-height: 1.7;
+  overflow-wrap: break-word;
+}
+
+.pagina-legal-conteudo h1 {
+  font-size: clamp(1.75rem, 5vw, 3rem);
+  line-height: 1.2;
+}
+
+.pagina-legal-conteudo h2 {
+  margin-bottom: 0.5rem;
+  font-size: 1.25rem;
+  line-height: 1.3;
+}
+
+.pagina-legal-conteudo p,
+.pagina-legal-conteudo ul {
+  color: var(--texto-secundario);
+}
+
+.pagina-legal-conteudo .pagina-legal-minuta {
+  margin: 0.75rem 0;
+  color: var(--atencao);
+  font-weight: 600;
+}
+
+.pagina-legal-conteudo section {
+  margin-top: 1.25rem;
+  padding: clamp(0.875rem, 4vw, 1.5rem);
+  border: 1px solid var(--borda);
+  border-radius: 1rem;
+  background: var(--painel);
+}
+
+.pagina-legal-conteudo p + p,
+.pagina-legal-conteudo li + li {
+  margin-top: 0.65rem;
+}
+
+.pagina-legal-conteudo ul {
+  padding-inline-start: 1.25rem;
+}
+
+.pagina-legal-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.pagina-legal-links a {
+  color: var(--texto);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}

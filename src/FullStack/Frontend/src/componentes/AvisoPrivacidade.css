@@ -1,0 +1,121 @@
+/* Fundo do aviso */
+
+.aviso-privacidade-fundo {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+/* Janela */
+
+.aviso-privacidade-janela {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    width: 100%;
+    max-width: 480px;
+    max-height: calc(100dvh - 40px);
+    overflow-y: auto;
+    padding: 32px;
+    color: var(--texto);
+    background: var(--painel);
+    border: 1px solid var(--borda);
+    border-radius: 14px;
+    box-shadow: 0 20px 70px rgba(0, 0, 0, 0.4);
+}
+
+/* Ícone */
+
+.aviso-privacidade-icone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 50px;
+    height: 50px;
+    color: var(--destaque-claro);
+    background: var(--campo);
+    border-radius: 12px;
+}
+
+/* Texto */
+
+.aviso-privacidade-conteudo {
+    width: 100%;
+    min-width: 0;
+}
+
+.aviso-privacidade-conteudo h2 {
+    margin: 0 0 14px;
+    color: var(--texto);
+    font-size: 23px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.aviso-privacidade-conteudo p {
+    margin: 0 0 12px;
+    color: var(--texto-secundario);
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.aviso-privacidade-conteudo p:last-child {
+    margin-bottom: 0;
+}
+
+.aviso-privacidade-conteudo a {
+    color: var(--destaque-claro);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+/* Botão */
+
+.aviso-privacidade-botao {
+    width: 100%;
+    min-height: 46px;
+    padding: 11px 16px;
+    color: #ffffff;
+    background: var(--destaque);
+    border: 1px solid var(--destaque);
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.aviso-privacidade-botao:hover {
+    background: var(--destaque-hover);
+}
+
+/* Celulares */
+
+@media (max-width: 480px) {
+    .aviso-privacidade-fundo {
+        padding: 14px;
+    }
+
+    .aviso-privacidade-janela {
+        gap: 18px;
+        max-height: calc(100dvh - 28px);
+        padding: 24px 20px;
+    }
+
+    .aviso-privacidade-conteudo h2 {
+        font-size: 20px;
+    }
+
+    .aviso-privacidade-conteudo p {
+        font-size: 12px;
+    }
+}

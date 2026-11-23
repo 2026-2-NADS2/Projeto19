@@ -22,7 +22,7 @@ function Login() {
   const [mostrarSenha, setMostrarSenha] = useState(false)
   const [mostrarRecuperacao, setMostrarRecuperacao] = useState(false)
 
-  // Verifica se o usuário foi redirecionado por sessão expirada
+  // Verifica se a sessão expirou
   useEffect(() => {
     const sessaoExpirada = sessionStorage.getItem(
       'kfka_sessao_expirada'
@@ -30,11 +30,11 @@ function Login() {
 
     if (sessaoExpirada === 'true') {
       setErro('Sua sessão expirou. Faça login novamente.')
-
       sessionStorage.removeItem('kfka_sessao_expirada')
     }
   }, [])
 
+  // Realiza o login
   async function fazerLogin(evento) {
     evento.preventDefault()
     setErro('')
@@ -78,7 +78,7 @@ function Login() {
         throw new Error('Resposta de autenticação inválida.')
       }
 
-      // Salva o token e os dados do usuário
+      // Salva os dados da sessão
       sessionStorage.setItem('kfka_token', dados.token)
 
       sessionStorage.setItem(
@@ -86,9 +86,9 @@ function Login() {
         JSON.stringify(dados.usuario)
       )
 
-      // Limpa qualquer aviso antigo de sessão expirada
       sessionStorage.removeItem('kfka_sessao_expirada')
 
+      // Redireciona conforme o perfil
       navigate(destino, { replace: true })
     } catch (erro) {
       setErro(
@@ -153,7 +153,7 @@ function Login() {
               name="email"
               type="email"
               value={email}
-              onChange={(evento) => {
+              onChange={evento => {
                 setEmail(evento.target.value)
                 setErro('')
               }}
@@ -173,7 +173,7 @@ function Login() {
               name="senha"
               type={mostrarSenha ? 'text' : 'password'}
               value={senha}
-              onChange={(evento) => {
+              onChange={evento => {
                 setSenha(evento.target.value)
                 setErro('')
               }}
@@ -207,15 +207,7 @@ function Login() {
               }
               aria-expanded={mostrarRecuperacao}
               aria-controls="orientacao-recuperacao"
-              style={{
-                background: 'transparent',
-                border: 0,
-                padding: '4px 0',
-                color: 'var(--destaque-claro)',
-                font: 'inherit',
-                cursor: 'pointer',
-                textDecoration: 'underline'
-              }}
+              className="login-recuperar-senha"
             >
               Esqueceu sua senha?
             </button>
@@ -225,20 +217,11 @@ function Login() {
             <div
               id="orientacao-recuperacao"
               role="status"
-              style={{
-                marginBottom: 16,
-                padding: 14,
-                border: '1px solid var(--borda)',
-                borderRadius: 8,
-                background: 'var(--campo)',
-                color: 'var(--texto)',
-                fontSize: 13,
-                lineHeight: 1.6
-              }}
+              className="login-recuperacao"
             >
               <strong>Como recuperar seu acesso</strong>
 
-              <p style={{ marginTop: 8 }}>
+              <p>
                 Procure a administração da sua escola e
                 informe o e-mail cadastrado. Após confirmar
                 sua identidade, o administrador poderá
@@ -261,17 +244,22 @@ function Login() {
             {carregando ? 'Entrando...' : 'Entrar'}
           </button>
 
-          <p
-            style={{
-              marginTop: 20,
-              color: 'var(--texto-secundario)',
-              fontSize: 12,
-              lineHeight: 1.6,
-              textAlign: 'center'
-            }}
-          >
+          <p className="login-sem-conta">
             Ainda não tem uma conta? Solicite seu cadastro
             à administração da escola.
+          </p>
+
+          {/* Links da LGPD */}
+          <p className="login-links-legais">
+            <Link to="/politica-de-privacidade">
+              Política de Privacidade
+            </Link>
+
+            <span aria-hidden="true">•</span>
+
+            <Link to="/termos-de-uso">
+              Termos de Uso
+            </Link>
           </p>
         </form>
       </section>

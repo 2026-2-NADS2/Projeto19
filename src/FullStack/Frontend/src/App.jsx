@@ -18,9 +18,13 @@ import Recursos from './paginas/Recursos.jsx'
 import SobrePlataforma from './paginas/SobrePlataforma.jsx'
 import Home from './paginas/Home.jsx'
 import Login from './paginas/Login.jsx'
-import WidgetAcessibilidade from './componentes/WidgetAcessibilidade.jsx'
+import PoliticaPrivacidade from './paginas/PoliticaPrivacidade.jsx'
+import TermosUso from './paginas/TermosUso.jsx'
 
-// Atualiza o título da aba conforme a página acessada
+import WidgetAcessibilidade from './componentes/WidgetAcessibilidade.jsx'
+import AvisoPrivacidade from './componentes/AvisoPrivacidade.jsx'
+
+// Atualiza o título da aba
 function TituloPagina() {
   const { pathname } = useLocation()
 
@@ -28,6 +32,8 @@ function TituloPagina() {
     const titulos = {
       '/': 'Início',
       '/login': 'Login',
+      '/politica-de-privacidade': 'Política de Privacidade',
+      '/termos-de-uso': 'Termos de Uso',
       '/sobre-plataforma': 'Sobre a Plataforma',
       '/recursos': 'Recursos',
       '/sobre-nos': 'Sobre Nós',
@@ -38,7 +44,6 @@ function TituloPagina() {
 
     let titulo = titulos[pathname]
 
-    // Identifica as páginas do administrador
     if (
       pathname === '/administrador' ||
       pathname.startsWith('/administrador/')
@@ -76,19 +81,44 @@ function RotaProtegida({ perfil, children }) {
   return children
 }
 
+// Mostra o aviso nas páginas públicas
+function AvisoPublico() {
+  const { pathname } = useLocation()
+
+  const paginasPublicas = [
+    '/',
+    '/login',
+    '/sobre-plataforma',
+    '/recursos',
+    '/sobre-nos',
+    '/contato'
+  ]
+
+  if (!paginasPublicas.includes(pathname)) {
+    return null
+  }
+
+  return <AvisoPrivacidade />
+}
+
 function App() {
   return (
     <BrowserRouter>
-      {/* Atualiza o título automaticamente */}
+      {/* Título da página */}
       <TituloPagina />
 
-      {/* Widget de acessibilidade */}
+      {/* Acessibilidade */}
       <WidgetAcessibilidade />
+
+      {/* Aviso de privacidade */}
+      <AvisoPublico />
 
       <Routes>
         {/* Páginas públicas */}
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/politica-de-privacidade" element={<PoliticaPrivacidade />} />
+        <Route path="/termos-de-uso" element={<TermosUso />} />
 
         <Route
           path="/sobre-plataforma"
