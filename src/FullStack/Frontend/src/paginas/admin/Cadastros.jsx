@@ -1,3 +1,4 @@
+import VinculosCadastro from './VinculosCadastro'
 
 import { cloneElement, useId, useState, useEffect } from 'react'
 import {
@@ -431,6 +432,7 @@ export default function Cadastros() {
 
     const [abaAtiva, setAbaAtiva] = useState('cadastros')
     const [visualizando, setVisualizando] = useState(null)
+    const [editandoVinculos, setEditandoVinculos] = useState(null)
     const [editando, setEditando] = useState(null)
     const [editandoTurma, setEditandoTurma] = useState(null)
     const [processando, setProcessando] = useState(false)
@@ -1513,6 +1515,12 @@ export default function Cadastros() {
                                         <td role="cell" data-coluna="Status">{registro.status}</td>
                                         <td role="cell" data-coluna="Ações">
                                             <div className="admin-tabela-acoes">
+                                                {registro.status === 'Ativo' && (
+                                                    <button type="button" className="admin-disciplinas-acao"
+                                                        onClick={() => setEditandoVinculos(registro.original)}>
+                                                        Gerenciar vínculos
+                                                    </button>
+                                                )}
                                                 <BotaoAcao
                                                     titulo="Visualizar detalhes"
                                                     onClick={() =>
@@ -1592,6 +1600,10 @@ export default function Cadastros() {
                 >
                     {mensagemLocal || mensagemCadastro}
                 </p>
+            )}
+
+            {editandoVinculos && (
+                <VinculosCadastro cadastro={editandoVinculos} fechar={() => setEditandoVinculos(null)} />
             )}
 
             {visualizando && (

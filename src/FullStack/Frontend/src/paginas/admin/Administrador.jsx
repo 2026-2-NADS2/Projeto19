@@ -568,8 +568,9 @@ export default function Administrador() {
         throw new Error('A data final não pode ser anterior à inicial.')
       }
 
-      await api('/periodos', {
-        method: 'POST',
+      const editando = periodoForm.id != null
+      await api(editando ? '/periodos/' + periodoForm.id : '/periodos', {
+        method: editando ? 'PUT' : 'POST',
         body: JSON.stringify({
           nome: periodoForm.bimestre,
           ano_letivo: Number(periodoForm.ano_letivo),
@@ -579,15 +580,31 @@ export default function Administrador() {
       })
 
       setFiltroPeriodoAno(String(periodoForm.ano_letivo))
-      setMensagemPeriodo('Bimestre cadastrado com sucesso!')
+      setMensagemPeriodo(editando ? 'Bimestre atualizado com sucesso!' : 'Bimestre cadastrado com sucesso!')
       setPeriodoForm(anterior => ({
         ...anterior,
+        id: null,
         data_inicio: '',
         data_fim: ''
       }))
       await carregarPeriodos()
     } catch (error) {
       setErroPeriodo(error.message)
+    }
+  }
+
+  async function desativarPeriodo(id) {
+    setErroPeriodo('')
+    setMensagemPeriodo('')
+    try {
+      const dados = await api('/periodos/' + id, { method: 'DELETE' })
+      setMensagemPeriodo(dados.mensagem)
+      setPeriodoForm(anterior => anterior.id === id
+        ? { ...anterior, id: null, data_inicio: '', data_fim: '' }
+        : anterior)
+      await carregarPeriodos()
+    } catch (erro) {
+      setErroPeriodo(erro.message)
     }
   }
 
@@ -772,7 +789,7 @@ export default function Administrador() {
     salvarTurma, periodoForm, setPeriodoForm,
     filtroPeriodoAno, setFiltroPeriodoAno,
     mensagemPeriodo, setMensagemPeriodo, erroPeriodo,
-    setErroPeriodo, salvarPeriodo, tags, setTags,
+    setErroPeriodo, salvarPeriodo, desativarPeriodo, tags, setTags,
     nomeTag, setNomeTag, tagEditando, setTagEditando,
     salvarTag, areas, nomeArea, setNomeArea,
     areaEditando, setAreaEditando, salvarArea, excluirArea,

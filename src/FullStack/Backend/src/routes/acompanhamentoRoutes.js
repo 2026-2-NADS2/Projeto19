@@ -522,7 +522,7 @@ router.patch('/:id', async (req, res) => {
         : corpo.descricao;
 
     const media = corpo.media === undefined
-        ? registro.media
+        ? (registro.media == null ? null : Number(registro.media))
         : corpo.media;
 
     if (

@@ -1,3 +1,4 @@
+import { falha } from '../middlewares/erros.js';
 import { z } from 'zod';
 import { anoLetivo, idPositivo, textoObrigatorio } from '../validacao.js';
 
@@ -330,6 +331,18 @@ router.post('/:id/alunos', async (req, res) => {
 
         throw erro;
     }
+});
+
+router.delete('/:id/alunos/:alunoId', async (req, res) => {
+    if (!validarId(req.params.id) || !validarId(req.params.alunoId)) {
+        throw falha(400, 'Informe IDs válidos para turma e aluno.');
+    }
+    const [resultado] = await bancoDados.query(
+        'DELETE FROM alunos_turmas WHERE turma_id = ? AND aluno_id = ?',
+        [Number(req.params.id), Number(req.params.alunoId)]
+    );
+    if (!resultado.affectedRows) throw falha(404, 'Vínculo não encontrado.');
+    res.json({ mensagem: 'Aluno desvinculado da turma.' });
 });
 
 export default router;
