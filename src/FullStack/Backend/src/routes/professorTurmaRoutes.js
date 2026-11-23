@@ -1,4 +1,6 @@
-import { idPositivo } from '../validacao.js';
+import { z } from 'zod';
+import { idPositivo, validar } from '../validacao.js';
+import { falha } from '../middlewares/erros.js';
 
 import { Router } from 'express';
 import bancoDados from '../bancoDados.js';
@@ -39,94 +41,53 @@ router.get('/', async (req, res) => {
     res.json(vinculos);
 });
 
-// POST - Vincular professor, turma e disciplina
-router.post('/', async (req, res) => {
+const dadosVinculo = z.object({
+    professor_id: idPositivo, turma_id: idPositivo, disciplina_id: idPositivo
+});
+
+router.post('/', salvarVinculo);
+router.put('/:id', salvarVinculo);
+
+async function salvarVinculo(req, res) {
+    const vinculo = validar(dadosVinculo, req.body, 'Informe IDs válidos de professor, turma e disciplina.');
+    const { professor_id, turma_id, disciplina_id } = vinculo;
+    const [[validos]] = await bancoDados.query(
+        `SELECT
+            EXISTS (SELECT 1 FROM usuarios WHERE id = ? AND perfil = 'professor' AND ativo = 1) AS professor,
+            EXISTS (SELECT 1 FROM turmas WHERE id = ? AND ativo = 1) AS turma,
+            EXISTS (SELECT 1 FROM disciplinas WHERE id = ? AND ativo = 1) AS disciplina`,
+        [professor_id, turma_id, disciplina_id]
+    );
+    if (!validos.professor || !validos.turma || !validos.disciplina) {
+        throw falha(404, 'Selecione professor, turma e disciplina ativos.');
+    }
+    const parametros = [professor_id, turma_id, disciplina_id];
     try {
-        const { professor_id, turma_id, disciplina_id } = req.body ?? {};
-
-        const professorId = Number(professor_id);
-        const turmaId = Number(turma_id);
-        const disciplinaId = Number(disciplina_id);
-
-        if (
-            [professor_id, turma_id, disciplina_id].some(valor => !idPositivo.safeParse(valor).success)
-        ) {
-            return res.status(400).json({
-                mensagem: 'Informe IDs válidos de professor, turma e disciplina.'
-            });
+        if (req.method === 'POST') {
+            const [resultado] = await bancoDados.query(
+                'INSERT INTO professores_turmas_disciplinas (professor_id, turma_id, disciplina_id) VALUES (?, ?, ?)',
+                parametros
+            );
+            return res.status(201).json({ mensagem: 'Professor vinculado com sucesso!', vinculo: { id: resultado.insertId, ...vinculo } });
         }
-
-        const [professores] = await bancoDados.query(
-            `SELECT id FROM usuarios
-             WHERE id = ? AND perfil = 'professor' AND ativo = 1`,
-            [professorId]
-        );
-
-        if (professores.length === 0) {
-            return res.status(404).json({
-                mensagem: 'Professor ativo não encontrado.'
-            });
-        }
-
-        const [turmas] = await bancoDados.query(
-            'SELECT id FROM turmas WHERE id = ? AND ativo = 1',
-            [turmaId]
-        );
-
-        if (turmas.length === 0) {
-            return res.status(404).json({
-                mensagem: 'Turma ativa não encontrada.'
-            });
-        }
-
-        const [disciplinas] = await bancoDados.query(
-            'SELECT id FROM disciplinas WHERE id = ? AND ativo = 1',
-            [disciplinaId]
-        );
-
-        if (disciplinas.length === 0) {
-            return res.status(404).json({
-                mensagem: 'Disciplina ativa não encontrada.'
-            });
-        }
-
-        const [existentes] = await bancoDados.query(
-            `SELECT id FROM professores_turmas_disciplinas
-             WHERE professor_id = ? AND turma_id = ? AND disciplina_id = ?`,
-            [professorId, turmaId, disciplinaId]
-        );
-
-        if (existentes.length > 0) {
-            return res.status(409).json({
-                mensagem: 'Esse vínculo já existe.'
-            });
-        }
-
+        const id = validar(idPositivo, req.params.id, 'Informe um ID de vínculo válido.');
         const [resultado] = await bancoDados.query(
-            `INSERT INTO professores_turmas_disciplinas
-             (professor_id, turma_id, disciplina_id)
-             VALUES (?, ?, ?)`,
-            [professorId, turmaId, disciplinaId]
+            'UPDATE professores_turmas_disciplinas SET professor_id = ?, turma_id = ?, disciplina_id = ? WHERE id = ?',
+            [...parametros, id]
         );
-
-        res.status(201).json({
-            mensagem: 'Professor vinculado com sucesso!',
-            vinculo: {
-                id: resultado.insertId,
-                professor_id: professorId,
-                turma_id: turmaId,
-                disciplina_id: disciplinaId
-            }
-        });
+        if (!resultado.affectedRows) throw falha(404, 'Vínculo não encontrado.');
+        res.json({ mensagem: 'Vínculo atualizado com sucesso!' });
     } catch (erro) {
-        if (erro.code === 'ER_DUP_ENTRY') {
-            return res.status(409).json({
-                mensagem: 'Esse vínculo já existe.'
-            });
-        }
-
+        if (erro.code === 'ER_DUP_ENTRY') throw falha(409, 'Esse vínculo já existe.');
         throw erro;
     }
+}
+
+router.delete('/:id', async (req, res) => {
+    const id = validar(idPositivo, req.params.id, 'Informe um ID de vínculo válido.');
+    const [resultado] = await bancoDados.query('DELETE FROM professores_turmas_disciplinas WHERE id = ?', [id]);
+    if (!resultado.affectedRows) throw falha(404, 'Vínculo não encontrado.');
+    res.json({ mensagem: 'Vínculo removido com sucesso!' });
 });
 
 export default router;

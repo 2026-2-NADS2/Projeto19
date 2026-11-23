@@ -19,7 +19,8 @@ export default function Periodos() {
     setFiltroPeriodoAno,
     mensagemPeriodo,
     erroPeriodo,
-    salvarPeriodo
+    salvarPeriodo,
+    desativarPeriodo
   } = useAdmin()
 
   const alterar = (campo, valor) => {
@@ -41,7 +42,8 @@ export default function Periodos() {
   }
 
   const buscarBimestre = nome => {
-    return lista.find(periodo => periodo.nome === nome)
+    return lista.find(periodo => periodo.nome === nome && Number(periodo.ativo) === 1)
+      ?? lista.find(periodo => periodo.nome === nome)
   }
 
   const renderizarBimestre = nome => {
@@ -75,6 +77,23 @@ export default function Periodos() {
               ? `${formatarData(periodo.data_inicio)} até ${formatarData(periodo.data_fim)}`
               : 'Ainda não cadastrado'}
           </p>
+          {Number(periodo?.ativo) === 1 && (
+            <div className="admin-disciplinas-item-acoes">
+              <button type="button" className="admin-disciplinas-acao"
+                onClick={() => setPeriodoForm({
+                  id: periodo.id, bimestre: periodo.nome, ano_letivo: String(periodo.ano_letivo),
+                  data_inicio: periodo.data_inicio, data_fim: periodo.data_fim
+                })}>
+                Editar bimestre
+              </button>
+              <button type="button" className="admin-disciplinas-acao excluir"
+                onClick={() => {
+                  if (window.confirm('Desativar este bimestre? O histórico será preservado.')) desativarPeriodo(periodo.id)
+                }}>
+                Desativar bimestre
+              </button>
+            </div>
+          )}
         </div>
       </div>
     )
@@ -189,8 +208,14 @@ export default function Periodos() {
                   className="admin-botao-principal"
                 >
                   <Save size={17} />
-                  Salvar bimestre
+                  {periodoForm.id ? "Salvar alterações" : "Salvar bimestre"}
                 </button>
+                {periodoForm.id && (
+                  <button type="button" className="admin-botao-secundario"
+                    onClick={() => setPeriodoForm(anterior => ({ ...anterior, id: null, data_inicio: '', data_fim: '' }))}>
+                    Cancelar edição
+                  </button>
+                )}
               </div>
             </form>
 
