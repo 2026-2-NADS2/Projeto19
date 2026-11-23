@@ -3,13 +3,13 @@ import { useEffect, useState } from 'react'
 import {
   Plus,
   Pencil,
-  Trash2,
+  Archive,
   RotateCcw,
-  Save,
+  Check,
   X
 } from 'lucide-react'
-import CabecalhoPagina from './CabecalhoPagina'
 import { api } from '../../servicos/api'
+import CabecalhoPagina from './CabecalhoPagina'
 
 export default function Tags() {
   const [tags, setTags] = useState([])
@@ -17,15 +17,17 @@ export default function Tags() {
   const [descricao, setDescricao] = useState('')
   const [editandoId, setEditandoId] = useState(null)
   const [mostrarInativas, setMostrarInativas] = useState(false)
-
   const [carregando, setCarregando] = useState(true)
   const [salvando, setSalvando] = useState(false)
+  const [processandoId, setProcessandoId] = useState(null)
   const [erro, setErro] = useState('')
   const [mensagem, setMensagem] = useState('')
 
+  const tagAtiva = tag =>
+    tag.ativo === true || Number(tag.ativo) === 1
+
   async function carregarTags() {
     setCarregando(true)
-    setErro('')
 
     try {
       const dados = await api('/tags')
@@ -103,6 +105,7 @@ export default function Tags() {
 
     if (!confirmar) return
 
+    setProcessandoId(tag.id)
     setErro('')
     setMensagem('')
 
@@ -119,10 +122,13 @@ export default function Tags() {
       setMensagem('Tag desativada com sucesso!')
     } catch (error) {
       setErro(error.message)
+    } finally {
+      setProcessandoId(null)
     }
   }
 
   async function reativarTag(tag) {
+    setProcessandoId(tag.id)
     setErro('')
     setMensagem('')
 
@@ -135,226 +141,228 @@ export default function Tags() {
       setMensagem('Tag reativada com sucesso!')
     } catch (error) {
       setErro(error.message)
+    } finally {
+      setProcessandoId(null)
     }
   }
 
-  const tagsVisiveis = tags.filter(tag =>
-    mostrarInativas || Number(tag.ativo) === 1
+  const tagsAtivas = tags.filter(tagAtiva).length
+
+  const tagsVisiveis = tags.filter(
+    tag => mostrarInativas || tagAtiva(tag)
   )
 
   return (
     <>
       <CabecalhoPagina
-        titulo="Gerenciar tags"
-        descricao="Cadastre e organize as tags utilizadas nos acompanhamentos dos alunos."
+        titulo="Tags"
+        descricao="Crie e organize as classificações utilizadas nos acompanhamentos."
       />
 
-      <section className="admin-painel">
-        <div className="admin-painel-topo">
-          <div>
-            <span>
-              {editandoId !== null ? 'EDITAR TAG' : 'NOVA TAG'}
-            </span>
-            <h3>
-              {editandoId !== null
-                ? 'Editar tag existente'
-                : 'Cadastrar tag'}
-            </h3>
-          </div>
-        </div>
+      <div className="admin-tags-pagina">
+        <div className="admin-tags-layout">
 
-        <form onSubmit={salvarTag}>
-          <div className="admin-form-grid">
-            <div className="admin-campo">
-              <label htmlFor="nome-tag">Nome da tag</label>
-              <input
-                id="nome-tag"
-                type="text"
-                maxLength={100}
-                required
-                placeholder="Ex.: Boa participação"
-                value={nome}
-                onChange={e => setNome(e.target.value)}
-              />
+          {/* Formulário */}
+
+          <section className="admin-tags-formulario">
+            <div className="admin-tags-secao-topo">
+              <h3>
+                {editandoId !== null
+                  ? 'Editar tag'
+                  : 'Nova tag'}
+              </h3>
+
+              <p>
+                {editandoId !== null
+                  ? 'Altere as informações da classificação.'
+                  : 'Cadastre uma classificação para os acompanhamentos.'}
+              </p>
             </div>
 
-            <div className="admin-campo">
-              <label htmlFor="descricao-tag">
-                Descrição (opcional)
-              </label>
-              <input
-                id="descricao-tag"
-                type="text"
-                maxLength={255}
-                placeholder="Descreva a finalidade da tag"
-                value={descricao}
-                onChange={e => setDescricao(e.target.value)}
-              />
-            </div>
-          </div>
+            <form onSubmit={salvarTag}>
+              <div className="admin-tags-campos">
+                <div className="admin-campo">
+                  <label htmlFor="tag-nome">
+                    Nome da tag
+                  </label>
 
-          <div
-            style={{
-              display: 'flex',
-              gap: 12,
-              flexWrap: 'wrap',
-              marginTop: 18
-            }}
-          >
-            <button
-              type="submit"
-              className="admin-botao-principal"
-              disabled={salvando}
-            >
-              {editandoId !== null
-                ? <Save size={17} />
-                : <Plus size={17} />}
-              {salvando
-                ? 'Salvando...'
-                : editandoId !== null
-                  ? 'Salvar alterações'
-                  : 'Cadastrar tag'}
-            </button>
+                  <input
+                    id="tag-nome"
+                    type="text"
+                    maxLength={100}
+                    required
+                    placeholder="Ex.: Boa participação"
+                    value={nome}
+                    onChange={e => setNome(e.target.value)}
+                  />
+                </div>
 
-            {editandoId !== null && (
-              <button
-                type="button"
-                className="admin-botao-secundario"
-                onClick={limparFormulario}
-              >
-                <X size={17} />
-                Cancelar edição
-              </button>
+                <div className="admin-campo">
+                  <label htmlFor="tag-descricao">
+                    Descrição (opcional)
+                  </label>
+
+                  <textarea
+                    id="tag-descricao"
+                    rows={3}
+                    placeholder="Explique quando utilizar esta tag"
+                    value={descricao}
+                    onChange={e => setDescricao(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="admin-tags-form-acoes">
+                <button
+                  type="submit"
+                  className="admin-botao-principal"
+                  disabled={salvando}
+                >
+                  {editandoId !== null
+                    ? <Check size={17} />
+                    : <Plus size={17} />}
+
+                  {salvando
+                    ? 'Salvando...'
+                    : editandoId !== null
+                      ? 'Salvar alterações'
+                      : 'Cadastrar tag'}
+                </button>
+
+                {editandoId !== null && (
+                  <button
+                    type="button"
+                    className="admin-botao-secundario"
+                    onClick={limparFormulario}
+                  >
+                    <X size={16} />
+                    Cancelar
+                  </button>
+                )}
+              </div>
+            </form>
+
+            {erro && (
+              <p className="admin-erro" role="alert">
+                {erro}
+              </p>
             )}
-          </div>
-        </form>
 
-        {erro && (
-          <p className="admin-erro" role="alert">
-            {erro}
-          </p>
-        )}
+            {mensagem && (
+              <p className="admin-mensagem" role="status">
+                {mensagem}
+              </p>
+            )}
+          </section>
 
-        {mensagem && (
-          <p className="admin-mensagem" role="status">
-            {mensagem}
-          </p>
-        )}
-      </section>
+          {/* Lista de tags */}
 
-      <section className="admin-painel admin-painel-separado">
-        <div className="admin-painel-topo">
-          <div>
-            <span>TAGS CADASTRADAS</span>
-            <h3>Lista de tags</h3>
-          </div>
+          <section className="admin-tags-listagem">
+            <div className="admin-tags-listagem-topo">
+              <div>
+                <h3>Tags cadastradas</h3>
 
-          <span>{tagsVisiveis.length} registro(s)</span>
-        </div>
+                <p>
+                  {tagsAtivas} {tagsAtivas === 1 ? 'tag ativa' : 'tags ativas'}
+                  {' de '}
+                  {tags.length} {tags.length === 1 ? 'cadastrada' : 'cadastradas'}
+                </p>
+              </div>
 
-        <div style={{ marginBottom: 20 }}>
-          <label
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              cursor: 'pointer'
-            }}
-          >
-            <input
-              type="checkbox"
-              checked={mostrarInativas}
-              onChange={e =>
-                setMostrarInativas(e.target.checked)
-              }
-            />
-            Mostrar tags desativadas
-          </label>
-        </div>
+              <label className="admin-tags-filtro">
+                <input
+                  type="checkbox"
+                  checked={mostrarInativas}
+                  onChange={e =>
+                    setMostrarInativas(e.target.checked)
+                  }
+                />
 
-        {carregando ? (
-          <p>Carregando tags...</p>
-        ) : tagsVisiveis.length === 0 ? (
-          <p>Nenhuma tag encontrada.</p>
-        ) : (
-          <div className="admin-tabela-scroll">
-            <table className="admin-tabela">
-              <thead>
-                <tr>
-                  <th>Nome</th>
-                  <th>Descrição</th>
-                  <th>Status</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
+                Mostrar desativadas
+              </label>
+            </div>
 
-              <tbody>
+            {carregando ? (
+              <p className="admin-tags-vazio">
+                Carregando tags...
+              </p>
+            ) : tagsVisiveis.length === 0 ? (
+              <div className="admin-tags-vazio">
+                <p>
+                  Nenhuma tag encontrada.
+                </p>
+              </div>
+            ) : (
+              <div className="admin-tags-lista">
                 {tagsVisiveis.map(tag => {
-                  const ativa = Number(tag.ativo) === 1
+                  const ativa = tagAtiva(tag)
+                  const processando = processandoId === tag.id
 
                   return (
-                    <tr key={tag.id}>
-                      <td>
-                        <strong>{tag.nome}</strong>
-                      </td>
+                    <article
+                      className="admin-tags-item"
+                      key={tag.id}
+                    >
+                      <div className="admin-tags-item-info">
+                        <div className="admin-tags-item-nome">
+                          <strong>{tag.nome}</strong>
 
-                      <td>{tag.descricao || '—'}</td>
-
-                      <td>
-                        {ativa ? 'Ativa' : 'Desativada'}
-                      </td>
-
-                      <td>
-                        <div
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 10,
-                            flexWrap: 'wrap'
-                          }}
-                        >
-                          <button
-                            type="button"
-                            className="admin-botao-secundario"
-                            onClick={() => iniciarEdicao(tag)}
-                            disabled={!ativa}
-                            title="Editar tag"
+                          <span
+                            className={`admin-tags-status ${ativa ? 'ativa' : 'inativa'
+                              }`}
                           >
-                            <Pencil size={16} />
-                            Editar
-                          </button>
+                            {ativa ? 'Ativa' : 'Inativa'}
+                          </span>
+                        </div>
 
-                          {ativa ? (
+                        <p>
+                          {tag.descricao || 'Sem descrição'}
+                        </p>
+                      </div>
+
+                      <div className="admin-tags-item-acoes">
+                        {ativa ? (
+                          <>
                             <button
                               type="button"
-                              className="admin-botao-secundario"
-                              onClick={() => desativarTag(tag)}
-                              title="Desativar tag"
+                              className="admin-tags-acao"
+                              onClick={() => iniciarEdicao(tag)}
+                              disabled={processando}
                             >
-                              <Trash2 size={16} />
+                              <Pencil size={15} />
+                              Editar
+                            </button>
+
+                            <button
+                              type="button"
+                              className="admin-tags-acao perigo"
+                              onClick={() => desativarTag(tag)}
+                              disabled={processando}
+                            >
+                              <Archive size={15} />
                               Desativar
                             </button>
-                          ) : (
-                            <button
-                              type="button"
-                              className="admin-botao-secundario"
-                              onClick={() => reativarTag(tag)}
-                              title="Reativar tag"
-                            >
-                              <RotateCcw size={16} />
-                              Reativar
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
+                          </>
+                        ) : (
+                          <button
+                            type="button"
+                            className="admin-tags-acao"
+                            onClick={() => reativarTag(tag)}
+                            disabled={processando}
+                          >
+                            <RotateCcw size={15} />
+                            Reativar
+                          </button>
+                        )}
+                      </div>
+                    </article>
                   )
                 })}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
+              </div>
+            )}
+          </section>
+        </div>
+      </div>
     </>
   )
 }

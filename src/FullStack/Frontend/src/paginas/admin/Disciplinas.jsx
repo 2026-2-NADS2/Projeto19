@@ -1,159 +1,391 @@
-import { Plus, Save, Pencil, Trash2 } from 'lucide-react'
+
+import { useState } from 'react'
+import { Plus, Save } from 'lucide-react'
 import { useAdmin } from './AdminContext'
 import CabecalhoPagina from './CabecalhoPagina'
 
 export default function Disciplinas() {
-    const {
-        areas, nomeArea, setNomeArea,
-        areaEditando, setAreaEditando,
-        disciplinas, setDisciplinas,
-        disciplinaForm, setDisciplinaForm,
-        disciplinaEditando, setDisciplinaEditando,
-        salvarArea, excluirArea, salvarDisciplina
-    } = useAdmin()
+  const {
+    areas,
+    nomeArea,
+    setNomeArea,
+    areaEditando,
+    setAreaEditando,
+    disciplinas,
+    disciplinaForm,
+    setDisciplinaForm,
+    disciplinaEditando,
+    setDisciplinaEditando,
+    salvarArea,
+    excluirArea,
+    salvarDisciplina
+  } = useAdmin()
 
-    return (
-        <>
-            <CabecalhoPagina
-                titulo="Áreas e disciplinas"
-                descricao="Cadastre e organize as áreas de conhecimento e disciplinas."
-            />
+  const [buscaArea, setBuscaArea] = useState('')
+  const [buscaDisciplina, setBuscaDisciplina] = useState('')
 
-            <div className="admin-duas-colunas">
-                <section className="admin-painel">
-                    <div className="admin-painel-topo">
-                        <div>
-                            <span>ÁREAS</span>
-                            <h3>{areaEditando ? 'Editar área' : 'Nova área'}</h3>
-                        </div>
-                    </div>
+  const areasFiltradas = areas.filter(area =>
+    area.nome.toLowerCase().includes(buscaArea.toLowerCase())
+  )
 
-                    <form className="admin-form-linha" onSubmit={salvarArea}>
-                        <input
-                            value={nomeArea}
-                            onChange={e => setNomeArea(e.target.value)}
-                            placeholder="Ex.: Linguagens"
-                        />
-                        <button className="admin-botao-principal">
-                            <Plus size={16} /> Salvar
-                        </button>
-                    </form>
+  const disciplinasFiltradas = disciplinas.filter(disciplina =>
+    `${disciplina.nome} ${disciplina.area || ''}`
+      .toLowerCase()
+      .includes(buscaDisciplina.toLowerCase())
+  )
 
-                    <div className="admin-lista-itens">
-                        {areas.map(area => (
-                            <div className="admin-item" key={area.id}>
-                                <span>{area.nome}</span>
+  const cancelarEdicaoArea = () => {
+    setAreaEditando(null)
+    setNomeArea('')
+  }
 
-                                <div className="admin-acoes">
-                                    <button
-                                        type="button"
-                                        className="admin-botao-icone"
-                                        onClick={() => {
-                                            setAreaEditando(area.id)
-                                            setNomeArea(area.nome)
-                                        }}
-                                    >
-                                        <Pencil size={15} />
-                                    </button>
+  const cancelarEdicaoDisciplina = () => {
+    setDisciplinaEditando(null)
+    setDisciplinaForm({
+      nome: '',
+      area: areas[0]?.nome || ''
+    })
+  }
 
-                                    <button
-                                        type="button"
-                                        className="admin-botao-icone perigo"
-                                        onClick={() => excluirArea(area.id)}
-                                    >
-                                        <Trash2 size={15} />
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </section>
+  const editarArea = area => {
+    setAreaEditando(area.id)
+    setNomeArea(area.nome)
+  }
 
-                <section className="admin-painel">
-                    <div className="admin-painel-topo">
-                        <div>
-                            <span>DISCIPLINAS</span>
-                            <h3>
-                                {disciplinaEditando ? 'Editar disciplina' : 'Nova disciplina'}
-                            </h3>
-                        </div>
-                    </div>
+  const editarDisciplina = disciplina => {
+    setDisciplinaEditando(disciplina.id)
+    setDisciplinaForm({
+      nome: disciplina.nome,
+      area: disciplina.area || areas[0]?.nome || ''
+    })
+  }
 
-                    <form className="admin-form-coluna" onSubmit={salvarDisciplina}>
-                        <div className="admin-campo">
-                            <label>Disciplina</label>
-                            <input
-                                value={disciplinaForm.nome}
-                                onChange={e => setDisciplinaForm({
-                                    ...disciplinaForm,
-                                    nome: e.target.value
-                                })}
-                                placeholder="Ex.: História"
-                            />
-                        </div>
-
-                        <div className="admin-campo">
-                            <label>Área</label>
-                            <select
-                                value={disciplinaForm.area}
-                                onChange={e => setDisciplinaForm({
-                                    ...disciplinaForm,
-                                    area: e.target.value
-                                })}
-                            >
-                                {areas.map(area => (
-                                    <option key={area.id} value={area.nome}>
-                                        {area.nome}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <button className="admin-botao-principal">
-                            <Save size={16} /> Salvar disciplina
-                        </button>
-                    </form>
-
-                    <div className="admin-lista-itens">
-                        {disciplinas.map(d => (
-                            <div className="admin-item" key={d.id}>
-                                <div className="admin-item-texto">
-                                    <strong>{d.nome}</strong>
-                                    <small>{d.area}</small>
-                                </div>
-
-                                <div className="admin-acoes">
-                                    <button
-                                        type="button"
-                                        className="admin-botao-icone"
-                                        onClick={() => {
-                                            setDisciplinaEditando(d.id)
-                                            setDisciplinaForm({
-                                                nome: d.nome,
-                                                area: d.area || 'Matemática'
-                                            })
-                                        }}
-                                    >
-                                        <Pencil size={15} />
-                                    </button>
-
-                                    <button
-                                        type="button"
-                                        className="admin-botao-icone perigo"
-                                        onClick={() => {
-                                            window.alert(
-                                                'A exclusão de disciplinas ainda precisa ser implementada no backend.'
-                                            )
-                                        }}
-                                    >
-                                        <Trash2 size={15} />
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </section>
-            </div>
-        </>
+  const confirmarExclusaoArea = area => {
+    const confirmar = window.confirm(
+      `Deseja realmente excluir a área "${area.nome}"?`
     )
+
+    if (!confirmar) return
+
+    excluirArea(area.id)
+  }
+
+  return (
+    <>
+      <CabecalhoPagina
+        titulo="Áreas e disciplinas"
+        descricao="Organize as áreas de conhecimento e as disciplinas da escola."
+      />
+
+      <div className="admin-disciplinas-layout">
+
+        {/* Áreas */}
+
+        <section className="admin-disciplinas-secao">
+          <div className="admin-disciplinas-topo">
+            <div>
+              <h3>Áreas de conhecimento</h3>
+              <p>
+                Cadastre e gerencie as áreas utilizadas pela escola.
+              </p>
+            </div>
+
+            <span className="admin-disciplinas-contador">
+              {areas.length} {areas.length === 1 ? 'área' : 'áreas'}
+            </span>
+          </div>
+
+          <form
+            className="admin-disciplinas-formulario"
+            onSubmit={salvarArea}
+          >
+            <div className="admin-campo">
+              <label htmlFor="nome-area">
+                {areaEditando != null
+                  ? 'Editar nome da área'
+                  : 'Nome da área'}
+              </label>
+
+              <input
+                id="nome-area"
+                type="text"
+                required
+                placeholder="Ex.: Linguagens"
+                value={nomeArea}
+                onChange={e => setNomeArea(e.target.value)}
+              />
+            </div>
+
+            <div className="admin-disciplinas-form-acoes">
+              <button
+                type="submit"
+                className="admin-botao-principal"
+              >
+                {areaEditando != null ? (
+                  <>
+                    <Save size={16} />
+                    Salvar alterações
+                  </>
+                ) : (
+                  <>
+                    <Plus size={16} />
+                    Cadastrar área
+                  </>
+                )}
+              </button>
+
+              {areaEditando != null && (
+                <button
+                  type="button"
+                  className="admin-botao-secundario"
+                  onClick={cancelarEdicaoArea}
+                >
+                  Cancelar
+                </button>
+              )}
+            </div>
+          </form>
+
+          <div className="admin-disciplinas-listagem">
+            <div className="admin-disciplinas-listagem-topo">
+              <h4>Áreas cadastradas</h4>
+
+              {areas.length > 4 && (
+                <input
+                  type="search"
+                  placeholder="Buscar área"
+                  aria-label="Buscar área"
+                  value={buscaArea}
+                  onChange={e => setBuscaArea(e.target.value)}
+                />
+              )}
+            </div>
+
+            <div className="admin-disciplinas-lista">
+              {areasFiltradas.length === 0 ? (
+                <p className="admin-disciplinas-vazio">
+                  {areas.length === 0
+                    ? 'Nenhuma área cadastrada.'
+                    : 'Nenhuma área encontrada.'}
+                </p>
+              ) : (
+                areasFiltradas.map(area => {
+                  const quantidade = disciplinas.filter(
+                    disciplina => disciplina.area === area.nome
+                  ).length
+
+                  return (
+                    <div
+                      className="admin-disciplinas-item"
+                      key={area.id}
+                    >
+                      <div className="admin-disciplinas-item-info">
+                        <strong>{area.nome}</strong>
+
+                        <span>
+                          {quantidade}{' '}
+                          {quantidade === 1
+                            ? 'disciplina'
+                            : 'disciplinas'}
+                        </span>
+                      </div>
+
+                      <div className="admin-disciplinas-item-acoes">
+                        <button
+                          type="button"
+                          className="admin-disciplinas-acao"
+                          onClick={() => editarArea(area)}
+                        >
+                          Editar
+                        </button>
+
+                        <button
+                          type="button"
+                          className="admin-disciplinas-acao excluir"
+                          onClick={() => confirmarExclusaoArea(area)}
+                        >
+                          Excluir
+                        </button>
+                      </div>
+                    </div>
+                  )
+                })
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* Disciplinas */}
+
+        <section className="admin-disciplinas-secao">
+          <div className="admin-disciplinas-topo">
+            <div>
+              <h3>Disciplinas</h3>
+              <p>
+                Vincule cada disciplina à sua área de conhecimento.
+              </p>
+            </div>
+
+            <span className="admin-disciplinas-contador">
+              {disciplinas.length}{' '}
+              {disciplinas.length === 1
+                ? 'disciplina'
+                : 'disciplinas'}
+            </span>
+          </div>
+
+          <form
+            className="admin-disciplinas-formulario"
+            onSubmit={salvarDisciplina}
+          >
+            <div className="admin-campo">
+              <label htmlFor="nome-disciplina">
+                {disciplinaEditando != null
+                  ? 'Editar disciplina'
+                  : 'Nome da disciplina'}
+              </label>
+
+              <input
+                id="nome-disciplina"
+                type="text"
+                required
+                placeholder="Ex.: História"
+                value={disciplinaForm.nome}
+                onChange={e =>
+                  setDisciplinaForm(anterior => ({
+                    ...anterior,
+                    nome: e.target.value
+                  }))
+                }
+              />
+            </div>
+
+            <div className="admin-campo">
+              <label htmlFor="area-disciplina">
+                Área de conhecimento
+              </label>
+
+              <select
+                id="area-disciplina"
+                required
+                value={disciplinaForm.area}
+                onChange={e =>
+                  setDisciplinaForm(anterior => ({
+                    ...anterior,
+                    area: e.target.value
+                  }))
+                }
+              >
+                <option value="" disabled>
+                  Selecione uma área
+                </option>
+
+                {areas.map(area => (
+                  <option
+                    key={area.id}
+                    value={area.nome}
+                  >
+                    {area.nome}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="admin-disciplinas-form-acoes">
+              <button
+                type="submit"
+                className="admin-botao-principal"
+                disabled={areas.length === 0}
+              >
+                {disciplinaEditando != null ? (
+                  <>
+                    <Save size={16} />
+                    Salvar alterações
+                  </>
+                ) : (
+                  <>
+                    <Plus size={16} />
+                    Cadastrar disciplina
+                  </>
+                )}
+              </button>
+
+              {disciplinaEditando != null && (
+                <button
+                  type="button"
+                  className="admin-botao-secundario"
+                  onClick={cancelarEdicaoDisciplina}
+                >
+                  Cancelar
+                </button>
+              )}
+            </div>
+
+            {areas.length === 0 && (
+              <p className="admin-disciplinas-aviso">
+                Cadastre uma área antes de adicionar disciplinas.
+              </p>
+            )}
+          </form>
+
+          <div className="admin-disciplinas-listagem">
+            <div className="admin-disciplinas-listagem-topo">
+              <h4>Disciplinas cadastradas</h4>
+
+              {disciplinas.length > 4 && (
+                <input
+                  type="search"
+                  placeholder="Buscar disciplina"
+                  aria-label="Buscar disciplina"
+                  value={buscaDisciplina}
+                  onChange={e => setBuscaDisciplina(e.target.value)}
+                />
+              )}
+            </div>
+
+            <div className="admin-disciplinas-lista">
+              {disciplinasFiltradas.length === 0 ? (
+                <p className="admin-disciplinas-vazio">
+                  {disciplinas.length === 0
+                    ? 'Nenhuma disciplina cadastrada.'
+                    : 'Nenhuma disciplina encontrada.'}
+                </p>
+              ) : (
+                disciplinasFiltradas.map(disciplina => (
+                  <div
+                    className="admin-disciplinas-item"
+                    key={disciplina.id}
+                  >
+                    <div className="admin-disciplinas-item-info">
+                      <strong>{disciplina.nome}</strong>
+                      <span>
+                        {disciplina.area || 'Sem área definida'}
+                      </span>
+                    </div>
+
+                    <div className="admin-disciplinas-item-acoes">
+                      <button
+                        type="button"
+                        className="admin-disciplinas-acao"
+                        onClick={() => editarDisciplina(disciplina)}
+                      >
+                        Editar
+                      </button>
+
+                      <span
+                        className="admin-disciplinas-indisponivel"
+                        title="Exclusão ainda não implementada no backend"
+                      >
+                        Exclusão indisponível
+                      </span>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </section>
+      </div>
+    </>
+  )
 }
