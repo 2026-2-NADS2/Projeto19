@@ -638,6 +638,12 @@ A hospedagem mantém a orientação de procurar a administração da escola enqu
 
 [Documentação de Node.js na Alwaysdata](https://help.alwaysdata.com/en/docs/web-hosting/languages/nodejs/configuration/)
 
+
+### Áreas de conhecimento e disciplinas
+
+A tela de disciplinas persiste as áreas no MySQL. Execute `src/FullStack/Backend/sql/areas_disciplinas.sql` uma vez em cada banco que já possua o esquema KFKA. A migração adiciona a tabela de áreas e a coluna opcional `disciplinas.area_id`. Ela associa disciplinas conhecidas às áreas padrão e mantém as demais disponíveis para classificação manual. O administrador pode corrigir o nome e a área de uma disciplina. O banco impede excluir uma disciplina vinculada a professores ou acompanhamentos, ou uma área que ainda tenha disciplinas.
+
+Em uma atualização autorizada da Alwaysdata, faça backup e aplique `recuperacoes_senha.sql` e `areas_disciplinas.sql` pelo cliente SQL com o banco de destino já selecionado. Aplique `areas_disciplinas.sql` somente se a coluna ainda não existir. Mantenha o dump completo fora do procedimento de atualização. Use Node.js 24, execute `npm ci --omit=dev` no backend e `npm ci` seguido de `npm run build` no frontend. Use a configuração de API existente, publique o diretório `dist` no momento autorizado e preserve o fallback de rotas React. Mantenha a recuperação local desativada na hospedagem.
 ### Controle de acesso
 
 As funcionalidades são separadas de acordo com os três perfis:

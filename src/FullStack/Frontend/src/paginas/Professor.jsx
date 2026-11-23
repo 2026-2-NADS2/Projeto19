@@ -17,7 +17,7 @@ import {
   AlertCircle,
   Menu
 } from 'lucide-react'
-import { api } from '../servicos/api'
+import { api, sairDaConta } from '../servicos/api'
 import BuscaAluno from '../componentes/BuscaAluno.jsx'
 import './Professor.css'
 
@@ -200,6 +200,8 @@ export default function Professor() {
   }, [])
 
   useEffect(() => {
+    // O carregamento inicial compartilha o indicador usado nas atualizações.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     carregar()
   }, [carregar])
 
@@ -722,6 +724,7 @@ export default function Professor() {
             <LayoutDashboard size={19} />
             Meus acompanhamentos
           </button>
+          <button type="button" onClick={sairDaConta}>Sair da conta</button>
         </nav>
       </aside>
 

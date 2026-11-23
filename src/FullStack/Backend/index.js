@@ -52,7 +52,7 @@ app.use(cienciaDocumentosRoutes);
 app.use('/usuarios', usuarioRoutes);
 app.use('/alunos', alunoRoutes);
 app.use('/turmas', turmaRoutes);
-app.use('/disciplinas', disciplinaRoutes);
+app.use('/disciplinas', disciplinaRoutes());
 app.use('/professores-turmas', professorTurmaRoutes);
 app.use('/periodos', periodoRoutes);
 app.use('/acompanhamentos', acompanhamentoRoutes);

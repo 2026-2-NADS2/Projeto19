@@ -17,7 +17,8 @@ function Login() {
 
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
-  const [erro, setErro] = useState('')
+  const [erro, setErro] = useState(() => sessionStorage.getItem('kfka_sessao_expirada') === 'true'
+    ? 'Sua sessão expirou. Faça login novamente.' : '')
   const [carregando, setCarregando] = useState(false)
   const [mostrarSenha, setMostrarSenha] = useState(false)
 
@@ -28,7 +29,6 @@ function Login() {
     )
 
     if (sessaoExpirada === 'true') {
-      setErro('Sua sessão expirou. Faça login novamente.')
       sessionStorage.removeItem('kfka_sessao_expirada')
     }
   }, [])

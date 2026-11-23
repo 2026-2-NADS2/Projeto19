@@ -1,106 +1,102 @@
-import { idPositivo, textoObrigatorio } from '../validacao.js';
-
 import { Router } from 'express';
+import { z } from 'zod';
 import bancoDados from '../bancoDados.js';
 import autenticarComCiencia from '../middlewares/autenticarComCiencia.js';
+import { falha } from '../middlewares/erros.js';
+import { idPositivo, textoObrigatorio, validar } from '../validacao.js';
 
-const router = Router();
+const nome = textoObrigatorio(100);
+const dadosArea = z.object({ nome });
+const dadosDisciplina = z.object({ nome, area_id: idPositivo.nullish() });
+const consultaDisciplinas = `SELECT d.id, d.nome, d.ativo, d.area_id, a.nome AS area
+    FROM disciplinas d LEFT JOIN areas_conhecimento a ON a.id = d.area_id`;
 
-// Exigir login
-router.use(autenticarComCiencia);
-
-// Somente administradores
-router.use((req, res, next) => {
-    if (req.usuario.perfil !== 'administrador') {
-        return res.status(403).json({
-            mensagem: 'Acesso permitido apenas para administradores.'
-        });
-    }
-
-    next();
-});
-
-// Listar disciplinas
-router.get('/', async (req, res) => {
-    const [disciplinas] = await bancoDados.query(
-        'SELECT id, nome, ativo FROM disciplinas ORDER BY nome'
-    );
-
-    res.json(disciplinas);
-});
-
-// Buscar disciplina por ID
-router.get('/:id', async (req, res) => {
-    const disciplinaId = Number(req.params.id);
-
-    if (!idPositivo.safeParse(req.params.id).success) {
-        return res.status(400).json({
-            mensagem: 'ID da disciplina inválido.'
-        });
-    }
-
-    const [disciplinas] = await bancoDados.query(
-        `SELECT id, nome, ativo
-         FROM disciplinas
-         WHERE id = ?`,
-        [disciplinaId]
-    );
-
-    if (disciplinas.length === 0) {
-        return res.status(404).json({
-            mensagem: 'Disciplina não encontrada.'
-        });
-    }
-
-    res.json(disciplinas[0]);
-});
-
-// Cadastrar disciplina
-router.post('/', async (req, res) => {
-    try {
-        const { nome } = req.body ?? {};
-
-        if (!textoObrigatorio(100).safeParse(nome).success) {
-            return res.status(400).json({
-                mensagem: 'Informe o nome da disciplina.'
-            });
+export default function criarRotasDisciplinas(pool = bancoDados) {
+    const router = Router();
+    const idDaRota = req => validar(idPositivo, req.params.id, 'Informe um ID válido.');
+    router.use(autenticarComCiencia, (req, res, next) => {
+        if (req.usuario.perfil !== 'administrador') {
+            throw falha(403, 'Acesso permitido apenas para administradores.');
         }
+        next();
+    });
 
-        const nomeLimpo = nome.trim();
+    router.get('/areas', async (req, res) => {
+        const [areas] = await pool.query('SELECT id, nome FROM areas_conhecimento ORDER BY nome');
+        res.json(areas);
+    });
 
-        const [existentes] = await bancoDados.query(
-            'SELECT id FROM disciplinas WHERE nome = ?',
-            [nomeLimpo]
-        );
+    router.post('/areas', async (req, res) => {
+        const { nome } = validar(dadosArea, req.body, 'Informe um nome de área de até 100 caracteres.');
+        const [resultado] = await pool.query('INSERT INTO areas_conhecimento (nome) VALUES (?)', [nome]);
+        res.status(201).json({ mensagem: 'Área cadastrada.', id: resultado.insertId });
+    });
 
-        if (existentes.length > 0) {
-            return res.status(409).json({
-                mensagem: 'Essa disciplina já está cadastrada.'
-            });
+    router.put('/areas/:id', async (req, res) => {
+        const id = idDaRota(req);
+        const { nome } = validar(dadosArea, req.body, 'Informe um nome de área de até 100 caracteres.');
+        const [resultado] = await pool.query('UPDATE areas_conhecimento SET nome = ? WHERE id = ?', [nome, id]);
+        if (!resultado.affectedRows) throw falha(404, 'Área não encontrada.');
+        res.json({ mensagem: 'Área atualizada.' });
+    });
+
+    router.delete('/areas/:id', async (req, res) => {
+        try {
+            const [resultado] = await pool.query('DELETE FROM areas_conhecimento WHERE id = ?', [idDaRota(req)]);
+            if (!resultado.affectedRows) throw falha(404, 'Área não encontrada.');
+            res.json({ mensagem: 'Área excluída.' });
+        } catch (erro) {
+            if ([1217, 1451].includes(erro.errno)) throw falha(409, 'Reatribua as disciplinas da área antes de excluí-la.');
+            throw erro;
         }
+    });
 
-        const [resultado] = await bancoDados.query(
-            'INSERT INTO disciplinas (nome) VALUES (?)',
-            [nomeLimpo]
-        );
+    router.get('/', async (req, res) => {
+        const [disciplinas] = await pool.query(consultaDisciplinas + ' ORDER BY d.nome');
+        res.json(disciplinas);
+    });
 
-        res.status(201).json({
-            mensagem: 'Disciplina cadastrada com sucesso!',
-            disciplina: {
-                id: resultado.insertId,
-                nome: nomeLimpo,
-                ativo: 1
+    router.get('/:id', async (req, res) => {
+        const [disciplinas] = await pool.query(consultaDisciplinas + ' WHERE d.id = ?', [idDaRota(req)]);
+        if (!disciplinas.length) throw falha(404, 'Disciplina não encontrada.');
+        res.json(disciplinas[0]);
+    });
+
+    router.post('/', salvarDisciplina);
+    router.put('/:id', salvarDisciplina);
+
+    async function salvarDisciplina(req, res) {
+        const { nome, area_id } = validar(dadosDisciplina, req.body, 'Informe um nome de disciplina e uma área válidos.');
+        try {
+            if (req.method === 'POST') {
+                const [resultado] = await pool.query('INSERT INTO disciplinas (nome, area_id) VALUES (?, ?)', [nome, area_id ?? null]);
+                const [disciplinas] = await pool.query(consultaDisciplinas + ' WHERE d.id = ?', [resultado.insertId]);
+                return res.status(201).json({ mensagem: 'Disciplina cadastrada com sucesso!', disciplina: disciplinas[0] });
             }
-        });
-    } catch (erro) {
-        if (erro.code === 'ER_DUP_ENTRY') {
-            return res.status(409).json({
-                mensagem: 'Essa disciplina já está cadastrada.'
-            });
+            const id = idDaRota(req);
+            const [resultado] = area_id === undefined
+                ? await pool.query('UPDATE disciplinas SET nome = ? WHERE id = ?', [nome, id])
+                : await pool.query('UPDATE disciplinas SET nome = ?, area_id = ? WHERE id = ?', [nome, area_id, id]);
+            if (!resultado.affectedRows) throw falha(404, 'Disciplina não encontrada.');
+            res.json({ mensagem: 'Disciplina atualizada.' });
+        } catch (erro) {
+            if (erro.code === 'ER_DUP_ENTRY') throw falha(409, 'Essa disciplina já está cadastrada.');
+            if ([1216, 1452].includes(erro.errno)) throw falha(400, 'Selecione uma área cadastrada.');
+            throw erro;
         }
-
-        throw erro;
     }
-});
 
-export default router;
+    router.delete('/:id', async (req, res) => {
+        try {
+            const [resultado] = await pool.query('DELETE FROM disciplinas WHERE id = ?', [idDaRota(req)]);
+            if (!resultado.affectedRows) throw falha(404, 'Disciplina não encontrada.');
+            res.json({ mensagem: 'Disciplina excluída.' });
+        } catch (erro) {
+            if ([1217, 1451].includes(erro.errno)) {
+                throw falha(409, 'A disciplina tem vínculos ou acompanhamentos e não pode ser excluída.');
+            }
+            throw erro;
+        }
+    });
+    return router;
+}

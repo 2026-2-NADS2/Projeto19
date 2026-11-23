@@ -7,7 +7,7 @@ import {
   ArrowLeft, History, CheckCircle2, MessageSquare, RefreshCw
 } from 'lucide-react'
 import './Administrador.css'
-import { api, verificarSessao } from '../../servicos/api'
+import { api, sairDaConta, verificarSessao } from '../../servicos/api'
 import { AdminContext } from './AdminContext'
 import Dashboard from './Dashboard'
 import Cadastros from './Cadastros'
@@ -106,6 +106,8 @@ function HistoricoFamiliar() {
   }
 
   useEffect(() => {
+    // A consulta alterna o indicador de carregamento do histórico.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     carregarLogs()
   }, [])
 
@@ -329,19 +331,14 @@ export default function Administrador() {
   const [nomeTag, setNomeTag] = useState('')
   const [tagEditando, setTagEditando] = useState(null)
 
-  const [areas, setAreas] = useState([
-    { id: 1, nome: 'Linguagens' },
-    { id: 2, nome: 'Matemática' },
-    { id: 3, nome: 'Ciências da Natureza' },
-    { id: 4, nome: 'Ciências Humanas' }
-  ])
+  const [areas, setAreas] = useState([])
 
   const [nomeArea, setNomeArea] = useState('')
   const [areaEditando, setAreaEditando] = useState(null)
 
   const [disciplinaForm, setDisciplinaForm] = useState({
     nome: '',
-    area: 'Linguagens'
+    area_id: ''
   })
   const [disciplinaEditando, setDisciplinaEditando] = useState(null)
 
@@ -361,14 +358,15 @@ export default function Administrador() {
   async function carregarCadastros() {
     const [
       listaUsuarios, listaAlunos, listaTurmas,
-      listaDisciplinas, listaProfessores, listaResponsaveis
+      listaDisciplinas, listaProfessores, listaResponsaveis, listaAreas
     ] = await Promise.all([
       api('/usuarios'),
       api('/alunos'),
       api('/turmas'),
       api('/disciplinas'),
       api('/professores-turmas'),
-      api('/responsaveis-alunos')
+      api('/responsaveis-alunos'),
+      api('/disciplinas/areas')
     ])
 
     const usuariosDados = Array.isArray(listaUsuarios) ? listaUsuarios : []
@@ -381,6 +379,7 @@ export default function Administrador() {
     setAlunos(alunosDados)
     setTurmas(turmasDados)
     setDisciplinas(disciplinasDados)
+    setAreas(listaAreas)
 
     setVinculosProfessores(
       Array.isArray(listaProfessores) ? listaProfessores : []
@@ -441,6 +440,8 @@ export default function Administrador() {
     }
 
     verificarSessao()
+    // O carregamento inicial também é usado para recarregar os dados.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     carregarTudo()
     window.addEventListener('focus', conferirSessao)
     document.addEventListener('visibilitychange', conferirSessao)
@@ -449,6 +450,8 @@ export default function Administrador() {
       window.removeEventListener('focus', conferirSessao)
       document.removeEventListener('visibilitychange', conferirSessao)
     }
+    // O carregamento e os listeners são registrados uma vez por sessão da tela.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   async function salvarCadastro(evento) {
@@ -675,59 +678,68 @@ export default function Administrador() {
     setTagEditando(null)
   }
 
-  function salvarArea(evento) {
-    evento.preventDefault()
-    if (!nomeArea.trim()) return
-
-    if (areaEditando !== null) {
-      setAreas(lista => lista.map(area =>
-        area.id === areaEditando
-          ? { ...area, nome: nomeArea.trim() }
-          : area
-      ))
-    } else {
-      setAreas(lista => [
-        ...lista,
-        { id: Date.now(), nome: nomeArea.trim() }
-      ])
-    }
-
-    setNomeArea('')
-    setAreaEditando(null)
+  async function atualizarDisciplinas() {
+    const [novasAreas, novasDisciplinas] = await Promise.all([
+      api('/disciplinas/areas'),
+      api('/disciplinas')
+    ])
+    setAreas(novasAreas)
+    setDisciplinas(novasDisciplinas)
   }
 
-  function excluirArea(id) {
-    setAreas(lista => lista.filter(area => area.id !== id))
+  async function salvarArea(evento) {
+    evento.preventDefault()
+    try {
+      await api(areaEditando == null ? '/disciplinas/areas' : '/disciplinas/areas/' + areaEditando, {
+        method: areaEditando == null ? 'POST' : 'PUT',
+        body: JSON.stringify({ nome: nomeArea.trim() })
+      })
+      setNomeArea('')
+      setAreaEditando(null)
+      await atualizarDisciplinas()
+    } catch (erro) {
+      window.alert(erro.message)
+    }
+  }
+
+  async function excluirArea(id) {
+    try {
+      await api('/disciplinas/areas/' + id, { method: 'DELETE' })
+      if (areaEditando === id) {
+        setNomeArea('')
+        setAreaEditando(null)
+      }
+      await atualizarDisciplinas()
+    } catch (erro) {
+      window.alert(erro.message)
+    }
   }
 
   async function salvarDisciplina(evento) {
     evento.preventDefault()
-    if (!disciplinaForm.nome.trim()) return
-
-    if (disciplinaEditando !== null) {
-      window.alert(
-        'A edição de disciplinas precisa de uma rota de atualização no backend.'
-      )
-      return
-    }
-
     try {
-      await api('/disciplinas', {
-        method: 'POST',
-        body: JSON.stringify({
-          nome: disciplinaForm.nome.trim()
-        })
+      await api(disciplinaEditando == null ? '/disciplinas' : '/disciplinas/' + disciplinaEditando, {
+        method: disciplinaEditando == null ? 'POST' : 'PUT',
+        body: JSON.stringify({ nome: disciplinaForm.nome.trim(), area_id: disciplinaForm.area_id })
       })
+      setDisciplinaForm({ nome: '', area_id: '' })
+      setDisciplinaEditando(null)
+      await atualizarDisciplinas()
+    } catch (erro) {
+      window.alert(erro.message)
+    }
+  }
 
-      setDisciplinaForm({
-        nome: '',
-        area: 'Linguagens'
-      })
-
-      const dados = await api('/disciplinas')
-      setDisciplinas(Array.isArray(dados) ? dados : [])
-    } catch (error) {
-      window.alert(error.message)
+  async function excluirDisciplina(id) {
+    try {
+      await api('/disciplinas/' + id, { method: 'DELETE' })
+      if (disciplinaEditando === id) {
+        setDisciplinaForm({ nome: '', area_id: '' })
+        setDisciplinaEditando(null)
+      }
+      await atualizarDisciplinas()
+    } catch (erro) {
+      window.alert(erro.message)
     }
   }
 
@@ -765,7 +777,7 @@ export default function Administrador() {
     salvarTag, areas, nomeArea, setNomeArea,
     areaEditando, setAreaEditando, salvarArea, excluirArea,
     disciplinaForm, setDisciplinaForm, disciplinaEditando,
-    setDisciplinaEditando, salvarDisciplina, filtros,
+    setDisciplinaEditando, salvarDisciplina, excluirDisciplina, filtros,
     setFiltros, alunosFiltrados, alunoSelecionado,
     setAlunoSelecionado, publicarAcompanhamento,
     devolverAcompanhamento, abrirDevolucao,
@@ -829,6 +841,7 @@ export default function Administrador() {
                 </Link>
               )
             })}
+            <Link to="/login" onClick={sairDaConta}>Sair da conta</Link>
           </nav>
         </aside>
 
