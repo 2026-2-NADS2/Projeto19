@@ -71,14 +71,6 @@
   min-width: 0;
 }
 
-.login-etiqueta {
-  margin: 0 0 22px;
-  color: var(--destaque-claro);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-}
-
 .conteudo-login-esquerda h1 {
   max-width: 650px;
   margin: 0;
@@ -156,14 +148,6 @@
 }
 
 /* Títulos */
-
-.login-form-etiqueta {
-  margin: 0 0 9px;
-  color: var(--destaque-claro);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 1.3px;
-}
 
 .formulario-login h1 {
   margin: 0;

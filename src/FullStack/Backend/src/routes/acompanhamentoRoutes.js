@@ -1,12 +1,12 @@
 
 import { Router } from 'express';
 import bancoDados from '../bancoDados.js';
-import autenticar from '../middlewares/autenticar.js';
+import autenticarComCiencia from '../middlewares/autenticarComCiencia.js';
 
 const router = Router();
 
 // Todas as rotas precisam de login
-router.use(autenticar);
+router.use(autenticarComCiencia);
 
 // Verifica se o ID é válido
 function idValido(valor) {

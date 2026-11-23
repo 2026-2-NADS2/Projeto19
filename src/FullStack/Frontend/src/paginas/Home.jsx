@@ -17,8 +17,7 @@ function Home() {
           </h1>
 
           <p>
-            Conectando escola e responsáveis para acompanhar de perto
-            o desenvolvimento de cada aluno.
+            Plataforma de acompanhamento escolar desenvolvida para avaliação pela KFKA Technology Consulting.
           </p>
 
           <div className="botoes-home">

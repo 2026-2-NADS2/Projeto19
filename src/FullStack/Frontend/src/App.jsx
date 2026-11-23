@@ -1,5 +1,5 @@
 
-import { useEffect } from 'react'
+import { createElement, useEffect } from 'react'
 import {
   BrowserRouter,
   Routes,
@@ -23,6 +23,7 @@ import TermosUso from './paginas/TermosUso.jsx'
 
 import WidgetAcessibilidade from './componentes/WidgetAcessibilidade.jsx'
 import AvisoPrivacidade from './componentes/AvisoPrivacidade.jsx'
+import CienciaDocumentos from './componentes/CienciaDocumentos.jsx'
 
 // Atualiza o título da aba
 function TituloPagina() {
@@ -78,7 +79,7 @@ function RotaProtegida({ perfil, children }) {
     return <Navigate to="/login" replace />
   }
 
-  return children
+  return createElement(CienciaDocumentos, { key: token, perfil }, children)
 }
 
 // Mostra o aviso nas páginas públicas

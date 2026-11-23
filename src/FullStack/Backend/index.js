@@ -4,6 +4,7 @@ import cors from 'cors';
 import bancoDados from './src/bancoDados.js';
 
 import authRoutes from './src/routes/authRoutes.js';
+import cienciaDocumentosRoutes from './src/routes/cienciaDocumentosRoutes.js';
 import usuarioRoutes from './src/routes/usuarioRoutes.js';
 import alunoRoutes from './src/routes/alunosRoutes.js';
 import turmaRoutes from './src/routes/turmaRoutes.js';
@@ -54,6 +55,7 @@ app.get('/teste-banco', async (req, res) => {
 });
 
 app.use(authRoutes);
+app.use(cienciaDocumentosRoutes);
 app.use('/usuarios', usuarioRoutes);
 app.use('/alunos', alunoRoutes);
 app.use('/turmas', turmaRoutes);

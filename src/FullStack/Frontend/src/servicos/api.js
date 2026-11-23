@@ -78,6 +78,10 @@ export async function api(caminho, opcoes = {}) {
         throw new Error('Sua sessão expirou. Faça login novamente.')
     }
 
+    if (resposta.status === 403 && dados.codigo === 'CIENCIA_DOCUMENTOS_PENDENTE') {
+        window.location.reload()
+    }
+
     if (!resposta.ok) {
         throw new Error(
             dados.mensagem ||

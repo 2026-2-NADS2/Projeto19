@@ -164,7 +164,6 @@ export default function Relatorios() {
       <section className="admin-painel">
         <div className="admin-painel-topo">
           <div>
-            <span>CONSULTA</span>
             <h3>Relatório de acompanhamentos</h3>
           </div>
 

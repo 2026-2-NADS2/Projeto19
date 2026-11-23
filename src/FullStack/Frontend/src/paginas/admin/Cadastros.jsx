@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react'
+import { cloneElement, useId, useState, useEffect } from 'react'
 import {
     Plus,
     Save,
@@ -12,6 +12,12 @@ import {
 import { useAdmin } from './AdminContext'
 import CabecalhoPagina from './CabecalhoPagina'
 import { api } from '../../servicos/api'
+
+const abas = [
+    { id: 'cadastros', titulo: 'Cadastros' },
+    { id: 'turmas', titulo: 'Turmas' },
+    { id: 'gerenciar', titulo: 'Gerenciar' }
+]
 
 const cadastroVazio = {
     nome: '',
@@ -76,11 +82,14 @@ function Campo({
     placeholder,
     children
 }) {
+    const id = useId()
+
     return (
         <div className="admin-campo">
-            <label>{label}</label>
-            {children || (
+            <label htmlFor={id}>{label}</label>
+            {children ? cloneElement(children, { id }) : (
                 <input
+                    id={id}
                     type={type}
                     value={value ?? ''}
                     onChange={e => onChange(e.target.value)}
@@ -94,6 +103,7 @@ function Campo({
 }
 
 function CampoDataNascimento({ value, onChange }) {
+    const id = useId()
     const [texto, setTexto] = useState(() => dataParaBR(value))
     const [erro, setErro] = useState('')
 
@@ -129,8 +139,9 @@ function CampoDataNascimento({ value, onChange }) {
 
     return (
         <div className="admin-campo">
-            <label>Data de nascimento</label>
+            <label htmlFor={id}>Data de nascimento</label>
             <input
+                id={id}
                 type="text"
                 inputMode="numeric"
                 autoComplete="bday"
@@ -157,6 +168,8 @@ function BotaoAcao({
     disabled,
     children
 }) {
+    const id = useId()
+
     return (
         <button
             type="button"
@@ -416,6 +429,7 @@ export default function Cadastros() {
         carregarCadastros
     } = useAdmin()
 
+    const [abaAtiva, setAbaAtiva] = useState('cadastros')
     const [visualizando, setVisualizando] = useState(null)
     const [editando, setEditando] = useState(null)
     const [editandoTurma, setEditandoTurma] = useState(null)
@@ -436,6 +450,23 @@ export default function Cadastros() {
         ano_letivo: '',
         periodo: 'manha'
     })
+
+    function navegarAbas(evento) {
+        const indice = abas.findIndex(aba => aba.id === abaAtiva)
+        let destino
+
+        switch (evento.key) {
+            case 'ArrowRight': destino = (indice + 1) % abas.length; break
+            case 'ArrowLeft': destino = (indice + abas.length - 1) % abas.length; break
+            case 'Home': destino = 0; break
+            case 'End': destino = abas.length - 1; break
+            default: return
+        }
+
+        evento.preventDefault()
+        setAbaAtiva(abas[destino].id)
+        evento.currentTarget.children[destino].focus()
+    }
 
     function limparMensagens() {
         setMensagemLocal('')
@@ -801,125 +832,206 @@ export default function Cadastros() {
                 descricao="Gerencie alunos, professores, responsáveis e turmas."
             />
 
-            <section className="admin-painel">
-                <div className="admin-painel-topo">
-                    <div>
-                        <span>NOVO CADASTRO</span>
-                        <h3>Cadastrar usuário</h3>
+            <div
+                className="admin-cadastros-abas"
+                role="tablist"
+                aria-label="Cadastros e vínculos"
+                onKeyDown={navegarAbas}
+            >
+                {abas.map(({ id, titulo }) => (
+                    <button
+                        key={id}
+                        id={`cadastros-aba-${id}`}
+                        type="button"
+                        role="tab"
+                        aria-controls={`cadastros-painel-${id}`}
+                        aria-selected={abaAtiva === id}
+                        tabIndex={abaAtiva === id ? 0 : -1}
+                        onClick={() => setAbaAtiva(id)}
+                    >
+                        {titulo}
+                    </button>
+                ))}
+            </div>
+
+            <div
+                className="admin-cadastros-painel"
+                id="cadastros-painel-cadastros"
+                role="tabpanel"
+                aria-labelledby="cadastros-aba-cadastros"
+                hidden={abaAtiva !== 'cadastros'}
+            >
+                <section className="admin-painel">
+                    <div className="admin-painel-topo">
+                        <div>
+                            <h3>Cadastrar usuário</h3>
+                        </div>
                     </div>
-                </div>
 
-                <div
-                    className="admin-campo"
-                    style={{ marginBottom: 18 }}
-                >
-                    <label>Tipo de cadastro</label>
+                    <div
+                        className="admin-campo"
+                        style={{ marginBottom: 18 }}
+                    >
+                        <label htmlFor="cadastros-tipo">Tipo de cadastro</label>
 
-                    <select
-                        value={tipoCadastro}
-                        onChange={e => {
-                            setTipoCadastro(e.target.value)
-                            setCadastroForm({ ...cadastroVazio })
-                            limparMensagens()
+                        <select
+                            id="cadastros-tipo"
+                            value={tipoCadastro}
+                            onChange={e => {
+                                setTipoCadastro(e.target.value)
+                                setCadastroForm({ ...cadastroVazio })
+                                limparMensagens()
+                            }}
+                        >
+                            <option value="aluno">Aluno</option>
+                            <option value="professor">Professor</option>
+                            <option value="responsavel">Responsável</option>
+                        </select>
+                    </div>
+
+                    <form
+                        className="admin-form-grid"
+                        onSubmit={evento => {
+                            if (tipoCadastro === 'aluno' && !cadastroForm.data_nascimento) {
+                                evento.preventDefault()
+                                setErroCadastro('Informe uma data de nascimento válida.')
+                                return
+                            }
+                            salvarCadastro(evento)
                         }}
                     >
-                        <option value="aluno">Aluno</option>
-                        <option value="professor">Professor</option>
-                        <option value="responsavel">Responsável</option>
-                    </select>
-                </div>
+                        <Campo
+                            label="Nome completo"
+                            value={cadastroForm.nome}
+                            onChange={v => alterarCadastro('nome', v)}
+                            required
+                            placeholder="Digite o nome completo"
+                        />
 
-                <form
-                    className="admin-form-grid"
-                    onSubmit={evento => {
-                        if (tipoCadastro === 'aluno' && !cadastroForm.data_nascimento) {
-                            evento.preventDefault()
-                            setErroCadastro('Informe uma data de nascimento válida.')
-                            return
-                        }
-                        salvarCadastro(evento)
-                    }}
-                >
-                    <Campo
-                        label="Nome completo"
-                        value={cadastroForm.nome}
-                        onChange={v => alterarCadastro('nome', v)}
-                        required
-                        placeholder="Digite o nome completo"
-                    />
-
-                    {tipoCadastro === 'aluno' ? (
-                        <>
-                            <Campo
-                                label="Matrícula"
-                                value={cadastroForm.matricula}
-                                onChange={v =>
-                                    alterarCadastro('matricula', v)
-                                }
-                                required
-                            />
-
-                            <CampoDataNascimento
-                                value={cadastroForm.data_nascimento}
-                                onChange={v =>
-                                    alterarCadastro('data_nascimento', v)
-                                }
-                            />
-
-                            <Campo label="Turma">
-                                <select
-                                    value={cadastroForm.turma_id}
-                                    onChange={e =>
-                                        alterarCadastro(
-                                            'turma_id',
-                                            e.target.value
-                                        )
+                        {tipoCadastro === 'aluno' ? (
+                            <>
+                                <Campo
+                                    label="Matrícula"
+                                    value={cadastroForm.matricula}
+                                    onChange={v =>
+                                        alterarCadastro('matricula', v)
                                     }
-                                >
-                                    <option value="">Vincular depois</option>
-                                    {turmas.filter(ativo).map(turma => (
-                                        <option
-                                            key={turma.id}
-                                            value={turma.id}
-                                        >
-                                            {turma.nome} — {turma.ano_letivo}
-                                        </option>
-                                    ))}
-                                </select>
-                            </Campo>
-                        </>
-                    ) : (
-                        <>
-                            <Campo
-                                label="E-mail"
-                                type="email"
-                                value={cadastroForm.email}
-                                onChange={v =>
-                                    alterarCadastro('email', v)
-                                }
-                                required
-                            />
+                                    required
+                                />
 
-                            <Campo
-                                label="Senha inicial"
-                                type="password"
-                                value={cadastroForm.senha}
-                                onChange={v =>
-                                    alterarCadastro('senha', v)
-                                }
-                                required
-                                minLength={8}
-                                placeholder="Mínimo de 8 caracteres"
-                            />
+                                <CampoDataNascimento
+                                    value={cadastroForm.data_nascimento}
+                                    onChange={v =>
+                                        alterarCadastro('data_nascimento', v)
+                                    }
+                                />
 
-                            {tipoCadastro === 'professor' ? (
-                                <>
-                                    <Campo label="Turma">
+                                <Campo label="Turma">
+                                    <select
+                                        value={cadastroForm.turma_id}
+                                        onChange={e =>
+                                            alterarCadastro(
+                                                'turma_id',
+                                                e.target.value
+                                            )
+                                        }
+                                    >
+                                        <option value="">Vincular depois</option>
+                                        {turmas.filter(ativo).map(turma => (
+                                            <option
+                                                key={turma.id}
+                                                value={turma.id}
+                                            >
+                                                {turma.nome} — {turma.ano_letivo}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </Campo>
+                            </>
+                        ) : (
+                            <>
+                                <Campo
+                                    label="E-mail"
+                                    type="email"
+                                    value={cadastroForm.email}
+                                    onChange={v =>
+                                        alterarCadastro('email', v)
+                                    }
+                                    required
+                                />
+
+                                <Campo
+                                    label="Senha inicial"
+                                    type="password"
+                                    value={cadastroForm.senha}
+                                    onChange={v =>
+                                        alterarCadastro('senha', v)
+                                    }
+                                    required
+                                    minLength={8}
+                                    placeholder="Mínimo de 8 caracteres"
+                                />
+
+                                {tipoCadastro === 'professor' ? (
+                                    <>
+                                        <Campo label="Turma">
+                                            <select
+                                                value={cadastroForm.turma_id}
+                                                onChange={e =>
+                                                    alterarCadastro(
+                                                        'turma_id',
+                                                        e.target.value
+                                                    )
+                                                }
+                                            >
+                                                <option value="">
+                                                    Vincular depois
+                                                </option>
+
+                                                {turmas.filter(ativo).map(turma => (
+                                                    <option
+                                                        key={turma.id}
+                                                        value={turma.id}
+                                                    >
+                                                        {turma.nome} — {turma.ano_letivo}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </Campo>
+
+                                        <Campo label="Disciplina">
+                                            <select
+                                                value={cadastroForm.disciplina_id}
+                                                required={Boolean(
+                                                    cadastroForm.turma_id
+                                                )}
+                                                onChange={e =>
+                                                    alterarCadastro(
+                                                        'disciplina_id',
+                                                        e.target.value
+                                                    )
+                                                }
+                                            >
+                                                <option value="">Selecione</option>
+
+                                                {disciplinas.map(disciplina => (
+                                                    <option
+                                                        key={disciplina.id}
+                                                        value={disciplina.id}
+                                                    >
+                                                        {disciplina.nome}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </Campo>
+                                    </>
+                                ) : (
+                                    <Campo label="Aluno vinculado">
                                         <select
-                                            value={cadastroForm.turma_id}
+                                            value={cadastroForm.aluno_id}
                                             onChange={e =>
                                                 alterarCadastro(
-                                                    'turma_id',
+                                                    'aluno_id',
                                                     e.target.value
                                                 )
                                             }
@@ -928,191 +1040,79 @@ export default function Cadastros() {
                                                 Vincular depois
                                             </option>
 
-                                            {turmas.filter(ativo).map(turma => (
+                                            {alunos.filter(ativo).map(aluno => (
                                                 <option
-                                                    key={turma.id}
-                                                    value={turma.id}
+                                                    key={aluno.id}
+                                                    value={aluno.id}
                                                 >
-                                                    {turma.nome} — {turma.ano_letivo}
+                                                    {aluno.nome}
                                                 </option>
                                             ))}
                                         </select>
                                     </Campo>
+                                )}
+                            </>
+                        )}
 
-                                    <Campo label="Disciplina">
-                                        <select
-                                            value={cadastroForm.disciplina_id}
-                                            required={Boolean(
-                                                cadastroForm.turma_id
-                                            )}
-                                            onChange={e =>
-                                                alterarCadastro(
-                                                    'disciplina_id',
-                                                    e.target.value
-                                                )
-                                            }
-                                        >
-                                            <option value="">Selecione</option>
+                        <div className="admin-form-acoes">
+                            <button
+                                type="submit"
+                                className="admin-botao-principal"
+                                disabled={salvandoCadastro}
+                            >
+                                <Plus size={17} />
+                                {salvandoCadastro
+                                    ? 'Salvando...'
+                                    : 'Cadastrar'}
+                            </button>
+                        </div>
+                    </form>
+                </section>
+            </div>
 
-                                            {disciplinas.map(disciplina => (
-                                                <option
-                                                    key={disciplina.id}
-                                                    value={disciplina.id}
-                                                >
-                                                    {disciplina.nome}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </Campo>
-                                </>
-                            ) : (
-                                <Campo label="Aluno vinculado">
-                                    <select
-                                        value={cadastroForm.aluno_id}
-                                        onChange={e =>
-                                            alterarCadastro(
-                                                'aluno_id',
-                                                e.target.value
-                                            )
-                                        }
-                                    >
-                                        <option value="">
-                                            Vincular depois
-                                        </option>
-
-                                        {alunos.filter(ativo).map(aluno => (
-                                            <option
-                                                key={aluno.id}
-                                                value={aluno.id}
-                                            >
-                                                {aluno.nome}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </Campo>
-                            )}
-                        </>
-                    )}
-
-                    <div className="admin-form-acoes">
-                        <button
-                            type="submit"
-                            className="admin-botao-principal"
-                            disabled={salvandoCadastro}
-                        >
-                            <Plus size={17} />
-                            {salvandoCadastro
-                                ? 'Salvando...'
-                                : 'Cadastrar'}
-                        </button>
+            <div
+                className="admin-cadastros-painel"
+                id="cadastros-painel-turmas"
+                role="tabpanel"
+                aria-labelledby="cadastros-aba-turmas"
+                hidden={abaAtiva !== 'turmas'}
+            >
+                <section className="admin-painel">
+                    <div className="admin-painel-topo">
+                        <div>
+                            <h3>Cadastrar turma</h3>
+                        </div>
                     </div>
-                </form>
-            </section>
 
-            <section className="admin-painel">
-                <div className="admin-painel-topo">
-                    <div>
-                        <span>ORGANIZAÇÃO ESCOLAR</span>
-                        <h3>Cadastrar turma</h3>
-                    </div>
-                </div>
-
-                <form
-                    className="admin-form-grid"
-                    onSubmit={salvarTurma}
-                >
-                    <Campo
-                        label="Nome da turma"
-                        value={turmaForm.nome}
-                        onChange={v =>
-                            alterarTurma('nome', v)
-                        }
-                        required
-                        placeholder="Ex.: 6º Ano A"
-                    />
-
-                    <Campo
-                        label="Ano letivo"
-                        type="number"
-                        value={turmaForm.ano_letivo}
-                        onChange={v =>
-                            alterarTurma('ano_letivo', v)
-                        }
-                        required
-                    />
-
-                    <Campo label="Período">
-                        <select
-                            value={turmaForm.periodo}
-                            onChange={e =>
-                                alterarTurma(
-                                    'periodo',
-                                    e.target.value
-                                )
-                            }
-                        >
-                            {Object.entries(nomesPeriodos).map(
-                                ([valor, nome]) => (
-                                    <option
-                                        key={valor}
-                                        value={valor}
-                                    >
-                                        {nome}
-                                    </option>
-                                )
-                            )}
-                        </select>
-                    </Campo>
-
-                    <div className="admin-form-acoes">
-                        <button
-                            type="submit"
-                            className="admin-botao-principal"
-                        >
-                            <Plus size={17} />
-                            Cadastrar turma
-                        </button>
-                    </div>
-                </form>
-            </section>
-
-            <section className="admin-painel">
-                <div className="admin-painel-topo">
-                    <div>
-                        <span>TURMAS CADASTRADAS</span>
-                        <h3>Gerenciar turmas</h3>
-                    </div>
-                </div>
-
-                {editandoTurma !== null && (
                     <form
                         className="admin-form-grid"
-                        onSubmit={salvarEdicaoTurma}
+                        onSubmit={salvarTurma}
                     >
                         <Campo
                             label="Nome da turma"
-                            value={formTurmaEdicao.nome}
+                            value={turmaForm.nome}
                             onChange={v =>
-                                alterarEdicaoTurma('nome', v)
+                                alterarTurma('nome', v)
                             }
                             required
+                            placeholder="Ex.: 6º Ano A"
                         />
 
                         <Campo
                             label="Ano letivo"
                             type="number"
-                            value={formTurmaEdicao.ano_letivo}
+                            value={turmaForm.ano_letivo}
                             onChange={v =>
-                                alterarEdicaoTurma('ano_letivo', v)
+                                alterarTurma('ano_letivo', v)
                             }
                             required
                         />
 
                         <Campo label="Período">
                             <select
-                                value={formTurmaEdicao.periodo}
+                                value={turmaForm.periodo}
                                 onChange={e =>
-                                    alterarEdicaoTurma(
+                                    alterarTurma(
                                         'periodo',
                                         e.target.value
                                     )
@@ -1135,266 +1135,67 @@ export default function Cadastros() {
                             <button
                                 type="submit"
                                 className="admin-botao-principal"
-                                disabled={processando}
                             >
-                                <Save size={17} />
-                                Salvar alterações
-                            </button>
-
-                            <button
-                                type="button"
-                                className="admin-botao-secundario"
-                                onClick={() =>
-                                    setEditandoTurma(null)
-                                }
-                            >
-                                <X size={17} />
-                                Cancelar
+                                <Plus size={17} />
+                                Cadastrar turma
                             </button>
                         </div>
                     </form>
-                )}
+                </section>
 
-                <div className="admin-tabela-container">
-                    <table className="admin-tabela">
-                        <thead>
-                            <tr>
-                                <th>Turma</th>
-                                <th>Ano letivo</th>
-                                <th>Período</th>
-                                <th>Status</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            {turmas.map(turma => (
-                                <tr key={turma.id}>
-                                    <td>{turma.nome}</td>
-                                    <td>{turma.ano_letivo}</td>
-                                    <td>
-                                        {nomesPeriodos[turma.periodo] ||
-                                            turma.periodo}
-                                    </td>
-                                    <td>
-                                        {ativo(turma)
-                                            ? 'Ativa'
-                                            : 'Inativa'}
-                                    </td>
-                                    <td>
-                                        <div className="admin-tabela-acoes">
-                                            <BotaoAcao
-                                                titulo="Editar turma"
-                                                onClick={() =>
-                                                    iniciarEdicaoTurma(turma)
-                                                }
-                                            >
-                                                <Pencil size={16} />
-                                            </BotaoAcao>
-
-                                            {ativo(turma) ? (
-                                                <BotaoAcao
-                                                    titulo="Desativar turma"
-                                                    disabled={processando}
-                                                    onClick={() =>
-                                                        desativarTurma(turma)
-                                                    }
-                                                >
-                                                    <Trash2 size={16} />
-                                                </BotaoAcao>
-                                            ) : (
-                                                <BotaoAcao
-                                                    titulo="Reativar turma"
-                                                    disabled={processando}
-                                                    onClick={() =>
-                                                        reativarTurma(turma)
-                                                    }
-                                                >
-                                                    <RotateCcw size={16} />
-                                                </BotaoAcao>
-                                            )}
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-
-                            {turmas.length === 0 && (
-                                <tr>
-                                    <td colSpan={5}>
-                                        Nenhuma turma cadastrada.
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <section className="admin-painel">
-                <div className="admin-painel-topo">
-                    <div>
-                        <span>GERENCIAMENTO</span>
-                        <h3>
-                            Alunos, professores e responsáveis
-                        </h3>
-                    </div>
-                </div>
-
-                <div className="admin-filtros">
-                    <Campo
-                        label="Buscar"
-                        type="search"
-                        value={filtroCadastro.busca}
-                        onChange={v =>
-                            alterarFiltro('busca', v)
-                        }
-                        placeholder="Nome, matrícula ou e-mail"
-                    />
-
-                    <Campo label="Perfil">
-                        <select
-                            value={filtroCadastro.perfil}
-                            onChange={e =>
-                                alterarFiltro(
-                                    'perfil',
-                                    e.target.value
-                                )
-                            }
-                        >
-                            <option value="">Todos</option>
-                            <option value="Aluno">Aluno</option>
-                            <option value="Professor">
-                                Professor
-                            </option>
-                            <option value="Responsável">
-                                Responsável
-                            </option>
-                        </select>
-                    </Campo>
-
-                    <Campo label="Turma">
-                        <select
-                            value={filtroCadastro.turma}
-                            onChange={e =>
-                                alterarFiltro(
-                                    'turma',
-                                    e.target.value
-                                )
-                            }
-                        >
-                            <option value="">Todas</option>
-
-                            {turmas.map(turma => (
-                                <option
-                                    key={turma.id}
-                                    value={turma.id}
-                                >
-                                    {turma.nome}
-                                </option>
-                            ))}
-                        </select>
-                    </Campo>
-
-                    <Campo label="Ano letivo">
-                        <select
-                            value={filtroCadastro.ano}
-                            onChange={e =>
-                                alterarFiltro(
-                                    'ano',
-                                    e.target.value
-                                )
-                            }
-                        >
-                            <option value="">Todos</option>
-
-                            {anos.map(ano => (
-                                <option
-                                    key={ano}
-                                    value={ano}
-                                >
-                                    {ano}
-                                </option>
-                            ))}
-                        </select>
-                    </Campo>
-                </div>
-
-                {editando && (
-                    <div className="admin-edicao">
-                        <div className="admin-painel-topo">
-                            <div>
-                                <span>EDITAR CADASTRO</span>
-                                <h3>{editando.nome}</h3>
-                            </div>
-
-                            <button
-                                type="button"
-                                onClick={() => setEditando(null)}
-                                aria-label="Fechar edição"
-                            >
-                                <X size={18} />
-                            </button>
+                <section className="admin-painel">
+                    <div className="admin-painel-topo">
+                        <div>
+                            <h3>Gerenciar turmas</h3>
                         </div>
+                    </div>
 
+                    {editandoTurma !== null && (
                         <form
                             className="admin-form-grid"
-                            onSubmit={salvarEdicao}
+                            onSubmit={salvarEdicaoTurma}
                         >
                             <Campo
-                                label="Nome completo"
-                                value={formEdicao.nome}
+                                label="Nome da turma"
+                                value={formTurmaEdicao.nome}
                                 onChange={v =>
-                                    alterarEdicao('nome', v)
+                                    alterarEdicaoTurma('nome', v)
                                 }
                                 required
                             />
 
-                            {editando.tipo === 'aluno' ? (
-                                <>
-                                    <Campo
-                                        label="Matrícula"
-                                        value={formEdicao.matricula}
-                                        onChange={v =>
-                                            alterarEdicao('matricula', v)
-                                        }
-                                        required
-                                    />
+                            <Campo
+                                label="Ano letivo"
+                                type="number"
+                                value={formTurmaEdicao.ano_letivo}
+                                onChange={v =>
+                                    alterarEdicaoTurma('ano_letivo', v)
+                                }
+                                required
+                            />
 
-                                    <CampoDataNascimento
-                                        key={`aluno-${editando.id}`}
-                                        value={formEdicao.data_nascimento}
-                                        onChange={v =>
-                                            alterarEdicao(
-                                                'data_nascimento',
-                                                v
-                                            )
-                                        }
-                                    />
-                                </>
-                            ) : (
-                                <>
-                                    <Campo
-                                        label="E-mail"
-                                        type="email"
-                                        value={formEdicao.email}
-                                        onChange={v =>
-                                            alterarEdicao('email', v)
-                                        }
-                                        required
-                                    />
-
-                                    <Campo
-                                        label="Nova senha (opcional)"
-                                        type="password"
-                                        value={formEdicao.senha}
-                                        onChange={v =>
-                                            alterarEdicao('senha', v)
-                                        }
-                                        minLength={8}
-                                        placeholder="Deixe em branco para manter"
-                                    />
-                                </>
-                            )}
+                            <Campo label="Período">
+                                <select
+                                    value={formTurmaEdicao.periodo}
+                                    onChange={e =>
+                                        alterarEdicaoTurma(
+                                            'periodo',
+                                            e.target.value
+                                        )
+                                    }
+                                >
+                                    {Object.entries(nomesPeriodos).map(
+                                        ([valor, nome]) => (
+                                            <option
+                                                key={valor}
+                                                value={valor}
+                                            >
+                                                {nome}
+                                            </option>
+                                        )
+                                    )}
+                                </select>
+                            </Campo>
 
                             <div className="admin-form-acoes">
                                 <button
@@ -1409,99 +1210,371 @@ export default function Cadastros() {
                                 <button
                                     type="button"
                                     className="admin-botao-secundario"
-                                    onClick={() => setEditando(null)}
+                                    onClick={() =>
+                                        setEditandoTurma(null)
+                                    }
                                 >
+                                    <X size={17} />
                                     Cancelar
                                 </button>
                             </div>
                         </form>
+                    )}
+
+                    <div className="admin-tabela-container">
+                        <table className="admin-tabela" role="table">
+                            <thead role="rowgroup">
+                                <tr role="row">
+                                    <th role="columnheader" scope="col">Turma</th>
+                                    <th role="columnheader" scope="col">Ano letivo</th>
+                                    <th role="columnheader" scope="col">Período</th>
+                                    <th role="columnheader" scope="col">Status</th>
+                                    <th role="columnheader" scope="col">Ações</th>
+                                </tr>
+                            </thead>
+
+                            <tbody role="rowgroup">
+                                {turmas.map(turma => (
+                                    <tr role="row" key={turma.id}>
+                                        <td role="cell" data-coluna="Turma">{turma.nome}</td>
+                                        <td role="cell" data-coluna="Ano letivo">{turma.ano_letivo}</td>
+                                        <td role="cell" data-coluna="Período">
+                                            {nomesPeriodos[turma.periodo] ||
+                                                turma.periodo}
+                                        </td>
+                                        <td role="cell" data-coluna="Status">
+                                            {ativo(turma)
+                                                ? 'Ativa'
+                                                : 'Inativa'}
+                                        </td>
+                                        <td role="cell" data-coluna="Ações">
+                                            <div className="admin-tabela-acoes">
+                                                <BotaoAcao
+                                                    titulo="Editar turma"
+                                                    onClick={() =>
+                                                        iniciarEdicaoTurma(turma)
+                                                    }
+                                                >
+                                                    <Pencil size={16} />
+                                                </BotaoAcao>
+
+                                                {ativo(turma) ? (
+                                                    <BotaoAcao
+                                                        titulo="Desativar turma"
+                                                        disabled={processando}
+                                                        onClick={() =>
+                                                            desativarTurma(turma)
+                                                        }
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </BotaoAcao>
+                                                ) : (
+                                                    <BotaoAcao
+                                                        titulo="Reativar turma"
+                                                        disabled={processando}
+                                                        onClick={() =>
+                                                            reativarTurma(turma)
+                                                        }
+                                                    >
+                                                        <RotateCcw size={16} />
+                                                    </BotaoAcao>
+                                                )}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+
+                                {turmas.length === 0 && (
+                                    <tr role="row">
+                                        <td role="cell" colSpan={5}>
+                                            Nenhuma turma cadastrada.
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
                     </div>
-                )}
+                </section>
+            </div>
 
-                <div className="admin-tabela-container">
-                    <table className="admin-tabela">
-                        <thead>
-                            <tr>
-                                <th>Nome</th>
-                                <th>Perfil</th>
-                                <th>Informações</th>
-                                <th>Vínculos</th>
-                                <th>Status</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
+            <div
+                className="admin-cadastros-painel"
+                id="cadastros-painel-gerenciar"
+                role="tabpanel"
+                aria-labelledby="cadastros-aba-gerenciar"
+                hidden={abaAtiva !== 'gerenciar'}
+            >
+                <section className="admin-painel">
+                    <div className="admin-painel-topo">
+                        <div>
+                            <h3>
+                                Alunos, professores e responsáveis
+                            </h3>
+                        </div>
+                    </div>
 
-                        <tbody>
-                            {filtrados.map(registro => (
-                                <tr key={registro.chave}>
-                                    <td>{registro.nome}</td>
-                                    <td>{registro.perfil}</td>
-                                    <td>{registro.detalhes}</td>
-                                    <td>{registro.vinculo}</td>
-                                    <td>{registro.status}</td>
-                                    <td>
-                                        <div className="admin-tabela-acoes">
-                                            <BotaoAcao
-                                                titulo="Visualizar detalhes"
-                                                onClick={() =>
-                                                    setVisualizando(registro)
-                                                }
-                                            >
-                                                <Eye size={16} />
-                                            </BotaoAcao>
+                    <div className="admin-filtros">
+                        <Campo
+                            label="Buscar"
+                            type="search"
+                            value={filtroCadastro.busca}
+                            onChange={v =>
+                                alterarFiltro('busca', v)
+                            }
+                            placeholder="Nome, matrícula ou e-mail"
+                        />
 
-                                            <BotaoAcao
-                                                titulo="Editar cadastro"
-                                                onClick={() =>
-                                                    iniciarEdicao(
-                                                        registro.original
-                                                    )
-                                                }
-                                            >
-                                                <Pencil size={16} />
-                                            </BotaoAcao>
+                        <Campo label="Perfil">
+                            <select
+                                value={filtroCadastro.perfil}
+                                onChange={e =>
+                                    alterarFiltro(
+                                        'perfil',
+                                        e.target.value
+                                    )
+                                }
+                            >
+                                <option value="">Todos</option>
+                                <option value="Aluno">Aluno</option>
+                                <option value="Professor">
+                                    Professor
+                                </option>
+                                <option value="Responsável">
+                                    Responsável
+                                </option>
+                            </select>
+                        </Campo>
 
-                                            {registro.status === 'Ativo' ? (
+                        <Campo label="Turma">
+                            <select
+                                value={filtroCadastro.turma}
+                                onChange={e =>
+                                    alterarFiltro(
+                                        'turma',
+                                        e.target.value
+                                    )
+                                }
+                            >
+                                <option value="">Todas</option>
+
+                                {turmas.map(turma => (
+                                    <option
+                                        key={turma.id}
+                                        value={turma.id}
+                                    >
+                                        {turma.nome}
+                                    </option>
+                                ))}
+                            </select>
+                        </Campo>
+
+                        <Campo label="Ano letivo">
+                            <select
+                                value={filtroCadastro.ano}
+                                onChange={e =>
+                                    alterarFiltro(
+                                        'ano',
+                                        e.target.value
+                                    )
+                                }
+                            >
+                                <option value="">Todos</option>
+
+                                {anos.map(ano => (
+                                    <option
+                                        key={ano}
+                                        value={ano}
+                                    >
+                                        {ano}
+                                    </option>
+                                ))}
+                            </select>
+                        </Campo>
+                    </div>
+
+                    {editando && (
+                        <div className="admin-edicao">
+                            <div className="admin-painel-topo">
+                                <div>
+                                    <h3>Editar cadastro de {editando.nome}</h3>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    onClick={() => setEditando(null)}
+                                    aria-label="Fechar edição"
+                                >
+                                    <X size={18} />
+                                </button>
+                            </div>
+
+                            <form
+                                className="admin-form-grid"
+                                onSubmit={salvarEdicao}
+                            >
+                                <Campo
+                                    label="Nome completo"
+                                    value={formEdicao.nome}
+                                    onChange={v =>
+                                        alterarEdicao('nome', v)
+                                    }
+                                    required
+                                />
+
+                                {editando.tipo === 'aluno' ? (
+                                    <>
+                                        <Campo
+                                            label="Matrícula"
+                                            value={formEdicao.matricula}
+                                            onChange={v =>
+                                                alterarEdicao('matricula', v)
+                                            }
+                                            required
+                                        />
+
+                                        <CampoDataNascimento
+                                            key={`aluno-${editando.id}`}
+                                            value={formEdicao.data_nascimento}
+                                            onChange={v =>
+                                                alterarEdicao(
+                                                    'data_nascimento',
+                                                    v
+                                                )
+                                            }
+                                        />
+                                    </>
+                                ) : (
+                                    <>
+                                        <Campo
+                                            label="E-mail"
+                                            type="email"
+                                            value={formEdicao.email}
+                                            onChange={v =>
+                                                alterarEdicao('email', v)
+                                            }
+                                            required
+                                        />
+
+                                        <Campo
+                                            label="Nova senha (opcional)"
+                                            type="password"
+                                            value={formEdicao.senha}
+                                            onChange={v =>
+                                                alterarEdicao('senha', v)
+                                            }
+                                            minLength={8}
+                                            placeholder="Deixe em branco para manter"
+                                        />
+                                    </>
+                                )}
+
+                                <div className="admin-form-acoes">
+                                    <button
+                                        type="submit"
+                                        className="admin-botao-principal"
+                                        disabled={processando}
+                                    >
+                                        <Save size={17} />
+                                        Salvar alterações
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        className="admin-botao-secundario"
+                                        onClick={() => setEditando(null)}
+                                    >
+                                        Cancelar
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    )}
+
+                    <div className="admin-tabela-container">
+                        <table className="admin-tabela" role="table">
+                            <thead role="rowgroup">
+                                <tr role="row">
+                                    <th role="columnheader" scope="col">Nome</th>
+                                    <th role="columnheader" scope="col">Perfil</th>
+                                    <th role="columnheader" scope="col">Informações</th>
+                                    <th role="columnheader" scope="col">Vínculos</th>
+                                    <th role="columnheader" scope="col">Status</th>
+                                    <th role="columnheader" scope="col">Ações</th>
+                                </tr>
+                            </thead>
+
+                            <tbody role="rowgroup">
+                                {filtrados.map(registro => (
+                                    <tr role="row" key={registro.chave}>
+                                        <td role="cell" data-coluna="Nome">{registro.nome}</td>
+                                        <td role="cell" data-coluna="Perfil">{registro.perfil}</td>
+                                        <td role="cell" data-coluna="Informações">{registro.detalhes}</td>
+                                        <td role="cell" data-coluna="Vínculos">{registro.vinculo}</td>
+                                        <td role="cell" data-coluna="Status">{registro.status}</td>
+                                        <td role="cell" data-coluna="Ações">
+                                            <div className="admin-tabela-acoes">
                                                 <BotaoAcao
-                                                    titulo="Desativar cadastro"
-                                                    disabled={processando}
+                                                    titulo="Visualizar detalhes"
                                                     onClick={() =>
-                                                        desativarRegistro(
+                                                        setVisualizando(registro)
+                                                    }
+                                                >
+                                                    <Eye size={16} />
+                                                </BotaoAcao>
+
+                                                <BotaoAcao
+                                                    titulo="Editar cadastro"
+                                                    onClick={() =>
+                                                        iniciarEdicao(
                                                             registro.original
                                                         )
                                                     }
                                                 >
-                                                    <Trash2 size={16} />
+                                                    <Pencil size={16} />
                                                 </BotaoAcao>
-                                            ) : (
-                                                <BotaoAcao
-                                                    titulo="Reativar cadastro"
-                                                    disabled={processando}
-                                                    onClick={() =>
-                                                        reativarRegistro(
-                                                            registro.original
-                                                        )
-                                                    }
-                                                >
-                                                    <RotateCcw size={16} />
-                                                </BotaoAcao>
-                                            )}
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
 
-                            {filtrados.length === 0 && (
-                                <tr>
-                                    <td colSpan={6}>
-                                        Nenhum cadastro encontrado.
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-            </section>
+                                                {registro.status === 'Ativo' ? (
+                                                    <BotaoAcao
+                                                        titulo="Desativar cadastro"
+                                                        disabled={processando}
+                                                        onClick={() =>
+                                                            desativarRegistro(
+                                                                registro.original
+                                                            )
+                                                        }
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </BotaoAcao>
+                                                ) : (
+                                                    <BotaoAcao
+                                                        titulo="Reativar cadastro"
+                                                        disabled={processando}
+                                                        onClick={() =>
+                                                            reativarRegistro(
+                                                                registro.original
+                                                            )
+                                                        }
+                                                    >
+                                                        <RotateCcw size={16} />
+                                                    </BotaoAcao>
+                                                )}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+
+                                {filtrados.length === 0 && (
+                                    <tr role="row">
+                                        <td role="cell" colSpan={6}>
+                                            Nenhum cadastro encontrado.
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
 
             {(erroLocal || erroCadastro) && (
                 <p

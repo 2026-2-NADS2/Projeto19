@@ -15,14 +15,13 @@
 .conteudo-sobre {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr);
-  align-items: center;
+  align-items: start;
 
   width: min(100%, 1600px);
-  min-height: calc(100vh - 72px);
   margin: 0 auto;
 
-  padding: 90px 5%;
-  gap: clamp(40px, 5vw, 90px);
+  padding: clamp(44px, 7vh, 76px) 5% clamp(42px, 6vh, 70px);
+  gap: clamp(28px, 4vw, 64px);
 }
 
 /* COLUNAS */
@@ -38,24 +37,13 @@
 
 /* LADO ESQUERDO */
 
-.sobre-etiqueta,
-.subtitulo-metodo {
-  margin: 0 0 20px;
-
-  color: var(--destaque-claro);
-
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-}
-
 .lado-esquerdo-sobre h1 {
   max-width: 650px;
   margin: 0;
 
   color: var(--texto);
 
-  font-size: clamp(42px, 3.8vw, 64px);
+  font-size: clamp(36px, 3.5vw, 54px);
   font-weight: 600;
   line-height: 1.1;
   letter-spacing: -2px;
@@ -67,7 +55,7 @@
 
 .sobre-descricao {
   max-width: 620px;
-  margin: 30px 0 0;
+  margin: 18px 0 0;
 
   color: var(--texto-secundario);
 
@@ -84,7 +72,7 @@
   flex-wrap: wrap;
 
   gap: 12px;
-  margin-top: 32px;
+  margin-top: 20px;
 }
 
 .informacoes-kfka div {
@@ -136,7 +124,7 @@
 
 .descricao-metodo {
   max-width: 680px;
-  margin: 20px 0 32px;
+  margin: 12px 0 20px;
 
   color: var(--texto-secundario);
 
@@ -148,45 +136,16 @@
 
 .cards-metodo {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
 
-  gap: 16px;
+  gap: 0;
 }
 
 .card-metodo {
   min-width: 0;
-  min-height: 230px;
-
-  padding: 24px 20px;
-
-  background: rgba(86, 38, 128, 0.42);
-
-  border: 1px solid rgba(184, 167, 206, 0.28);
-  border-radius: 12px;
-
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-
-  transition:
-    transform 0.2s,
-    background 0.2s,
-    border-color 0.2s;
-}
-
-.card-metodo:hover {
-  transform: translateY(-3px);
-
-  background: rgba(100, 47, 148, 0.48);
-  border-color: var(--destaque-claro);
-}
-
-.numero-card {
-  display: block;
-  margin-bottom: 20px;
-
-  color: var(--destaque-claro);
-
-  font-size: 14px;
-  font-weight: 600;
+  min-height: 0;
+  padding: 16px 0;
+  border-top: 1px solid var(--borda);
 }
 
 .card-metodo h3 {
@@ -213,7 +172,7 @@
   .conteudo-sobre {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
 
-    padding: 75px 5%;
+    padding: clamp(34px, 6vh, 58px) 5%;
     gap: 40px;
   }
 
@@ -225,10 +184,6 @@
     grid-template-columns: 1fr;
   }
 
-  .card-metodo {
-    min-height: auto;
-    padding: 20px;
-  }
 }
 
 /* TABLETS */
@@ -238,13 +193,13 @@
     grid-template-columns: 1fr;
     min-height: auto;
 
-    padding: 80px 6%;
-    gap: 60px;
+    padding: clamp(34px, 6vh, 58px) 5%;
+    gap: 34px;
   }
 
   .lado-esquerdo-sobre h1 {
     max-width: 650px;
-    font-size: clamp(38px, 6vw, 54px);
+    font-size: clamp(34px, 5.5vw, 46px);
   }
 
   .cards-metodo {
@@ -256,13 +211,8 @@
 
 @media (max-width: 600px) {
   .conteudo-sobre {
-    padding: 55px 22px 65px;
-    gap: 50px;
-  }
-
-  .sobre-etiqueta,
-  .subtitulo-metodo {
-    font-size: 12px;
+    padding: clamp(34px, 6vh, 58px) 5%;
+    gap: 34px;
   }
 
   .lado-esquerdo-sobre h1 {
@@ -271,7 +221,7 @@
   }
 
   .sobre-descricao {
-    margin-top: 24px;
+    margin-top: 20px;
     font-size: 15px;
   }
 
@@ -294,11 +244,6 @@
 
   .cards-metodo {
     grid-template-columns: 1fr;
-  }
-
-  .card-metodo {
-    min-height: auto;
-    padding: 22px;
   }
 
   .card-metodo h3 {

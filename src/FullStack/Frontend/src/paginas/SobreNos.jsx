@@ -10,19 +10,13 @@ function SobreNos() {
 
         <section className="lado-esquerdo-sobre">
 
-          <p className="sobre-etiqueta">
-            SOBRE NÓS
-          </p>
-
           <h1>
             Tecnologia com
             <span> clareza e propósito.</span>
           </h1>
 
           <p className="sobre-descricao">
-            A KFKA Technology Consulting foi fundada em 2011 e atua
-            no desenvolvimento de soluções tecnológicas, combinando
-            conhecimento técnico com uma visão estratégica.
+            Fundada em 2011, a KFKA Technology Consulting atua em arquitetura de sistemas, segurança e inteligência artificial.
           </p>
 
           <div className="informacoes-kfka">
@@ -49,10 +43,6 @@ function SobreNos() {
 
         <section className="lado-direito-sobre">
 
-          <p className="subtitulo-metodo">
-            NOSSA ESSÊNCIA
-          </p>
-
           <h2>
             Transformar com
             <span> inteligência.</span>
@@ -69,10 +59,6 @@ function SobreNos() {
 
             <article className="card-metodo">
 
-              <span className="numero-card">
-                01
-              </span>
-
               <h3>Clareza</h3>
 
               <p>
@@ -85,10 +71,6 @@ function SobreNos() {
 
             <article className="card-metodo">
 
-              <span className="numero-card">
-                02
-              </span>
-
               <h3>Propósito</h3>
 
               <p>
@@ -100,10 +82,6 @@ function SobreNos() {
 
 
             <article className="card-metodo">
-
-              <span className="numero-card">
-                03
-              </span>
 
               <h3>Inteligência</h3>
 

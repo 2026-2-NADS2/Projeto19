@@ -2,12 +2,12 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import bancoDados from '../bancoDados.js';
-import autenticar from '../middlewares/autenticar.js';
+import autenticarComCiencia from '../middlewares/autenticarComCiencia.js';
 
 const router = Router();
 
 // Exigir autenticação
-router.use(autenticar);
+router.use(autenticarComCiencia);
 
 // Somente administradores
 router.use((req, res, next) => {

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import Cabecalho from '../componentes/Cabecalho.jsx'
+import LinkRetornoLegal from '../componentes/LinkRetornoLegal.jsx'
 import './PaginasLegais.css'
 
 export default function PoliticaPrivacidade() {
@@ -54,7 +55,7 @@ export default function PoliticaPrivacidade() {
         </section>
 
         <nav className="pagina-legal-links" aria-label="Links da Política de Privacidade">
-          <Link to="/login">Voltar ao login</Link>
+          <LinkRetornoLegal />
           <Link to="/termos-de-uso">Termos de Uso</Link>
         </nav>
       </main>

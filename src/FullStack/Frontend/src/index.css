@@ -213,6 +213,10 @@ html.acessibilidade-reduzir-movimento *::after {
 
 /* Layout das páginas públicas */
 
+body:has(:is(.home, .sobre-plataforma, .sobre-nos, .contato, .pagina-login, .recursos)) {
+    min-width: 0;
+}
+
 :where(.conteudo-plataforma,
     .conteudo-sobre,
     .conteudo-recursos,
@@ -247,26 +251,6 @@ html.acessibilidade-reduzir-movimento *::after {
     .contato-canais) {
     width: 100%;
     min-width: 0;
-}
-
-/* Etiquetas */
-
-:where(.plataforma-etiqueta,
-    .subtitulo-plataforma,
-    .sobre-etiqueta,
-    .subtitulo-metodo,
-    .recursos-etiqueta,
-    .recursos-listagem-etiqueta,
-    .contato-etiqueta,
-    .contato-canais-etiqueta) {
-    margin: 0 0 18px;
-
-    color: var(--destaque-claro);
-
-    font-size: 12px;
-    font-weight: 700;
-    line-height: 1.4;
-    letter-spacing: 1.5px;
 }
 
 /* Títulos principais */
@@ -369,10 +353,6 @@ html.acessibilidade-reduzir-movimento *::after {
     margin-bottom: 12px;
 }
 
-.recurso-numero {
-    font-size: 11px;
-}
-
 .recursos-fluxo strong {
     font-size: 12px;
 }
@@ -407,8 +387,7 @@ html.acessibilidade-reduzir-movimento *::after {
 
 /* Cards de plataforma e sobre nós */
 
-.card-plataforma,
-.card-metodo {
+.card-plataforma {
     min-width: 0;
     min-height: 190px;
     padding: 20px;
@@ -438,8 +417,7 @@ html.acessibilidade-reduzir-movimento *::after {
         grid-template-columns: 1fr;
     }
 
-    .card-plataforma,
-    .card-metodo {
+    .card-plataforma {
         min-height: auto;
     }
 }
@@ -489,17 +467,11 @@ html.acessibilidade-reduzir-movimento *::after {
         font-size: clamp(24px, 4vw, 30px);
     }
 
-    .recursos {
-        overflow: visible;
-    }
-
-    .recursos-grid,
     .contato-lista {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .card-plataforma,
-    .card-metodo {
+    .card-plataforma {
         min-height: auto;
     }
 }
@@ -531,15 +503,13 @@ html.acessibilidade-reduzir-movimento *::after {
         font-size: clamp(24px, 6vw, 27px);
     }
 
-    .recursos-grid,
     .contato-lista {
         grid-template-columns: 1fr;
     }
 
     .recurso-card,
     .contato-item,
-    .card-plataforma,
-    .card-metodo {
+    .card-plataforma {
         min-height: auto;
     }
 }

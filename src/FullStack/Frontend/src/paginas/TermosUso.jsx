@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import Cabecalho from '../componentes/Cabecalho.jsx'
+import LinkRetornoLegal from '../componentes/LinkRetornoLegal.jsx'
 import './PaginasLegais.css'
 
 export default function TermosUso() {
@@ -39,7 +40,7 @@ export default function TermosUso() {
         </section>
 
         <nav className="pagina-legal-links" aria-label="Links dos Termos de Uso">
-          <Link to="/login">Voltar ao login</Link>
+          <LinkRetornoLegal />
           <Link to="/politica-de-privacidade">Política de Privacidade</Link>
         </nav>
       </main>

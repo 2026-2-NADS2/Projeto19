@@ -128,9 +128,9 @@ function HistoricoFamiliar() {
   }
 
   const estiloCampo = {
-    background: '#180d23',
-    color: '#fff',
-    border: '1px solid #67477d',
+    background: 'var(--campo)',
+    color: 'var(--texto)',
+    border: '1px solid var(--borda)',
     borderRadius: 8,
     padding: '10px 12px',
     minHeight: 42,
@@ -138,7 +138,7 @@ function HistoricoFamiliar() {
   }
 
   return (
-    <section style={{ padding: '24px 0', color: '#fff' }}>
+    <section style={{ padding: '12px 0 24px', color: 'var(--texto)' }}>
       <div style={{
         display: 'flex',
         justifyContent: 'space-between',
@@ -148,11 +148,8 @@ function HistoricoFamiliar() {
         marginBottom: 20
       }}>
         <div>
-          <span style={{ color: '#c4a3e7', fontSize: 12, fontWeight: 700 }}>
-            ACOMPANHAMENTO DA FAMÍLIA
-          </span>
-          <h2 style={{ margin: '6px 0' }}>Histórico familiar</h2>
-          <p style={{ color: '#cbb8d7', margin: 0 }}>
+          <h2>Histórico familiar</h2>
+          <p style={{ color: 'var(--texto-secundario)', margin: '7px 0 0' }}>
             Consulte as ações registradas pelos responsáveis, sem notificações.
           </p>
         </div>
@@ -203,8 +200,8 @@ function HistoricoFamiliar() {
       {!carregando && !erro && filtrados.length === 0 && (
         <div style={{
           padding: 24,
-          border: '1px solid #56366a',
-          borderRadius: 12
+          border: '1px solid var(--borda)',
+          borderRadius: 9
         }}>
           Nenhum registro encontrado.
         </div>
@@ -217,9 +214,9 @@ function HistoricoFamiliar() {
               key={log.id}
               style={{
                 padding: 18,
-                borderRadius: 12,
-                background: '#21132d',
-                border: '1px solid #56366a'
+                borderRadius: 9,
+                background: 'var(--painel)',
+                border: '1px solid var(--borda)'
               }}
             >
               <div style={{
@@ -870,7 +867,6 @@ export default function Administrador() {
               >
                 <div className="admin-modal-topo">
                   <div>
-                    <span>ACOMPANHAMENTO</span>
                     <h3>{alunoSelecionado.nome}</h3>
                     <p>
                       {alunoSelecionado.disciplina}
@@ -971,7 +967,7 @@ export default function Administrador() {
                     style={{
                       marginTop: 24,
                       padding: 18,
-                      borderRadius: 12,
+                      borderRadius: 9,
                       background: '#23112f',
                       border: '1px solid #69418a'
                     }}

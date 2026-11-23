@@ -185,6 +185,100 @@
   font-size: 10px;
 }
 
+/* Cadastros e vínculos */
+
+body:has(.admin-cadastros-abas) {
+  min-width: 0;
+}
+
+.admin-cadastros-painel .admin-tabela-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.admin-cadastros-abas {
+  display: inline-grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  max-width: 100%;
+  margin-bottom: 16px;
+  padding: 4px;
+  border: 1px solid var(--borda);
+  border-radius: 10px;
+  background: var(--painel);
+}
+
+.admin-cadastros-abas button {
+  min-height: 44px;
+  padding: 6px clamp(8px, 2vw, 18px);
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--texto-secundario);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.admin-cadastros-abas button:hover {
+  background: var(--campo-hover);
+  color: var(--texto);
+}
+
+.admin-cadastros-abas button[aria-selected="true"] {
+  border-color: var(--destaque-claro);
+  background: var(--painel-secundario);
+  color: var(--texto);
+}
+
+.admin-cadastros-painel > .admin-painel + .admin-painel {
+  margin-top: 16px;
+}
+
+@media (max-width: 650px) {
+  .admin-cadastros-abas {
+    display: grid;
+  }
+
+  .admin-cadastros-abas button {
+    padding-inline: 3px;
+  }
+
+  .admin-cadastros-painel .admin-tabela,
+  .admin-cadastros-painel .admin-tabela tbody {
+    display: block;
+  }
+
+  .admin-cadastros-painel .admin-tabela thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    clip-path: inset(50%);
+    overflow: hidden;
+  }
+
+  .admin-cadastros-painel .admin-tabela tr {
+    display: grid;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--borda);
+  }
+
+  .admin-cadastros-painel .admin-tabela td[data-coluna] {
+    display: grid;
+    grid-template-columns: minmax(0, 6.5rem) minmax(0, 1fr);
+    gap: 8px;
+    padding: 5px 0;
+    border: 0;
+  }
+
+  .admin-cadastros-painel .admin-tabela td[data-coluna]::before {
+    content: attr(data-coluna) / "";
+    color: var(--texto-secundario);
+    font-weight: 600;
+  }
+}
+
 /* Painéis */
 
 .admin-painel,
@@ -215,7 +309,7 @@
 }
 
 .admin-painel-topo h3 {
-  margin: 4px 0 0;
+  margin: 0;
   color: var(--texto);
   font-size: 17px;
   font-weight: 600;
@@ -244,12 +338,12 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 14px;
-  min-height: 108px;
-  padding: 20px;
+  gap: 9px;
+  min-height: 92px;
+  padding: 16px;
   background: var(--painel);
   border: 1px solid var(--borda);
-  border-radius: 11px;
+  border-radius: 9px;
 }
 
 .admin-card span {

@@ -574,10 +574,6 @@ export default function Responsavel() {
           id="dashboard"
         >
           <div>
-            <span className="responsavel-subtitulo">
-              ÁREA DO RESPONSÁVEL
-            </span>
-
             <h2>Acompanhamento escolar</h2>
 
             <p>
@@ -633,7 +629,6 @@ export default function Responsavel() {
           <>
             <section className="responsavel-selecao">
               <div className="responsavel-secao-cabecalho">
-                <span>ALUNOS VINCULADOS</span>
                 <h3>Selecione o aluno</h3>
               </div>
 
@@ -711,10 +706,6 @@ export default function Responsavel() {
             >
               <div className="responsavel-secao-topo">
                 <div>
-                  <span className="responsavel-secao-label">
-                    ACOMPANHAMENTOS PUBLICADOS
-                  </span>
-
                   <h3>{alunoAtual.nome}</h3>
 
                   <p>
@@ -941,8 +932,6 @@ export default function Responsavel() {
               id="evolucao"
             >
               <div className="responsavel-secao-cabecalho">
-                <span>EVOLUÇÃO DO ALUNO</span>
-
                 <h3>Desenvolvimento ao longo do ano</h3>
 
                 <p>
@@ -963,7 +952,6 @@ export default function Responsavel() {
               id="historico"
             >
               <div className="responsavel-secao-cabecalho">
-                <span>HISTÓRICO</span>
                 <h3>Registros da família</h3>
 
                 <p>
@@ -1054,10 +1042,6 @@ export default function Responsavel() {
           >
             <header className="responsavel-modal-topo">
               <div>
-                <span>
-                  ACOMPANHAMENTO ESCOLAR
-                </span>
-
                 <h3>
                   {acompanhamentoAberto.disciplina}
                 </h3>
@@ -1216,10 +1200,6 @@ export default function Responsavel() {
           >
             <header className="responsavel-modal-topo">
               <div>
-                <span>
-                  REGISTRO DA FAMÍLIA
-                </span>
-
                 <h3>
                   Registrar observação
                 </h3>

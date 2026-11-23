@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import bancoDados from '../bancoDados.js';
-import autenticar from '../middlewares/autenticar.js';
+import autenticarComCiencia from '../middlewares/autenticarComCiencia.js';
 
 export const falha = (status, mensagem) => Object.assign(new Error(mensagem), { status });
 export const id = valor => {
@@ -21,7 +21,7 @@ export function criarContexto(pool = bancoDados) {
     const router = Router();
 
     const rota = (metodo, caminho, perfis, executar) =>
-        router[metodo](caminho, autenticar, async (req, res) => {
+        router[metodo](caminho, autenticarComCiencia, async (req, res) => {
             let conexao;
             try {
                 if (!perfis.includes(req.usuario.perfil)) throw falha(403, 'Acesso não autorizado.');

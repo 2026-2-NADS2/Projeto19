@@ -109,10 +109,6 @@ function Login() {
         </Link>
 
         <div className="conteudo-login-esquerda">
-          <p className="login-etiqueta">
-            ACOMPANHAMENTO ESCOLAR
-          </p>
-
           <h1>
             Acompanhar de perto
             <span>faz a diferença.</span>
@@ -132,10 +128,6 @@ function Login() {
             <ArrowLeft size={18} />
             Voltar ao início
           </Link>
-
-          <p className="login-form-etiqueta">
-            ACESSO À PLATAFORMA
-          </p>
 
           <h1>Bem-vindo!</h1>
 

@@ -1,11 +1,11 @@
 
 import { Router } from 'express';
 import bancoDados from '../bancoDados.js';
-import autenticar from '../middlewares/autenticar.js';
+import autenticarComCiencia from '../middlewares/autenticarComCiencia.js';
 
 const router = Router();
 
-router.use(autenticar);
+router.use(autenticarComCiencia);
 
 // Somente administradores
 router.use((req, res, next) => {

@@ -1,0 +1,182 @@
+.ciencia-documentos-pagina {
+  display: grid;
+  place-items: center;
+  min-height: 100svh;
+  padding: clamp(1rem, 4vw, 3rem);
+}
+
+.ciencia-documentos {
+  width: 100%;
+  max-width: 41rem;
+  padding: clamp(1rem, 4vw, 2.5rem);
+  border: 1px solid var(--borda);
+  border-radius: 1.25rem;
+  background: var(--painel);
+  box-shadow: 0 1rem 3rem var(--sidebar);
+  text-align: center;
+}
+
+.ciencia-documentos-escudo {
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  margin: 0 auto 1rem;
+  border: 1px solid var(--borda);
+  border-radius: 1rem;
+  background: var(--painel-secundario);
+  color: var(--destaque-claro);
+}
+
+.ciencia-documentos h1 {
+  font-size: clamp(1.65rem, 4vw, 2.35rem);
+}
+
+.ciencia-documentos .pagina-legal-minuta {
+  font-size: 0.875rem;
+}
+
+.ciencia-documentos .ciencia-documentos-lista {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 1.5rem 0 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+.ciencia-documentos .ciencia-documentos-lista li {
+  display: flex;
+  margin: 0;
+}
+
+.ciencia-documentos-lista a {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  min-height: 4.5rem;
+  padding: 0.8rem;
+  border: 1px solid var(--borda);
+  border-radius: 0.75rem;
+  background: var(--campo);
+  color: var(--texto);
+  text-decoration: none;
+  line-height: 1.4;
+}
+
+.ciencia-documentos-lista a:hover {
+  border-color: var(--destaque-claro);
+  background: var(--campo-hover);
+}
+
+.ciencia-documentos-icone {
+  color: var(--destaque-claro);
+}
+
+.ciencia-documentos-lista strong,
+.ciencia-documentos-lista small {
+  display: block;
+}
+
+.ciencia-documentos-lista strong {
+  font-size: 0.9rem;
+}
+
+.ciencia-documentos-lista small {
+  margin-top: 0.25rem;
+  color: var(--texto-secundario);
+  font-size: 0.8rem;
+}
+
+.ciencia-documentos form {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.ciencia-documentos-declaracao {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.875rem;
+  border: 1px solid var(--borda);
+  border-radius: 0.75rem;
+  background: var(--campo);
+  text-align: left;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+.ciencia-documentos-declaracao input {
+  flex: none;
+  width: 1.15rem;
+  height: 1.15rem;
+  margin-top: 0.1rem;
+  accent-color: var(--destaque);
+}
+
+.ciencia-documentos button {
+  min-height: 2.75rem;
+  padding: 0.55rem 1rem;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ciencia-documentos-confirmar {
+  border: 1px solid var(--destaque);
+  border-radius: 0.75rem;
+  background: var(--destaque);
+  color: #ffffff;
+}
+
+.ciencia-documentos-confirmar:hover:not(:disabled) {
+  background: var(--destaque-hover);
+}
+
+.ciencia-documentos-confirmar:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.ciencia-documentos-acoes {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.ciencia-documentos-acoes button {
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--texto-secundario);
+  font-size: 0.875rem;
+  text-underline-offset: 0.2em;
+}
+
+.ciencia-documentos-acoes button:hover {
+  color: var(--texto);
+  text-decoration: underline;
+}
+
+.ciencia-documentos :is(button, a, input):focus-visible {
+  outline: 2px solid var(--texto);
+  outline-offset: 3px;
+}
+
+.ciencia-documentos [role="alert"] {
+  margin-top: 0.75rem;
+  color: var(--erro);
+}
+
+@media (max-width: 36rem) {
+  .ciencia-documentos .ciencia-documentos-lista {
+    grid-template-columns: 1fr;
+  }
+}

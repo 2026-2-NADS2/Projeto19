@@ -10,10 +10,6 @@ function SobrePlataforma() {
 
         <section className="lado-esquerdo-plataforma">
 
-          <p className="plataforma-etiqueta">
-            NOSSA PLATAFORMA
-          </p>
-
           <h1>
             Tecnologia que
             <span> aproxima escola e família.</span>
@@ -41,10 +37,6 @@ function SobrePlataforma() {
 
 
         <section className="lado-direito-plataforma">
-
-          <p className="subtitulo-plataforma">
-            COMO FUNCIONA
-          </p>
 
           <h2>
             Uma plataforma,

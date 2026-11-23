@@ -711,3 +711,54 @@ As seguintes documentações e materiais foram utilizados como referência para 
 <p align="center">
   Desenvolvido pela equipe <strong>Sintonia Tech</strong> como parte das atividades acadêmicas da FECAP.
 </p>
+
+## Ciência das minutas legais no ambiente de teste
+
+O fluxo registra ciência da Política de Privacidade e dos Termos de Uso para
+administradores, professores e responsáveis. A interface identifica as versões
+como minutas em revisão e a finalidade como teste.
+
+1. Com o bloqueio desligado, conecte-se ao MySQL de teste com uma conta que
+   possa criar tabelas. Confirme o servidor e o banco usados pelo backend de
+   teste. No cliente MySQL, execute os comandos abaixo, substituindo o nome da
+   base e usando o caminho absoluto da migração:
+
+   ```sql
+   SELECT @@hostname, DATABASE();
+   USE nome_da_base_de_teste;
+   SELECT DATABASE();
+   SOURCE C:/Projetos/Projeto19/src/FullStack/Backend/sql/ciencias_documentos_legais.sql
+   SHOW CREATE TABLE ciencias_documentos_legais;
+   SELECT COUNT(*) FROM ciencias_documentos_legais;
+   ```
+
+   Confira a chave primária composta, a chave estrangeira para `usuarios(id)`
+   e o campo `confirmado_em` com precisão de microssegundos. A tabela recém-criada
+   começa vazia. A conta de execução do backend precisa de leitura e inserção
+   nessa tabela, além dos privilégios que já usa.
+2. Publique o frontend e configure `KFKA_CIENCIA_LEGAL_TESTE=true` somente no
+   backend de teste. Reinicie esse backend. Com a variável ausente ou definida
+   como `false`, as rotas operacionais funcionam sem consultar a nova tabela.
+3. Entre com uma conta de cada perfil e abra também a URL protegida diretamente.
+   Antes de confirmar, espere a tela de ciência e HTTP 403 com o código
+   `CIENCIA_DOCUMENTOS_PENDENTE` nas chamadas operacionais autenticadas. O login,
+   a rota `GET /perfil` e a consulta `GET /ciencia-documentos` devem continuar
+   disponíveis conforme a autenticação de cada rota.
+4. Confirme, recarregue a página e verifique o painel. Consulte o histórico no
+   MySQL. Repetir o POST com as mesmas versões deve preservar o horário e a
+   quantidade de linhas.
+
+   ```sql
+   SELECT usuario_id, versao_termos, versao_privacidade, confirmado_em
+   FROM ciencias_documentos_legais
+   ORDER BY confirmado_em;
+   ```
+
+Atualize o identificador do documento correspondente em
+`src/FullStack/Backend/src/cienciaDocumentos.js` e em
+src/FullStack/Frontend/src/componentes/CienciaDocumentos.jsx a cada revisão publicada.
+Publique o frontend
+com a minuta correspondente antes de disponibilizar as novas versões pela API.
+O horário é armazenado em UTC. Para desligar o fluxo, defina a variável como
+`false` e reinicie o backend de teste. A tabela e o histórico ficam disponíveis
+para consulta.

@@ -150,19 +150,8 @@
   margin-bottom: 28px;
 }
 
-.professor-area {
-  display: block;
-
-  color: var(--destaque-claro);
-
-  font-size: 10px;
-  font-weight: 700;
-
-  letter-spacing: 1.5px;
-}
-
 .professor-topo h2 {
-  margin-top: 5px;
+  margin: 0;
 
   color: var(--texto);
 
@@ -307,14 +296,12 @@
 /* PAINEL */
 
 .professor-painel {
-  padding: 25px;
+  padding: clamp(16px, 2vw, 22px);
 
   background: var(--painel);
 
   border: 1px solid var(--borda);
-  border-radius: 14px;
-
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+  border-radius: 10px;
 }
 
 .professor-painel-topo {
@@ -327,17 +314,8 @@
   margin-bottom: 24px;
 }
 
-.professor-painel-topo span {
-  color: var(--destaque-claro);
-
-  font-size: 9px;
-  font-weight: 700;
-
-  letter-spacing: 1.5px;
-}
-
 .professor-painel-topo h3 {
-  margin-top: 4px;
+  margin: 0;
 
   color: var(--texto);
 
@@ -753,15 +731,6 @@
   gap: 20px;
 
   margin-bottom: 18px;
-}
-
-.professor-modal-topo span {
-  color: var(--destaque-claro);
-
-  font-size: 9px;
-  font-weight: 700;
-
-  letter-spacing: 1.4px;
 }
 
 .professor-modal-topo h3 {
@@ -1187,4 +1156,52 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* Busca de alunos por turma */
+.professor-busca-atual {
+  color: var(--texto-secundario);
+  font-size: 12px;
+}
+
+.professor-busca-resultados {
+  min-width: 0;
+  color: var(--texto);
+  background: var(--painel);
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+}
+
+.professor-busca-resultados ul {
+  max-height: 14rem;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.professor-busca-resultados li {
+  display: grid;
+  gap: 4px;
+  min-height: 44px;
+  padding: 8px 12px;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.professor-busca-resultados li + li {
+  border-top: 1px solid var(--borda);
+}
+
+.professor-busca-resultados li:hover,
+.professor-busca-resultados li[data-ativo="true"] {
+  background: var(--painel-secundario);
+}
+
+.professor-busca-resultados small,
+.professor-busca-resultados p {
+  color: var(--texto-secundario);
+  font-size: 12px;
+}
+
+.professor-busca-resultados p {
+  padding: 12px;
 }

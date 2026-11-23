@@ -64,10 +64,6 @@ function Recursos() {
 
         <section className="recursos-apresentacao">
 
-          <p className="recursos-etiqueta">
-            RECURSOS
-          </p>
-
           <h1>
             Acompanhamento escolar
             <span> em um só lugar.</span>
@@ -107,10 +103,6 @@ function Recursos() {
 
         <section className="recursos-listagem">
 
-          <p className="recursos-listagem-etiqueta">
-            FUNCIONALIDADES
-          </p>
-
           <h2>
             Recursos para cada
             <span> etapa.</span>
@@ -134,10 +126,6 @@ function Recursos() {
                   <div className="recurso-icone">
                     {recurso.icone}
                   </div>
-
-                  <span className="recurso-numero">
-                    {recurso.id}
-                  </span>
 
                 </div>
 

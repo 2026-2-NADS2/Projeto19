@@ -161,20 +161,9 @@
   margin-bottom: 32px;
 }
 
-.responsavel-subtitulo,
-.responsavel-secao-label,
 .responsavel-disciplina-label,
-.responsavel-secao-cabecalho > span {
-  color: var(--destaque-claro);
-
-  font-size: 10px;
-  font-weight: 700;
-
-  letter-spacing: 1.5px;
-}
-
 .responsavel-topo h2 {
-  margin-top: 5px;
+  margin: 0;
 
   color: var(--texto);
 
@@ -244,7 +233,7 @@
 }
 
 .responsavel-secao-cabecalho h3 {
-  margin-top: 4px;
+  margin: 0;
 
   color: var(--texto);
 
@@ -525,8 +514,6 @@
 }
 
 .responsavel-card {
-  min-height: 330px;
-
   padding: 20px;
 
   display: flex;
@@ -535,13 +522,12 @@
   background: var(--painel);
 
   border: 1px solid var(--borda);
-  border-radius: 12px;
+  border-radius: 10px;
 
   transition: 0.2s;
 }
 
 .responsavel-card:hover {
-  transform: translateY(-2px);
 
   border-color: var(--destaque-claro);
 }
@@ -933,15 +919,6 @@
   gap: 20px;
 
   margin-bottom: 18px;
-}
-
-.responsavel-modal-topo > div > span {
-  color: var(--destaque-claro);
-
-  font-size: 9px;
-  font-weight: 700;
-
-  letter-spacing: 1.4px;
 }
 
 .responsavel-modal-topo h3 {

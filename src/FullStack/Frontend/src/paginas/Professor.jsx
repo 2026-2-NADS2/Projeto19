@@ -18,10 +18,12 @@ import {
   Menu
 } from 'lucide-react'
 import { api } from '../servicos/api'
+import BuscaAluno from '../componentes/BuscaAluno.jsx'
 import './Professor.css'
 
 const vazio = {
   aluno_id: '',
+  turma_id: '',
   disciplina_id: '',
   periodo_id: '',
   media: '',
@@ -104,6 +106,7 @@ export default function Professor() {
   const [pagina, setPagina] = useState('novo')
   const [menuMobileAberto, setMenuMobileAberto] = useState(false)
 
+  const [filtroTurma, setFiltroTurma] = useState('')
   const [formulario, setFormulario] = useState({
     ...vazio,
     tags: []
@@ -202,26 +205,34 @@ export default function Professor() {
 
   // ALUNOS E DISCIPLINAS
 
-  const alunos = useMemo(() => {
-    const mapa = new Map()
+  const { alunos, turmas } = useMemo(() => {
+    const porAlunoETurma = new Map()
+    const porTurma = new Map()
 
-    vinculos.forEach(v => {
-      if (!mapa.has(v.aluno_id)) {
-        mapa.set(v.aluno_id, {
-          id: v.aluno_id,
-          nome: v.aluno,
-          turma: v.turma
-        })
-      }
-    })
+    for (const v of vinculos) {
+      const turmaId = String(v.turma_id)
+      porTurma.set(turmaId, { id: turmaId, nome: v.turma, ano: v.ano_letivo })
+      porAlunoETurma.set(`${v.aluno_id}-${turmaId}`, {
+        id: String(v.aluno_id),
+        nome: v.aluno,
+        turmaId,
+        turma: v.turma,
+        ano: v.ano_letivo
+      })
+    }
 
-    return [...mapa.values()]
+    return {
+      alunos: [...porAlunoETurma.values()],
+      turmas: [...porTurma.values()].sort((a, b) =>
+        b.ano - a.ano || a.nome.localeCompare(b.nome, 'pt-BR', { numeric: true }))
+    }
   }, [vinculos])
 
-  const vinculosAluno = vinculos.filter(
-    v =>
-      String(v.aluno_id) ===
-      String(formulario.aluno_id)
+  const turmaFiltrada = turmas.length === 1 ? turmas[0].id : filtroTurma
+  const alunosFiltrados = alunos.filter(a => !turmaFiltrada || a.turmaId === turmaFiltrada)
+  const vinculosAluno = vinculos.filter(v =>
+    String(v.aluno_id) === formulario.aluno_id &&
+    (!formulario.turma_id || String(v.turma_id) === formulario.turma_id)
   )
 
   const disciplinas = [
@@ -249,10 +260,12 @@ export default function Professor() {
       Number(vinculoEscolhido.ano_letivo)
   )
 
-  const alunoEscolhido = alunos.find(
-    a =>
-      String(a.id) ===
-      String(formulario.aluno_id)
+  const alunoEscolhido = alunos.find(a =>
+    a.id === formulario.aluno_id &&
+    (!formulario.turma_id || a.turmaId === formulario.turma_id)
+  )
+  const alunoDaTurma = alunos.find(a =>
+    a.id === formulario.aluno_id && a.turmaId === String(vinculoEscolhido?.turma_id)
   )
 
   const resumo = {
@@ -287,13 +300,19 @@ export default function Professor() {
     }))
   }
 
-  function selecionarAluno(e) {
-    setFormulario(atual => ({
-      ...atual,
-      aluno_id: e.target.value,
-      disciplina_id: '',
-      periodo_id: ''
-    }))
+  function selecionarAluno(aluno) {
+    setFiltroTurma(aluno.turmaId)
+    setFormulario(atual => {
+      if (atual.aluno_id === aluno.id && atual.turma_id === aluno.turmaId) return atual
+
+      return {
+        ...atual,
+        aluno_id: aluno.id,
+        turma_id: aluno.turmaId,
+        disciplina_id: '',
+        periodo_id: ''
+      }
+    })
   }
 
   function selecionarTag(id) {
@@ -721,10 +740,6 @@ export default function Professor() {
 
         <header className="professor-topo">
           <div>
-            <span className="professor-area">
-              ÁREA DO PROFESSOR
-            </span>
-
             <h2>Acompanhamento escolar</h2>
 
             <p>
@@ -805,12 +820,6 @@ export default function Professor() {
 
             <div className="professor-painel-topo">
               <div>
-                <span>
-                  {editandoId
-                    ? 'EDIÇÃO'
-                    : 'NOVO REGISTRO'}
-                </span>
-
                 <h3>
                   {editandoId
                     ? 'Corrigir acompanhamento'
@@ -822,8 +831,6 @@ export default function Professor() {
                   do aluno durante o período.
                 </p>
               </div>
-
-              <BookOpen size={24} />
             </div>
 
             <form
@@ -835,50 +842,44 @@ export default function Professor() {
             >
               <div className="professor-form-grid">
 
-                {/* ALUNO */}
-
                 <div className="professor-campo">
-                  <label htmlFor="aluno">
-                    Aluno *
-                  </label>
-
-                  <select
-                    id="aluno"
-                    value={formulario.aluno_id}
-                    onChange={selecionarAluno}
-                    disabled={Boolean(editandoId)}
-                  >
-                    <option value="">
-                      Selecione o aluno
-                    </option>
-
-                    {alunos.map(a => (
-                      <option
-                        key={a.id}
-                        value={a.id}
-                      >
-                        {a.nome}
-                      </option>
-                    ))}
-                  </select>
+                  <label htmlFor="turma">Turma</label>
+                  {editandoId ? (
+                    <input id="turma" value={alunoDaTurma?.turma || alunoEscolhido?.turma || ''} readOnly />
+                  ) : (
+                    <select
+                      id="turma"
+                      value={turmaFiltrada}
+                      onChange={e => setFiltroTurma(e.target.value)}
+                      disabled={turmas.length <= 1}
+                    >
+                      {turmas.length !== 1 && (
+                        <option value="">{turmas.length ? 'Todas as turmas' : 'Nenhuma turma disponível'}</option>
+                      )}
+                      {turmas.map(turma => (
+                        <option key={turma.id} value={turma.id}>
+                          {turma.nome} — {turma.ano}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                  {!editandoId && alunoEscolhido && turmaFiltrada && alunoEscolhido.turmaId !== turmaFiltrada && (
+                    <small className="professor-busca-atual">O aluno selecionado ainda pertence a {alunoEscolhido.turma}.</small>
+                  )}
                 </div>
 
-                {/* TURMA */}
-
-                <div className="professor-campo">
-                  <label htmlFor="turma">
-                    Turma
-                  </label>
-
-                  <input
-                    id="turma"
-                    value={
-                      alunoEscolhido?.turma || ''
-                    }
-                    readOnly
-                    placeholder="Turma do aluno"
+                {editandoId ? (
+                  <div className="professor-campo">
+                    <label htmlFor="aluno">Aluno *</label>
+                    <input id="aluno" value={alunoEscolhido?.nome || ''} readOnly />
+                  </div>
+                ) : (
+                  <BuscaAluno
+                    alunos={alunosFiltrados}
+                    selecionado={alunoEscolhido}
+                    aoSelecionar={selecionarAluno}
                   />
-                </div>
+                )}
 
                 {/* DISCIPLINA */}
 
@@ -1204,8 +1205,6 @@ export default function Professor() {
 
             <div className="professor-painel-topo">
               <div>
-                <span>MEUS REGISTROS</span>
-
                 <h3>Acompanhamentos</h3>
 
                 <p>
@@ -1334,10 +1333,6 @@ export default function Professor() {
           >
             <header className="professor-modal-topo">
               <div>
-                <span>
-                  ACOMPANHAMENTO ESCOLAR
-                </span>
-
                 <h3>
                   {selecionado.aluno}
                 </h3>
