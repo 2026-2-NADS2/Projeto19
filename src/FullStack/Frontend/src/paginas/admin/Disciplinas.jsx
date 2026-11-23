@@ -18,7 +18,8 @@ export default function Disciplinas() {
     setDisciplinaEditando,
     salvarArea,
     excluirArea,
-    salvarDisciplina
+    salvarDisciplina,
+    excluirDisciplina
   } = useAdmin()
 
   const [buscaArea, setBuscaArea] = useState('')
@@ -43,7 +44,7 @@ export default function Disciplinas() {
     setDisciplinaEditando(null)
     setDisciplinaForm({
       nome: '',
-      area: areas[0]?.nome || ''
+      area_id: ''
     })
   }
 
@@ -56,7 +57,7 @@ export default function Disciplinas() {
     setDisciplinaEditando(disciplina.id)
     setDisciplinaForm({
       nome: disciplina.nome,
-      area: disciplina.area || areas[0]?.nome || ''
+      area_id: disciplina.area_id ?? ''
     })
   }
 
@@ -171,7 +172,7 @@ export default function Disciplinas() {
               ) : (
                 areasFiltradas.map(area => {
                   const quantidade = disciplinas.filter(
-                    disciplina => disciplina.area === area.nome
+                    disciplina => disciplina.area_id === area.id
                   ).length
 
                   return (
@@ -268,11 +269,11 @@ export default function Disciplinas() {
               <select
                 id="area-disciplina"
                 required
-                value={disciplinaForm.area}
+                value={disciplinaForm.area_id}
                 onChange={e =>
                   setDisciplinaForm(anterior => ({
                     ...anterior,
-                    area: e.target.value
+                    area_id: e.target.value
                   }))
                 }
               >
@@ -283,7 +284,7 @@ export default function Disciplinas() {
                 {areas.map(area => (
                   <option
                     key={area.id}
-                    value={area.nome}
+                    value={area.id}
                   >
                     {area.nome}
                   </option>
@@ -372,12 +373,17 @@ export default function Disciplinas() {
                         Editar
                       </button>
 
-                      <span
-                        className="admin-disciplinas-indisponivel"
-                        title="Exclusão ainda não implementada no backend"
+                      <button
+                        type="button"
+                        className="admin-disciplinas-acao excluir"
+                        onClick={() => {
+                          if (window.confirm('Deseja excluir a disciplina "' + disciplina.nome + '"?')) {
+                            excluirDisciplina(disciplina.id)
+                          }
+                        }}
                       >
-                        Exclusão indisponível
-                      </span>
+                        Excluir
+                      </button>
                     </div>
                   </div>
                 ))

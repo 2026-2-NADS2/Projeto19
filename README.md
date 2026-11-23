@@ -308,6 +308,7 @@ O projeto utiliza tecnologias de desenvolvimento web Full Stack, banco de dados 
 | Express.js | Desenvolvimento da API e gerenciamento das rotas. |
 | JWT | Autenticação baseada em tokens assinados. |
 | bcryptjs | Geração e verificação de hashes de senhas. |
+| Zod | Validação de dados recebidos pela API. |
 | CORS | Configuração da comunicação entre origens. |
 | dotenv | Leitura das variáveis de ambiente. |
 
@@ -604,6 +605,45 @@ O KFKA utiliza autenticação baseada em **JWT (JSON Web Token)** e controle de 
 
 As senhas são armazenadas utilizando hashes gerados com `bcryptjs`, evitando seu armazenamento em texto simples.
 
+### RF01 — Recuperação de senha
+
+Em **Esqueceu sua senha?**, informe o e-mail da conta. A API responde da mesma forma para e-mails cadastrados e desconhecidos. No modo de demonstração, somente quem tem acesso ao terminal privado do backend pode copiar o link de uma conta ativa. O token tem 256 bits de entropia, vence em 15 minutos e fica no fragmento da URL. O MySQL recebe o hash SHA-256, o prazo e os dados necessários para validar e consumir o token.
+
+O link mais recente substitui o anterior. O MySQL aplica a alteração de senha e o consumo do token na mesma operação. O limite por IP e por processo é de cinco solicitações e dez tentativas de redefinição por janela de 15 minutos.
+
+#### Demonstração local
+
+1. Selecione o banco **local de teste** no MySQL Workbench e execute apenas o arquivo `src/FullStack/Backend/sql/recuperacoes_senha.sql`. A migração adiciona uma tabela e pode ser reaplicada. O banco selecionado já deve ter a tabela `usuarios`. Não reimporte o dump sobre um banco existente.
+2. Configure `DB_*` para o banco de teste e gere `JWT_SECRET` com `node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"`. No `.env` do backend, acrescente:
+
+   ```dotenv
+   DB_HOST=127.0.0.1
+   NODE_ENV=development
+   HOST=127.0.0.1
+   PORT=3333
+   KFKA_RECUPERACAO_LOCAL=true
+   ```
+
+3. Na pasta `src/FullStack/Backend`, execute `npm ci`, `npm test` e `npm run dev`. Os testes automatizados usam banco simulado.
+4. Em outro terminal, na pasta `src/FullStack/Frontend`, configure `VITE_API_URL=http://127.0.0.1:3333` no `.env.local`. Execute `npm ci` e `npm run dev -- --host localhost --port 5173 --strictPort`.
+5. Abra `http://localhost:5173/login`, solicite a recuperação de uma conta local ativa e copie o link do terminal do backend. Defina a nova senha e teste o login. Use um terminal privado e mantenha a demonstração fora de proxies, túneis e coletores de logs.
+
+As novas senhas devem ter pelo menos oito caracteres e até 72 bytes em UTF-8. O administrador inicial continua exigindo pelo menos 12 caracteres. As senhas cadastradas continuam sendo verificadas pelo hash existente.
+
+#### Alwaysdata
+
+Defina `NODE_ENV=production` e `KFKA_RECUPERACAO_LOCAL=false`. Mantenha `JWT_SECRET` e `DB_*` no ambiente privado do backend. Use o `HOST` ou `IP` e o `PORT` atribuídos ao site, preservando o encaminhamento do prefixo `/api` e o fallback do React para `index.html`. Execute `npm ci --omit=dev` no backend e inicie com `npm start`. Selecione o banco da aplicação e aplique a migração aditiva antes de disponibilizar a versão.
+
+A hospedagem mantém a orientação de procurar a administração da escola enquanto a entrega por SMTP estiver indisponível. O serviço recebe um adaptador de entrega, que futuramente pode enviar o link para o e-mail da conta. As respostas HTTP nunca incluem tokens ou links.
+
+[Documentação de Node.js na Alwaysdata](https://help.alwaysdata.com/en/docs/web-hosting/languages/nodejs/configuration/)
+
+
+### Áreas de conhecimento e disciplinas
+
+A tela de disciplinas persiste as áreas no MySQL. Execute `src/FullStack/Backend/sql/areas_disciplinas.sql` uma vez em cada banco que já possua o esquema KFKA. A migração adiciona a tabela de áreas e a coluna opcional `disciplinas.area_id`. Ela associa disciplinas conhecidas às áreas padrão e mantém as demais disponíveis para classificação manual. O administrador pode corrigir o nome e a área de uma disciplina. O banco impede excluir uma disciplina vinculada a professores ou acompanhamentos, ou uma área que ainda tenha disciplinas.
+
+Em uma atualização autorizada da Alwaysdata, faça backup e aplique `recuperacoes_senha.sql` e `areas_disciplinas.sql` pelo cliente SQL com o banco de destino já selecionado. Aplique `areas_disciplinas.sql` somente se a coluna ainda não existir. Mantenha o dump completo fora do procedimento de atualização. Use Node.js 24, execute `npm ci --omit=dev` no backend e `npm ci` seguido de `npm run build` no frontend. Use a configuração de API existente, publique o diretório `dist` no momento autorizado e preserve o fallback de rotas React. Mantenha a recuperação local desativada na hospedagem.
 ### Controle de acesso
 
 As funcionalidades são separadas de acordo com os três perfis:

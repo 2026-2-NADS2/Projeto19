@@ -40,6 +40,8 @@ export default function Tags() {
   }
 
   useEffect(() => {
+    // A mesma consulta atualiza o indicador no início e após alterações.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     carregarTags()
   }, [])
 

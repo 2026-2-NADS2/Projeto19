@@ -5,7 +5,7 @@ export const API_URL = (
 
 let encerrandoSessao = false
 
-export function encerrarSessao() {
+export function encerrarSessao(expirada = true) {
     if (encerrandoSessao) return
 
     encerrandoSessao = true
@@ -13,9 +13,15 @@ export function encerrarSessao() {
     sessionStorage.removeItem('kfka_token')
     sessionStorage.removeItem('kfka_usuario')
 
-    sessionStorage.setItem('kfka_sessao_expirada', 'true')
+    if (expirada) sessionStorage.setItem('kfka_sessao_expirada', 'true')
+    else sessionStorage.removeItem('kfka_sessao_expirada')
 
     window.location.replace('/login')
+}
+
+export function sairDaConta(evento) {
+    evento.preventDefault()
+    encerrarSessao(false)
 }
 
 export function verificarSessao() {

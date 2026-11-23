@@ -1,16 +1,21 @@
+import { z } from 'zod';
+import { falha } from '../middlewares/erros.js';
 import { Router } from 'express';
 import autenticar from '../middlewares/autenticar.js';
 import { cienciaAtiva, consultarCiencia, registrarCiencia, versoes } from '../cienciaDocumentos.js';
 
 export function criarRotasCiencia(pool) {
     const router = Router();
+    const aceite = z.strictObject({
+        ciente: z.literal(true), versaoTermos: z.string(), versaoPrivacidade: z.string()
+    });
 
     router.use('/ciencia-documentos', (req, res, next) => {
         res.set('Cache-Control', 'no-store');
         next();
     });
 
-    router.get('/ciencia-documentos', autenticar, async (req, res) => {
+    router.get('/ciencia-documentos', autenticar, async (req, res, next) => {
         try {
             const ativo = cienciaAtiva();
             const confirmado = ativo ? await consultarCiencia(req.usuario, pool) : false;
@@ -20,23 +25,23 @@ export function criarRotasCiencia(pool) {
             }
 
             res.json({ ativo, confirmado, perfil: req.usuario.perfil, ...versoes });
-        } catch (erro) {
-            console.error('Erro ao consultar ciência dos documentos:', erro.message);
-            res.status(503).json({ mensagem: 'Não foi possível consultar a ciência dos documentos.' });
+        } catch {
+            next(falha(503, 'Não foi possível consultar a ciência dos documentos.'));
         }
     });
 
-    router.post('/ciencia-documentos', autenticar, async (req, res) => {
+    router.post('/ciencia-documentos', autenticar, async (req, res, next) => {
         if (!cienciaAtiva()) {
             return res.status(403).json({ mensagem: 'A confirmação de ciência está desativada.' });
         }
 
-        const { ciente, versaoTermos, versaoPrivacidade, ...outrosCampos } = req.body ?? {};
+        const dados = aceite.safeParse(req.body);
 
-        if (ciente !== true || Object.keys(outrosCampos).length > 0) {
+        if (!dados.success) {
             return res.status(400).json({ mensagem: 'Envie apenas a confirmação e as versões exibidas.' });
         }
 
+        const { versaoTermos, versaoPrivacidade } = dados.data;
         if (versaoTermos !== versoes.versaoTermos || versaoPrivacidade !== versoes.versaoPrivacidade) {
             return res.status(409).json({
                 mensagem: 'As versões das minutas mudaram. Atualize a página e consulte os documentos novamente.'
@@ -49,9 +54,8 @@ export function criarRotasCiencia(pool) {
             }
 
             res.json({ ativo: true, confirmado: true, perfil: req.usuario.perfil, ...versoes });
-        } catch (erro) {
-            console.error('Erro ao registrar ciência dos documentos:', erro.message);
-            res.status(503).json({ mensagem: 'Não foi possível registrar a ciência dos documentos.' });
+        } catch {
+            next(falha(503, 'Não foi possível registrar a ciência dos documentos.'));
         }
     });
 

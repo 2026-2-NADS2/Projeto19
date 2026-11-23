@@ -7,7 +7,7 @@ import {
   CalendarDays, Tag, ChevronRight, X, Save, Clock3,
   Eye, Menu
 } from 'lucide-react'
-import { api } from '../servicos/api'
+import { api, sairDaConta } from '../servicos/api'
 import './Responsavel.css'
 import { gerarPdfAcompanhamento } from '../servicos/gerarPdfAcompanhamento'
 import GraficoEvolucao from '../componentes/GraficoEvolucao'
@@ -237,6 +237,8 @@ export default function Responsavel() {
     return () => {
       ativo = false
     }
+    // Carrega os dados ao entrar. A atualização do histórico tem seus próprios acionamentos.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const alunoAtual = alunos.find(
@@ -560,6 +562,7 @@ export default function Responsavel() {
             <Clock3 size={19} />
             Histórico
           </a>
+          <Link to="/login" onClick={sairDaConta}>Sair da conta</Link>
         </nav>
       </aside>
 

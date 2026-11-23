@@ -1,9 +1,14 @@
 
 import { Router } from 'express';
+import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 import bancoDados from '../bancoDados.js';
 import autenticarComCiencia from '../middlewares/autenticarComCiencia.js';
 
+import { email as emailSchema, idPositivo, senhaNova, textoObrigatorio } from '../validacao.js';
+
+const nomeValido = textoObrigatorio(150);
+const perfilCadastro = z.enum(['professor', 'responsavel']);
 const router = Router();
 
 // Exigir autenticação
@@ -20,73 +25,45 @@ router.use((req, res, next) => {
     next();
 });
 
-// Validar ID
 function validarId(valor) {
-    const id = Number(valor);
-
-    if (!Number.isSafeInteger(id) || id <= 0) {
-        return null;
-    }
-
-    return id;
-}
-
-// Validar e-mail
-function emailValido(email) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    return idPositivo.safeParse(valor).data ?? null;
 }
 
 // Listar usuários
 router.get('/', async (req, res) => {
-    try {
-        const [usuarios] = await bancoDados.query(
-            `SELECT id, nome, email, perfil, ativo, criado_em
-             FROM usuarios
-             ORDER BY id`
-        );
+    const [usuarios] = await bancoDados.query(
+        `SELECT id, nome, email, perfil, ativo, criado_em
+         FROM usuarios
+         ORDER BY id`
+    );
 
-        res.json(usuarios);
-    } catch (erro) {
-        console.error('Erro ao listar usuários:', erro.message);
-
-        res.status(500).json({
-            mensagem: 'Erro ao listar usuários.'
-        });
-    }
+    res.json(usuarios);
 });
 
 // Buscar usuário por ID
 router.get('/:id', async (req, res) => {
-    try {
-        const usuarioId = validarId(req.params.id);
+    const usuarioId = validarId(req.params.id);
 
-        if (!usuarioId) {
-            return res.status(400).json({
-                mensagem: 'ID inválido.'
-            });
-        }
-
-        const [usuarios] = await bancoDados.query(
-            `SELECT id, nome, email, perfil, ativo, criado_em
-             FROM usuarios
-             WHERE id = ?`,
-            [usuarioId]
-        );
-
-        if (usuarios.length === 0) {
-            return res.status(404).json({
-                mensagem: 'Usuário não encontrado.'
-            });
-        }
-
-        res.json(usuarios[0]);
-    } catch (erro) {
-        console.error('Erro ao buscar usuário:', erro.message);
-
-        res.status(500).json({
-            mensagem: 'Erro interno ao buscar usuário.'
+    if (!usuarioId) {
+        return res.status(400).json({
+            mensagem: 'ID inválido.'
         });
     }
+
+    const [usuarios] = await bancoDados.query(
+        `SELECT id, nome, email, perfil, ativo, criado_em
+         FROM usuarios
+         WHERE id = ?`,
+        [usuarioId]
+    );
+
+    if (usuarios.length === 0) {
+        return res.status(404).json({
+            mensagem: 'Usuário não encontrado.'
+        });
+    }
+
+    res.json(usuarios[0]);
 });
 
 // Cadastrar professor ou responsável
@@ -95,29 +72,24 @@ router.post('/', async (req, res) => {
         const { nome, email, senha, perfil } = req.body ?? {};
 
         if (
-            typeof nome !== 'string' ||
-            typeof email !== 'string' ||
-            typeof senha !== 'string' ||
-            typeof perfil !== 'string' ||
-            !nome.trim() ||
-            !email.trim() ||
-            senha.length < 8
+            !nomeValido.safeParse(nome).success ||
+            !senhaNova.safeParse(senha).success
         ) {
             return res.status(400).json({
-                mensagem: 'Informe nome, e-mail, perfil e senha com pelo menos 8 caracteres.'
+                mensagem: 'Informe nome, e-mail, perfil e senha com pelo menos 8 caracteres e no máximo 72 bytes.'
             });
         }
 
-        if (!['professor', 'responsavel'].includes(perfil)) {
+        if (!perfilCadastro.safeParse(perfil).success) {
             return res.status(400).json({
                 mensagem: 'O perfil deve ser professor ou responsavel.'
             });
         }
 
         const nomeLimpo = nome.trim();
-        const emailLimpo = email.trim().toLowerCase();
+        const emailLimpo = emailSchema.safeParse(email).data?.toLowerCase();
 
-        if (!emailValido(emailLimpo)) {
+        if (!emailLimpo) {
             return res.status(400).json({
                 mensagem: 'Informe um e-mail válido.'
             });
@@ -159,11 +131,7 @@ router.post('/', async (req, res) => {
             });
         }
 
-        console.error('Erro ao cadastrar usuário:', erro.message);
-
-        res.status(500).json({
-            mensagem: 'Erro interno ao cadastrar usuário.'
-        });
+        throw erro;
     }
 });
 
@@ -180,21 +148,16 @@ router.put('/:id', async (req, res) => {
 
         const { nome, email, senha } = req.body ?? {};
 
-        if (
-            typeof nome !== 'string' ||
-            typeof email !== 'string' ||
-            !nome.trim() ||
-            !email.trim()
-        ) {
+        if (!nomeValido.safeParse(nome).success) {
             return res.status(400).json({
-                mensagem: 'Nome e e-mail são obrigatórios.'
+                mensagem: 'Informe um nome de até 150 caracteres.'
             });
         }
 
         const nomeLimpo = nome.trim();
-        const emailLimpo = email.trim().toLowerCase();
+        const emailLimpo = emailSchema.safeParse(email).data?.toLowerCase();
 
-        if (!emailValido(emailLimpo)) {
+        if (!emailLimpo) {
             return res.status(400).json({
                 mensagem: 'Informe um e-mail válido.'
             });
@@ -237,9 +200,9 @@ router.put('/:id', async (req, res) => {
         }
 
         if (senha !== undefined && senha !== null && senha !== '') {
-            if (typeof senha !== 'string' || senha.length < 8) {
+            if (!senhaNova.safeParse(senha).success) {
                 return res.status(400).json({
-                    mensagem: 'A nova senha deve ter pelo menos 8 caracteres.'
+                    mensagem: 'A nova senha deve ter pelo menos 8 caracteres e no máximo 72 bytes.'
                 });
             }
 
@@ -274,88 +237,68 @@ router.put('/:id', async (req, res) => {
             });
         }
 
-        console.error('Erro ao editar usuário:', erro.message);
-
-        res.status(500).json({
-            mensagem: 'Erro interno ao editar usuário.'
-        });
+        throw erro;
     }
 });
 
 // Desativar professor ou responsável
 router.delete('/:id', async (req, res) => {
-    try {
-        const usuarioId = validarId(req.params.id);
+    const usuarioId = validarId(req.params.id);
 
-        if (!usuarioId) {
-            return res.status(400).json({
-                mensagem: 'ID inválido.'
-            });
-        }
-
-        const [resultado] = await bancoDados.query(
-            `UPDATE usuarios
-             SET ativo = 0
-             WHERE id = ?
-             AND perfil IN ('professor', 'responsavel')
-             AND ativo = 1`,
-            [usuarioId]
-        );
-
-        if (resultado.affectedRows === 0) {
-            return res.status(404).json({
-                mensagem: 'Professor ou responsável ativo não encontrado.'
-            });
-        }
-
-        res.json({
-            mensagem: 'Usuário desativado com sucesso!'
-        });
-    } catch (erro) {
-        console.error('Erro ao desativar usuário:', erro.message);
-
-        res.status(500).json({
-            mensagem: 'Erro interno ao desativar usuário.'
+    if (!usuarioId) {
+        return res.status(400).json({
+            mensagem: 'ID inválido.'
         });
     }
+
+    const [resultado] = await bancoDados.query(
+        `UPDATE usuarios
+         SET ativo = 0
+         WHERE id = ?
+         AND perfil IN ('professor', 'responsavel')
+         AND ativo = 1`,
+        [usuarioId]
+    );
+
+    if (resultado.affectedRows === 0) {
+        return res.status(404).json({
+            mensagem: 'Professor ou responsável ativo não encontrado.'
+        });
+    }
+
+    res.json({
+        mensagem: 'Usuário desativado com sucesso!'
+    });
 });
 
 // Reativar professor ou responsável
 router.patch('/:id/reativar', async (req, res) => {
-    try {
-        const usuarioId = validarId(req.params.id);
+    const usuarioId = validarId(req.params.id);
 
-        if (!usuarioId) {
-            return res.status(400).json({
-                mensagem: 'ID inválido.'
-            });
-        }
-
-        const [resultado] = await bancoDados.query(
-            `UPDATE usuarios
-             SET ativo = 1
-             WHERE id = ?
-             AND perfil IN ('professor', 'responsavel')
-             AND ativo = 0`,
-            [usuarioId]
-        );
-
-        if (resultado.affectedRows === 0) {
-            return res.status(404).json({
-                mensagem: 'Professor ou responsável inativo não encontrado.'
-            });
-        }
-
-        res.json({
-            mensagem: 'Usuário reativado com sucesso!'
-        });
-    } catch (erro) {
-        console.error('Erro ao reativar usuário:', erro.message);
-
-        res.status(500).json({
-            mensagem: 'Erro interno ao reativar usuário.'
+    if (!usuarioId) {
+        return res.status(400).json({
+            mensagem: 'ID inválido.'
         });
     }
+
+    const [resultado] = await bancoDados.query(
+        `UPDATE usuarios
+         SET ativo = 1
+         WHERE id = ?
+         AND perfil IN ('professor', 'responsavel')
+         AND ativo = 0`,
+        [usuarioId]
+    );
+
+    if (resultado.affectedRows === 0) {
+        return res.status(404).json({
+            mensagem: 'Professor ou responsável inativo não encontrado.'
+        });
+    }
+
+    res.json({
+        mensagem: 'Usuário reativado com sucesso!'
+    });
 });
 
 export default router;

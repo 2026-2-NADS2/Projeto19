@@ -19,6 +19,10 @@ test('ciência das minutas controla o acesso sem alterar o histórico', async t 
     let consultas = 0;
 
     t.mock.method(bancoDados, 'execute', async (sql, parametros) => {
+        if (parametros.length === 2) {
+            const [id, perfil] = parametros;
+            return [contas.get(id) === perfil ? [{ id }] : []];
+        }
         consultas++;
         const [termos, privacidade, id, perfil] = parametros;
         const contaValida = contas.get(id) === perfil;
@@ -55,7 +59,7 @@ test('ciência das minutas controla o acesso sem alterar o histórico', async t 
     await once(servidor, 'listening');
 
     const url = `http://127.0.0.1:${servidor.address().port}`;
-    const token = (id, perfil) => jwt.sign({ id, perfil }, process.env.JWT_SECRET);
+    const token = (id, perfil) => jwt.sign({ id, perfil }, process.env.JWT_SECRET, { expiresIn: '2h' });
     function chamar(caminho, credencial, dados) {
         const headers = { 'Content-Type': 'application/json' };
         if (credencial) headers.Authorization = `Bearer ${credencial}`;

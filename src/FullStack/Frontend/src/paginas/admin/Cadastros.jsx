@@ -109,6 +109,8 @@ function CampoDataNascimento({ value, onChange }) {
 
     useEffect(() => {
         if (!value) {
+            // Mantém o texto editável sincronizado quando o formulário é limpo externamente.
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setTexto('')
             setErro('')
         } else if (dataValidaBR(dataParaBR(value))) {
@@ -168,8 +170,6 @@ function BotaoAcao({
     disabled,
     children
 }) {
-    const id = useId()
-
     return (
         <button
             type="button"

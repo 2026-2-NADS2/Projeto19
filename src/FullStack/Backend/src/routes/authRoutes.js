@@ -1,41 +1,38 @@
 
+import { randomBytes } from 'node:crypto';
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import bancoDados from '../bancoDados.js';
 import autenticar from '../middlewares/autenticar.js';
 
-const router = Router();
+import { z } from 'zod';
+import { email as emailSchema, validar } from '../validacao.js';
 
-// Login
-router.post('/login', async (req, res) => {
-    try {
-        const { email, senha } = req.body ?? {};
+const credenciais = z.object({ email: emailSchema, senha: z.string().min(1) });
 
-        if (
-            typeof email !== 'string' ||
-            typeof senha !== 'string' ||
-            !email.trim() ||
-            !senha
-        ) {
-            return res.status(400).json({
-                mensagem: 'Informe e-mail e senha válidos.'
-            });
-        }
+// Executa o mesmo trabalho de bcrypt para contas ausentes.
+const hashReserva = bcrypt.hashSync(randomBytes(32).toString('hex'), 10);
 
-        const [usuarios] = await bancoDados.query(
+export default function criarAuthRoutes(pool = bancoDados) {
+    const router = Router();
+
+    // Login
+    router.post('/login', async (req, res) => {
+        const { email, senha } = validar(credenciais, req.body, 'Informe e-mail e senha válidos.');
+
+        const [usuarios] = await pool.query(
             `SELECT id, nome, email, senha_hash, perfil
              FROM usuarios
              WHERE email = ? AND ativo = 1`,
-            [email.trim()]
+            [email]
         );
 
         const usuario = usuarios[0];
 
-        if (
-            !usuario ||
-            !(await bcrypt.compare(senha, usuario.senha_hash))
-        ) {
+        const senhaCorreta = await bcrypt.compare(senha, usuario?.senha_hash ?? hashReserva);
+
+        if (!senhaCorreta || !usuario) {
             return res.status(401).json({
                 mensagem: 'E-mail ou senha inválidos.'
             });
@@ -48,6 +45,7 @@ router.post('/login', async (req, res) => {
             },
             process.env.JWT_SECRET,
             {
+                algorithm: 'HS256',
                 expiresIn: process.env.JWT_EXPIRES_IN || '2h'
             }
         );
@@ -62,23 +60,15 @@ router.post('/login', async (req, res) => {
                 perfil: usuario.perfil
             }
         });
-    } catch (erro) {
-        console.error('Erro no login:', erro.message);
+    });
 
-        res.status(500).json({
-            mensagem: 'Erro interno ao realizar login.'
-        });
-    }
-});
-
-// Perfil do usuário autenticado
-router.get('/perfil', autenticar, async (req, res) => {
-    try {
-        const [usuarios] = await bancoDados.query(
+    // Perfil do usuário autenticado
+    router.get('/perfil', autenticar, async (req, res) => {
+        const [usuarios] = await pool.query(
             `SELECT id, nome, email, perfil, ativo
              FROM usuarios
-             WHERE id = ? AND ativo = 1`,
-            [req.usuario.id]
+             WHERE id = ? AND perfil = ? AND ativo = 1`,
+            [req.usuario.id, req.usuario.perfil]
         );
 
         if (usuarios.length === 0) {
@@ -88,13 +78,7 @@ router.get('/perfil', autenticar, async (req, res) => {
         }
 
         res.json(usuarios[0]);
-    } catch (erro) {
-        console.error('Erro ao buscar perfil:', erro.message);
+    });
 
-        res.status(500).json({
-            mensagem: 'Erro interno ao buscar perfil.'
-        });
-    }
-});
-
-export default router;
+    return router;
+}

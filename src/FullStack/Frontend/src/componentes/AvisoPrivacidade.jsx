@@ -1,22 +1,13 @@
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ShieldCheck } from 'lucide-react'
 import './AvisoPrivacidade.css'
 
 function AvisoPrivacidade() {
-    const [mostrarAviso, setMostrarAviso] = useState(false)
-
-    // Verifica se o aviso já foi fechado
-    useEffect(() => {
-        const avisoFechado = localStorage.getItem(
-            'kfka_aviso_privacidade_v1'
-        )
-
-        if (avisoFechado !== 'fechado') {
-            setMostrarAviso(true)
-        }
-    }, [])
+    const [mostrarAviso, setMostrarAviso] = useState(() =>
+        localStorage.getItem('kfka_aviso_privacidade_v1') !== 'fechado'
+    )
 
     // Fecha o aviso
     function fecharAviso() {

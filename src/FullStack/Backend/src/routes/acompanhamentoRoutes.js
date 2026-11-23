@@ -1,17 +1,25 @@
+import { z } from 'zod';
+import { idPositivo, textoObrigatorio } from '../validacao.js';
 
 import { Router } from 'express';
 import bancoDados from '../bancoDados.js';
 import autenticarComCiencia from '../middlewares/autenticarComCiencia.js';
 
 const router = Router();
+const descricaoValida = textoObrigatorio(16000);
+const observacaoFamilia = textoObrigatorio(5000);
+const acaoRevisao = z.enum(['aprovado', 'devolvido']);
+const observacaoRevisao = z.string().nullish();
+const edicao = z.strictObject({ descricao: z.unknown().optional(), media: z.unknown().optional() })
+    .refine(dados => dados.descricao !== undefined || dados.media !== undefined);
+const mediaValida = z.number().min(0).max(10).nullish();
 
 // Todas as rotas precisam de login
 router.use(autenticarComCiencia);
 
 // Verifica se o ID é válido
 function idValido(valor) {
-    const id = Number(valor);
-    return Number.isSafeInteger(id) && id > 0;
+    return idPositivo.safeParse(valor).success;
 }
 
 // Verifica se o usuário é responsável
@@ -29,90 +37,76 @@ function apenasResponsavel(req, res) {
 router.get('/responsavel/alunos', async (req, res) => {
     if (!apenasResponsavel(req, res)) return;
 
-    try {
-        const [alunos] = await bancoDados.query(
-            `SELECT a.id, a.nome, a.matricula,
-                (
-                    SELECT t.nome
-                    FROM alunos_turmas at
-                    JOIN turmas t ON t.id = at.turma_id
-                    WHERE at.aluno_id = a.id AND t.ativo = 1
-                    ORDER BY t.ano_letivo DESC, t.id DESC
-                    LIMIT 1
-                ) AS turma,
-                (
-                    SELECT t.ano_letivo
-                    FROM alunos_turmas at
-                    JOIN turmas t ON t.id = at.turma_id
-                    WHERE at.aluno_id = a.id AND t.ativo = 1
-                    ORDER BY t.ano_letivo DESC, t.id DESC
-                    LIMIT 1
-                ) AS ano_letivo
-             FROM responsaveis_alunos ra
-             JOIN alunos a ON a.id = ra.aluno_id
-             WHERE ra.responsavel_id = ? AND a.ativo = 1
-             ORDER BY a.nome, a.id`,
-            [req.usuario.id]
-        );
+    const [alunos] = await bancoDados.query(
+        `SELECT a.id, a.nome, a.matricula,
+            (
+                SELECT t.nome
+                FROM alunos_turmas at
+                JOIN turmas t ON t.id = at.turma_id
+                WHERE at.aluno_id = a.id AND t.ativo = 1
+                ORDER BY t.ano_letivo DESC, t.id DESC
+                LIMIT 1
+            ) AS turma,
+            (
+                SELECT t.ano_letivo
+                FROM alunos_turmas at
+                JOIN turmas t ON t.id = at.turma_id
+                WHERE at.aluno_id = a.id AND t.ativo = 1
+                ORDER BY t.ano_letivo DESC, t.id DESC
+                LIMIT 1
+            ) AS ano_letivo
+         FROM responsaveis_alunos ra
+         JOIN alunos a ON a.id = ra.aluno_id
+         WHERE ra.responsavel_id = ? AND a.ativo = 1
+         ORDER BY a.nome, a.id`,
+        [req.usuario.id]
+    );
 
-        return res.json(alunos);
-    } catch (erro) {
-        console.error('Erro ao buscar alunos:', erro);
-        return res.status(500).json({
-            mensagem: 'Erro ao carregar alunos vinculados.'
-        });
-    }
+    return res.json(alunos);
 });
 
 // Busca os relatórios publicados dos filhos
 router.get('/responsavel/publicados', async (req, res) => {
     if (!apenasResponsavel(req, res)) return;
 
-    try {
-        const [dados] = await bancoDados.query(
-            `SELECT
-                ac.id, ac.aluno_id, a.nome AS aluno,
-                ac.professor_id, u.nome AS professor,
-                ac.disciplina_id, d.nome AS disciplina,
-                ac.periodo_id, p.nome AS periodo,
-                p.ano_letivo, ac.descricao, ac.media,
-                ac.status, ac.criado_em,
-                ac.atualizado_em, ac.publicado_em,
-                (
-                    SELECT t.nome
-                    FROM alunos_turmas at
-                    JOIN turmas t ON t.id = at.turma_id
-                    JOIN professores_turmas_disciplinas ptd
-                        ON ptd.turma_id = t.id
-                    WHERE at.aluno_id = ac.aluno_id
-                      AND ptd.professor_id = ac.professor_id
-                      AND ptd.disciplina_id = ac.disciplina_id
-                      AND t.ano_letivo = p.ano_letivo
-                    LIMIT 1
-                ) AS turma
-             FROM acompanhamentos ac
-             JOIN alunos a ON a.id = ac.aluno_id
-             JOIN usuarios u ON u.id = ac.professor_id
-             JOIN disciplinas d ON d.id = ac.disciplina_id
-             JOIN periodos_avaliativos p ON p.id = ac.periodo_id
-             WHERE ac.status = 'publicado'
-               AND EXISTS (
-                   SELECT 1 FROM responsaveis_alunos ra
-                   WHERE ra.responsavel_id = ?
-                     AND ra.aluno_id = ac.aluno_id
-               )
-             ORDER BY p.ano_letivo DESC,
-                      ac.publicado_em DESC, ac.id DESC`,
-            [req.usuario.id]
-        );
+    const [dados] = await bancoDados.query(
+        `SELECT
+            ac.id, ac.aluno_id, a.nome AS aluno,
+            ac.professor_id, u.nome AS professor,
+            ac.disciplina_id, d.nome AS disciplina,
+            ac.periodo_id, p.nome AS periodo,
+            p.ano_letivo, ac.descricao, ac.media,
+            ac.status, ac.criado_em,
+            ac.atualizado_em, ac.publicado_em,
+            (
+                SELECT t.nome
+                FROM alunos_turmas at
+                JOIN turmas t ON t.id = at.turma_id
+                JOIN professores_turmas_disciplinas ptd
+                    ON ptd.turma_id = t.id
+                WHERE at.aluno_id = ac.aluno_id
+                  AND ptd.professor_id = ac.professor_id
+                  AND ptd.disciplina_id = ac.disciplina_id
+                  AND t.ano_letivo = p.ano_letivo
+                LIMIT 1
+            ) AS turma
+         FROM acompanhamentos ac
+         JOIN alunos a ON a.id = ac.aluno_id
+         JOIN usuarios u ON u.id = ac.professor_id
+         JOIN disciplinas d ON d.id = ac.disciplina_id
+         JOIN periodos_avaliativos p ON p.id = ac.periodo_id
+         WHERE ac.status = 'publicado'
+           AND EXISTS (
+               SELECT 1 FROM responsaveis_alunos ra
+               WHERE ra.responsavel_id = ?
+                 AND ra.aluno_id = ac.aluno_id
+           )
+         ORDER BY p.ano_letivo DESC,
+                  ac.publicado_em DESC, ac.id DESC`,
+        [req.usuario.id]
+    );
 
-        return res.json(dados);
-    } catch (erro) {
-        console.error('Erro ao buscar relatórios:', erro);
-        return res.status(500).json({
-            mensagem: 'Erro ao carregar acompanhamentos publicados.'
-        });
-    }
+    return res.json(dados);
 });
 
 // Lista os registros familiares para o administrador
@@ -123,37 +117,30 @@ router.get('/admin/logs-familia', async (req, res) => {
         });
     }
 
-    try {
-        const [logs] = await bancoDados.query(
-            `SELECT
-                l.id, l.acompanhamento_id, l.usuario_id,
-                u.nome AS responsavel,
-                a.id AS aluno_id, a.nome AS aluno,
-                d.nome AS disciplina,
-                p.nome AS periodo, p.ano_letivo,
-                l.acao, l.descricao, l.criado_em
-             FROM logs_acompanhamentos l
-             JOIN usuarios u ON u.id = l.usuario_id
-             JOIN acompanhamentos ac
-                ON ac.id = l.acompanhamento_id
-             JOIN alunos a ON a.id = ac.aluno_id
-             JOIN disciplinas d ON d.id = ac.disciplina_id
-             JOIN periodos_avaliativos p ON p.id = ac.periodo_id
-             ORDER BY l.criado_em DESC, l.id DESC`
-        );
+    const [logs] = await bancoDados.query(
+        `SELECT
+            l.id, l.acompanhamento_id, l.usuario_id,
+            u.nome AS responsavel,
+            a.id AS aluno_id, a.nome AS aluno,
+            d.nome AS disciplina,
+            p.nome AS periodo, p.ano_letivo,
+            l.acao, l.descricao, l.criado_em
+         FROM logs_acompanhamentos l
+         JOIN usuarios u ON u.id = l.usuario_id
+         JOIN acompanhamentos ac
+            ON ac.id = l.acompanhamento_id
+         JOIN alunos a ON a.id = ac.aluno_id
+         JOIN disciplinas d ON d.id = ac.disciplina_id
+         JOIN periodos_avaliativos p ON p.id = ac.periodo_id
+         ORDER BY l.criado_em DESC, l.id DESC`
+    );
 
-        return res.json(logs);
-    } catch (erro) {
-        console.error('Erro ao listar registros familiares:', erro);
-        return res.status(500).json({
-            mensagem: 'Erro ao consultar registros familiares.'
-        });
-    }
+    return res.json(logs);
 });
 
 // Busca um acompanhamento e verifica quem pode acessá-lo
 async function buscarRegistro(req, res) {
-    const id = Number(req.params.id);
+    const id = idPositivo.safeParse(req.params.id).data;
 
     if (!idValido(id)) {
         res.status(400).json({ mensagem: 'ID inválido.' });
@@ -252,12 +239,8 @@ router.post('/:id/ciencia', async (req, res) => {
             confirmado_em: ciencias[0].confirmado_em
         });
     } catch (erro) {
-        if (conexao) await conexao.rollback();
-        console.error('Erro ao confirmar ciência:', erro);
-
-        return res.status(500).json({
-            mensagem: 'Erro ao confirmar ciência.'
-        });
+        if (conexao) await conexao.rollback().catch(() => {});
+        throw erro;
     } finally {
         if (conexao) conexao.release();
     }
@@ -269,91 +252,71 @@ router.post('/:id/observacoes', async (req, res) => {
 
     const { descricao } = req.body ?? {};
 
-    if (
-        typeof descricao !== 'string' ||
-        !descricao.trim() ||
-        descricao.trim().length > 5000
-    ) {
+    if (!observacaoFamilia.safeParse(descricao).success) {
         return res.status(400).json({
             mensagem: 'A observação deve ter entre 1 e 5000 caracteres.'
         });
     }
 
-    try {
-        const registro = await buscarRegistro(req, res);
-        if (!registro) return;
+    const registro = await buscarRegistro(req, res);
+    if (!registro) return;
 
-        // Cada observação vira um registro no histórico
-        const [resultado] = await bancoDados.query(
-            `INSERT INTO logs_acompanhamentos
-                (acompanhamento_id, usuario_id, acao, descricao)
-             VALUES (?, ?, 'observacao', ?)`,
-            [registro.id, req.usuario.id, descricao.trim()]
-        );
+    // Cada observação vira um registro no histórico
+    const [resultado] = await bancoDados.query(
+        `INSERT INTO logs_acompanhamentos
+            (acompanhamento_id, usuario_id, acao, descricao)
+         VALUES (?, ?, 'observacao', ?)`,
+        [registro.id, req.usuario.id, descricao.trim()]
+    );
 
-        return res.status(201).json({
-            mensagem: 'Observação registrada com sucesso.',
-            id: resultado.insertId
-        });
-    } catch (erro) {
-        console.error('Erro ao salvar observação:', erro);
-
-        return res.status(500).json({
-            mensagem: 'Erro ao registrar observação.'
-        });
-    }
+    return res.status(201).json({
+        mensagem: 'Observação registrada com sucesso.',
+        id: resultado.insertId
+    });
 });
 
 // Consulta o histórico familiar de um acompanhamento
 router.get('/:id/familia', async (req, res) => {
-    try {
-        const registro = await buscarRegistro(req, res);
-        if (!registro) return;
+    const registro = await buscarRegistro(req, res);
+    if (!registro) return;
 
-        const [logs] = await bancoDados.query(
-            `SELECT
-                l.id, l.usuario_id,
-                u.nome AS responsavel,
-                l.acao, l.descricao, l.criado_em
-             FROM logs_acompanhamentos l
-             JOIN usuarios u ON u.id = l.usuario_id
-             WHERE l.acompanhamento_id = ?
-             ORDER BY l.criado_em DESC, l.id DESC`,
-            [registro.id]
-        );
+    const [logs] = await bancoDados.query(
+        `SELECT
+            l.id, l.usuario_id,
+            u.nome AS responsavel,
+            l.acao, l.descricao, l.criado_em
+         FROM logs_acompanhamentos l
+         JOIN usuarios u ON u.id = l.usuario_id
+         WHERE l.acompanhamento_id = ?
+         ORDER BY l.criado_em DESC, l.id DESC`,
+        [registro.id]
+    );
 
-        const [ciencias] = await bancoDados.query(
-            `SELECT
-                c.responsavel_id,
-                u.nome AS responsavel,
-                c.confirmado_em
-             FROM ciencias_acompanhamentos c
-             JOIN usuarios u ON u.id = c.responsavel_id
-             WHERE c.acompanhamento_id = ?
-             ORDER BY c.confirmado_em DESC`,
-            [registro.id]
-        );
+    const [ciencias] = await bancoDados.query(
+        `SELECT
+            c.responsavel_id,
+            u.nome AS responsavel,
+            c.confirmado_em
+         FROM ciencias_acompanhamentos c
+         JOIN usuarios u ON u.id = c.responsavel_id
+         WHERE c.acompanhamento_id = ?
+         ORDER BY c.confirmado_em DESC`,
+        [registro.id]
+    );
 
-        // O responsável vê somente os próprios registros
-        if (req.usuario.perfil === 'responsavel') {
-            return res.json({
-                logs: logs.filter(
-                    item => Number(item.usuario_id) === Number(req.usuario.id)
-                ),
-                ciencias: ciencias.filter(
-                    item => Number(item.responsavel_id) === Number(req.usuario.id)
-                )
-            });
-        }
-
-        return res.json({ logs, ciencias });
-    } catch (erro) {
-        console.error('Erro ao consultar histórico familiar:', erro);
-
-        return res.status(500).json({
-            mensagem: 'Erro ao consultar histórico familiar.'
+    // O responsável vê somente os próprios registros
+    if (req.usuario.perfil === 'responsavel') {
+        return res.json({
+            logs: logs.filter(
+                item => Number(item.usuario_id) === Number(req.usuario.id)
+            ),
+            ciencias: ciencias.filter(
+                item => Number(item.responsavel_id) === Number(req.usuario.id)
+            )
         });
     }
+
+    return res.json({ logs, ciencias });
 });
 
 // Busca os alunos, disciplinas e períodos do professor
@@ -364,45 +327,37 @@ router.get('/opcoes', async (req, res) => {
         });
     }
 
-    try {
-        const [vinculos] = await bancoDados.query(
-            `SELECT DISTINCT
-                a.id AS aluno_id,
-                a.nome AS aluno,
-                t.id AS turma_id,
-                t.nome AS turma,
-                t.ano_letivo,
-                d.id AS disciplina_id,
-                d.nome AS disciplina
-             FROM professores_turmas_disciplinas ptd
-             JOIN turmas t
-                ON t.id = ptd.turma_id AND t.ativo = 1
-             JOIN alunos_turmas at
-                ON at.turma_id = t.id
-             JOIN alunos a
-                ON a.id = at.aluno_id AND a.ativo = 1
-             JOIN disciplinas d
-                ON d.id = ptd.disciplina_id AND d.ativo = 1
-             WHERE ptd.professor_id = ?
-             ORDER BY a.nome, d.nome`,
-            [req.usuario.id]
-        );
+    const [vinculos] = await bancoDados.query(
+        `SELECT DISTINCT
+            a.id AS aluno_id,
+            a.nome AS aluno,
+            t.id AS turma_id,
+            t.nome AS turma,
+            t.ano_letivo,
+            d.id AS disciplina_id,
+            d.nome AS disciplina
+         FROM professores_turmas_disciplinas ptd
+         JOIN turmas t
+            ON t.id = ptd.turma_id AND t.ativo = 1
+         JOIN alunos_turmas at
+            ON at.turma_id = t.id
+         JOIN alunos a
+            ON a.id = at.aluno_id AND a.ativo = 1
+         JOIN disciplinas d
+            ON d.id = ptd.disciplina_id AND d.ativo = 1
+         WHERE ptd.professor_id = ?
+         ORDER BY a.nome, d.nome`,
+        [req.usuario.id]
+    );
 
-        const [periodos] = await bancoDados.query(
-            `SELECT id, nome, ano_letivo
-             FROM periodos_avaliativos
-             WHERE ativo = 1
-             ORDER BY ano_letivo DESC, data_inicio`
-        );
+    const [periodos] = await bancoDados.query(
+        `SELECT id, nome, ano_letivo
+         FROM periodos_avaliativos
+         WHERE ativo = 1
+         ORDER BY ano_letivo DESC, data_inicio`
+    );
 
-        return res.json({ vinculos, periodos });
-    } catch (erro) {
-        console.error('Erro ao carregar opções:', erro);
-
-        return res.status(500).json({
-            mensagem: 'Erro ao carregar dados do professor.'
-        });
-    }
+    return res.json({ vinculos, periodos });
 });
 
 // Lista os acompanhamentos do professor ou administrador
@@ -413,53 +368,45 @@ router.get('/', async (req, res) => {
         });
     }
 
-    try {
-        const parametros = [];
+    const parametros = [];
 
-        const filtro = req.usuario.perfil === 'professor'
-            ? 'WHERE ac.professor_id = ?'
-            : '';
+    const filtro = req.usuario.perfil === 'professor'
+        ? 'WHERE ac.professor_id = ?'
+        : '';
 
-        if (filtro) parametros.push(req.usuario.id);
+    if (filtro) parametros.push(req.usuario.id);
 
-        const [dados] = await bancoDados.query(
-            `SELECT
-                ac.id, ac.aluno_id, a.nome AS aluno,
-                ac.professor_id, u.nome AS professor,
-                ac.disciplina_id, d.nome AS disciplina,
-                ac.periodo_id, p.nome AS periodo,
-                ac.descricao, ac.media, ac.status,
-                ac.criado_em, ac.atualizado_em, ac.publicado_em,
-                (
-                    SELECT t.nome
-                    FROM alunos_turmas at
-                    JOIN turmas t ON t.id = at.turma_id
-                    JOIN professores_turmas_disciplinas ptd
-                        ON ptd.turma_id = t.id
-                    WHERE at.aluno_id = ac.aluno_id
-                      AND ptd.professor_id = ac.professor_id
-                      AND ptd.disciplina_id = ac.disciplina_id
-                      AND t.ano_letivo = p.ano_letivo
-                    LIMIT 1
-                ) AS turma
-             FROM acompanhamentos ac
-             JOIN alunos a ON a.id = ac.aluno_id
-             JOIN usuarios u ON u.id = ac.professor_id
-             JOIN disciplinas d ON d.id = ac.disciplina_id
-             JOIN periodos_avaliativos p ON p.id = ac.periodo_id
-             ${filtro}
-             ORDER BY ac.criado_em DESC, ac.id DESC`,
-            parametros
-        );
+    const [dados] = await bancoDados.query(
+        `SELECT
+            ac.id, ac.aluno_id, a.nome AS aluno,
+            ac.professor_id, u.nome AS professor,
+            ac.disciplina_id, d.nome AS disciplina,
+            ac.periodo_id, p.nome AS periodo,
+            ac.descricao, ac.media, ac.status,
+            ac.criado_em, ac.atualizado_em, ac.publicado_em,
+            (
+                SELECT t.nome
+                FROM alunos_turmas at
+                JOIN turmas t ON t.id = at.turma_id
+                JOIN professores_turmas_disciplinas ptd
+                    ON ptd.turma_id = t.id
+                WHERE at.aluno_id = ac.aluno_id
+                  AND ptd.professor_id = ac.professor_id
+                  AND ptd.disciplina_id = ac.disciplina_id
+                  AND t.ano_letivo = p.ano_letivo
+                LIMIT 1
+            ) AS turma
+         FROM acompanhamentos ac
+         JOIN alunos a ON a.id = ac.aluno_id
+         JOIN usuarios u ON u.id = ac.professor_id
+         JOIN disciplinas d ON d.id = ac.disciplina_id
+         JOIN periodos_avaliativos p ON p.id = ac.periodo_id
+         ${filtro}
+         ORDER BY ac.criado_em DESC, ac.id DESC`,
+        parametros
+    );
 
-        return res.json(dados);
-    } catch (erro) {
-        console.error('Erro ao listar acompanhamentos:', erro);
-
-        return res.status(500).json({
-            mensagem: 'Erro ao listar acompanhamentos.'
-        });
-    }
+    return res.json(dados);
 });
 
 // Cria um acompanhamento como rascunho
@@ -470,106 +417,79 @@ router.post('/', async (req, res) => {
         });
     }
 
-    try {
-        const {
-            aluno_id, disciplina_id, periodo_id,
-            descricao, media
-        } = req.body ?? {};
+    const {
+        aluno_id, disciplina_id, periodo_id,
+        descricao, media
+    } = req.body ?? {};
 
-        const ids = [aluno_id, disciplina_id, periodo_id].map(Number);
+    const ids = [aluno_id, disciplina_id, periodo_id].map(Number);
 
-        if (
-            ids.some(valor => !Number.isSafeInteger(valor) || valor <= 0) ||
-            typeof descricao !== 'string' ||
-            !descricao.trim() ||
-            descricao.trim().length > 16000
-        ) {
-            return res.status(400).json({
-                mensagem: 'Informe aluno, disciplina, período e descrição válidos.'
-            });
-        }
-
-        if (
-            media !== null &&
-            media !== undefined &&
-            (
-                typeof media !== 'number' ||
-                !Number.isFinite(media) ||
-                media < 0 ||
-                media > 10
-            )
-        ) {
-            return res.status(400).json({
-                mensagem: 'A média deve estar entre 0 e 10.'
-            });
-        }
-
-        // Confere o vínculo do professor com o aluno
-        const [vinculos] = await bancoDados.query(
-            `SELECT ptd.id
-             FROM professores_turmas_disciplinas ptd
-             JOIN turmas t
-                ON t.id = ptd.turma_id AND t.ativo = 1
-             JOIN alunos_turmas at
-                ON at.turma_id = t.id
-             JOIN alunos a
-                ON a.id = at.aluno_id AND a.ativo = 1
-             JOIN disciplinas d
-                ON d.id = ptd.disciplina_id AND d.ativo = 1
-             JOIN periodos_avaliativos p
-                ON p.ano_letivo = t.ano_letivo AND p.ativo = 1
-             WHERE ptd.professor_id = ?
-               AND at.aluno_id = ?
-               AND ptd.disciplina_id = ?
-               AND p.id = ?
-             LIMIT 1`,
-            [req.usuario.id, ...ids]
-        );
-
-        if (!vinculos.length) {
-            return res.status(403).json({
-                mensagem: 'Professor sem vínculo válido com aluno, disciplina e período.'
-            });
-        }
-
-        const [resultado] = await bancoDados.query(
-            `INSERT INTO acompanhamentos
-                (
-                    aluno_id, professor_id, disciplina_id,
-                    periodo_id, descricao, media, status
-                )
-             VALUES (?, ?, ?, ?, ?, ?, 'rascunho')`,
-            [
-                ids[0], req.usuario.id, ids[1], ids[2],
-                descricao.trim(), media ?? null
-            ]
-        );
-
-        return res.status(201).json({
-            mensagem: 'Acompanhamento criado.',
-            acompanhamento: { id: resultado.insertId }
-        });
-    } catch (erro) {
-        console.error('Erro ao criar acompanhamento:', erro);
-
-        return res.status(500).json({
-            mensagem: 'Erro ao criar acompanhamento.'
+    if (
+        [aluno_id, disciplina_id, periodo_id].some(valor => !idValido(valor)) ||
+        !descricaoValida.safeParse(descricao).success
+    ) {
+        return res.status(400).json({
+            mensagem: 'Informe aluno, disciplina, período e descrição válidos.'
         });
     }
+
+    if (!mediaValida.safeParse(media).success) {
+        return res.status(400).json({
+            mensagem: 'A média deve estar entre 0 e 10.'
+        });
+    }
+
+    // Confere o vínculo do professor com o aluno
+    const [vinculos] = await bancoDados.query(
+        `SELECT ptd.id
+         FROM professores_turmas_disciplinas ptd
+         JOIN turmas t
+            ON t.id = ptd.turma_id AND t.ativo = 1
+         JOIN alunos_turmas at
+            ON at.turma_id = t.id
+         JOIN alunos a
+            ON a.id = at.aluno_id AND a.ativo = 1
+         JOIN disciplinas d
+            ON d.id = ptd.disciplina_id AND d.ativo = 1
+         JOIN periodos_avaliativos p
+            ON p.ano_letivo = t.ano_letivo AND p.ativo = 1
+         WHERE ptd.professor_id = ?
+           AND at.aluno_id = ?
+           AND ptd.disciplina_id = ?
+           AND p.id = ?
+         LIMIT 1`,
+        [req.usuario.id, ...ids]
+    );
+
+    if (!vinculos.length) {
+        return res.status(403).json({
+            mensagem: 'Professor sem vínculo válido com aluno, disciplina e período.'
+        });
+    }
+
+    const [resultado] = await bancoDados.query(
+        `INSERT INTO acompanhamentos
+            (
+                aluno_id, professor_id, disciplina_id,
+                periodo_id, descricao, media, status
+            )
+         VALUES (?, ?, ?, ?, ?, ?, 'rascunho')`,
+        [
+            ids[0], req.usuario.id, ids[1], ids[2],
+            descricao.trim(), media ?? null
+        ]
+    );
+
+    return res.status(201).json({
+        mensagem: 'Acompanhamento criado.',
+        acompanhamento: { id: resultado.insertId }
+    });
 });
 
 // Busca um acompanhamento pelo ID
 router.get('/:id', async (req, res) => {
-    try {
-        const registro = await buscarRegistro(req, res);
-        if (registro) return res.json(registro);
-    } catch (erro) {
-        console.error('Erro ao buscar acompanhamento:', erro);
-
-        return res.status(500).json({
-            mensagem: 'Erro ao buscar acompanhamento.'
-        });
-    }
+    const registro = await buscarRegistro(req, res);
+    if (registro) return res.json(registro);
 });
 
 // Edita acompanhamentos em rascunho ou devolvidos
@@ -580,73 +500,50 @@ router.patch('/:id', async (req, res) => {
         });
     }
 
-    try {
-        const registro = await buscarRegistro(req, res);
-        if (!registro) return;
+    const registro = await buscarRegistro(req, res);
+    if (!registro) return;
 
-        if (!['rascunho', 'devolvido'].includes(registro.status)) {
-            return res.status(409).json({
-                mensagem: 'Registro não pode mais ser editado.'
-            });
-        }
-
-        const corpo = req.body ?? {};
-
-        if (
-            !Object.keys(corpo).length ||
-            Object.keys(corpo).some(
-                chave => !['descricao', 'media'].includes(chave)
-            )
-        ) {
-            return res.status(400).json({
-                mensagem: 'Informe somente descrição e/ou média.'
-            });
-        }
-
-        const descricao = corpo.descricao === undefined
-            ? registro.descricao
-            : corpo.descricao;
-
-        const media = corpo.media === undefined
-            ? registro.media
-            : corpo.media;
-
-        if (
-            typeof descricao !== 'string' ||
-            !descricao.trim() ||
-            descricao.trim().length > 16000 ||
-            (
-                media !== null &&
-                (
-                    typeof media !== 'number' ||
-                    !Number.isFinite(media) ||
-                    media < 0 ||
-                    media > 10
-                )
-            )
-        ) {
-            return res.status(400).json({
-                mensagem: 'Descrição ou média inválida.'
-            });
-        }
-
-        await bancoDados.query(
-            `UPDATE acompanhamentos
-             SET descricao = ?, media = ?
-             WHERE id = ?`,
-            [descricao.trim(), media, registro.id]
-        );
-
-        return res.json({
-            mensagem: 'Acompanhamento atualizado.'
-        });
-    } catch (erro) {
-        console.error('Erro ao atualizar acompanhamento:', erro);
-
-        return res.status(500).json({
-            mensagem: 'Erro ao atualizar acompanhamento.'
+    if (!['rascunho', 'devolvido'].includes(registro.status)) {
+        return res.status(409).json({
+            mensagem: 'Registro não pode mais ser editado.'
         });
     }
+
+    const corpo = req.body ?? {};
+
+    if (!edicao.safeParse(corpo).success) {
+        return res.status(400).json({
+            mensagem: 'Informe somente descrição e/ou média.'
+        });
+    }
+
+    const descricao = corpo.descricao === undefined
+        ? registro.descricao
+        : corpo.descricao;
+
+    const media = corpo.media === undefined
+        ? registro.media
+        : corpo.media;
+
+    if (
+        !descricaoValida.safeParse(descricao).success ||
+        !mediaValida.safeParse(media).success
+    ) {
+        return res.status(400).json({
+            mensagem: 'Descrição ou média inválida.'
+        });
+    }
+
+    await bancoDados.query(
+        `UPDATE acompanhamentos
+         SET descricao = ?, media = ?
+         WHERE id = ?`,
+        [descricao.trim(), media, registro.id]
+    );
+
+    return res.json({
+        mensagem: 'Acompanhamento atualizado.'
+    });
 });
 
 // Envia um acompanhamento para revisão
@@ -657,33 +554,25 @@ router.patch('/:id/enviar', async (req, res) => {
         });
     }
 
-    try {
-        const registro = await buscarRegistro(req, res);
-        if (!registro) return;
+    const registro = await buscarRegistro(req, res);
+    if (!registro) return;
 
-        if (!['rascunho', 'devolvido'].includes(registro.status)) {
-            return res.status(409).json({
-                mensagem: 'Registro não pode ser enviado.'
-            });
-        }
-
-        await bancoDados.query(
-            `UPDATE acompanhamentos
-             SET status = 'pendente', publicado_em = NULL
-             WHERE id = ?`,
-            [registro.id]
-        );
-
-        return res.json({
-            mensagem: 'Acompanhamento enviado para revisão.'
-        });
-    } catch (erro) {
-        console.error('Erro ao enviar acompanhamento:', erro);
-
-        return res.status(500).json({
-            mensagem: 'Erro ao enviar acompanhamento.'
+    if (!['rascunho', 'devolvido'].includes(registro.status)) {
+        return res.status(409).json({
+            mensagem: 'Registro não pode ser enviado.'
         });
     }
+
+    await bancoDados.query(
+        `UPDATE acompanhamentos
+         SET status = 'pendente', publicado_em = NULL
+         WHERE id = ?`,
+        [registro.id]
+    );
+
+    return res.json({
+        mensagem: 'Acompanhamento enviado para revisão.'
+    });
 });
 
 // Administrador aprova ou devolve um acompanhamento
@@ -694,7 +583,7 @@ router.post('/:id/revisoes', async (req, res) => {
         });
     }
 
-    const id = Number(req.params.id);
+    const id = idPositivo.safeParse(req.params.id).data;
     const { acao, observacao } = req.body ?? {};
 
     if (!idValido(id)) {
@@ -703,17 +592,13 @@ router.post('/:id/revisoes', async (req, res) => {
         });
     }
 
-    if (!['aprovado', 'devolvido'].includes(acao)) {
+    if (!acaoRevisao.safeParse(acao).success) {
         return res.status(400).json({
             mensagem: 'A ação deve ser aprovado ou devolvido.'
         });
     }
 
-    if (
-        observacao !== undefined &&
-        observacao !== null &&
-        typeof observacao !== 'string'
-    ) {
+    if (!observacaoRevisao.safeParse(observacao).success) {
         return res.status(400).json({
             mensagem: 'A observação deve ser um texto.'
         });
@@ -800,12 +685,8 @@ router.post('/:id/revisoes', async (req, res) => {
             observacao: motivo || null
         });
     } catch (erro) {
-        if (conexao) await conexao.rollback();
-        console.error('Erro ao revisar acompanhamento:', erro);
-
-        return res.status(500).json({
-            mensagem: 'Erro ao revisar acompanhamento.'
-        });
+        if (conexao) await conexao.rollback().catch(() => {});
+        throw erro;
     } finally {
         if (conexao) conexao.release();
     }
@@ -813,36 +694,28 @@ router.post('/:id/revisoes', async (req, res) => {
 
 // Mostra o histórico de revisões
 router.get('/:id/revisoes', async (req, res) => {
-    try {
-        const registro = await buscarRegistro(req, res);
-        if (!registro) return;
+    const registro = await buscarRegistro(req, res);
+    if (!registro) return;
 
-        if (req.usuario.perfil === 'responsavel') {
-            return res.status(403).json({
-                mensagem: 'Acesso não autorizado às revisões.'
-            });
-        }
-
-        const [revisoes] = await bancoDados.query(
-            `SELECT
-                r.id, r.acompanhamento_id,
-                r.acao, r.observacao, r.criado_em,
-                u.nome AS administrador
-             FROM revisoes_acompanhamentos r
-             JOIN usuarios u ON u.id = r.administrador_id
-             WHERE r.acompanhamento_id = ?
-             ORDER BY r.criado_em DESC, r.id DESC`,
-            [registro.id]
-        );
-
-        return res.json(revisoes);
-    } catch (erro) {
-        console.error('Erro ao consultar revisões:', erro);
-
-        return res.status(500).json({
-            mensagem: 'Erro ao consultar revisões.'
+    if (req.usuario.perfil === 'responsavel') {
+        return res.status(403).json({
+            mensagem: 'Acesso não autorizado às revisões.'
         });
     }
+
+    const [revisoes] = await bancoDados.query(
+        `SELECT
+            r.id, r.acompanhamento_id,
+            r.acao, r.observacao, r.criado_em,
+            u.nome AS administrador
+         FROM revisoes_acompanhamentos r
+         JOIN usuarios u ON u.id = r.administrador_id
+         WHERE r.acompanhamento_id = ?
+         ORDER BY r.criado_em DESC, r.id DESC`,
+        [registro.id]
+    );
+
+    return res.json(revisoes);
 });
 
 export default router;

@@ -17,10 +17,10 @@ function Login() {
 
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
-  const [erro, setErro] = useState('')
+  const [erro, setErro] = useState(() => sessionStorage.getItem('kfka_sessao_expirada') === 'true'
+    ? 'Sua sessão expirou. Faça login novamente.' : '')
   const [carregando, setCarregando] = useState(false)
   const [mostrarSenha, setMostrarSenha] = useState(false)
-  const [mostrarRecuperacao, setMostrarRecuperacao] = useState(false)
 
   // Verifica se a sessão expirou
   useEffect(() => {
@@ -29,7 +29,6 @@ function Login() {
     )
 
     if (sessaoExpirada === 'true') {
-      setErro('Sua sessão expirou. Faça login novamente.')
       sessionStorage.removeItem('kfka_sessao_expirada')
     }
   }, [])
@@ -192,35 +191,10 @@ function Login() {
           </div>
 
           <div className="opcoes-login">
-            <button
-              type="button"
-              onClick={() =>
-                setMostrarRecuperacao(!mostrarRecuperacao)
-              }
-              aria-expanded={mostrarRecuperacao}
-              aria-controls="orientacao-recuperacao"
-              className="login-recuperar-senha"
-            >
+            <Link to="/recuperar-senha" className="login-recuperar-senha">
               Esqueceu sua senha?
-            </button>
+            </Link>
           </div>
-
-          {mostrarRecuperacao && (
-            <div
-              id="orientacao-recuperacao"
-              role="status"
-              className="login-recuperacao"
-            >
-              <strong>Como recuperar seu acesso</strong>
-
-              <p>
-                Procure a administração da sua escola e
-                informe o e-mail cadastrado. Após confirmar
-                sua identidade, o administrador poderá
-                redefinir sua senha.
-              </p>
-            </div>
-          )}
 
           {erro && (
             <p className="erro-login" role="alert">
